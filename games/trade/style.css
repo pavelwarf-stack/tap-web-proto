@@ -1,262 +1,710 @@
-/* «Trade» — бумажная тема по онбординг-макетам Миши (_рабочее/onboarding-new,
-   node-JSON группы onb1–onb3), стейдж 375×812 = размер фигма-фреймов @1x */
+/* «Trade» — ОДИН скелет, ЧЕТЫРЕ скина (вердикт владельца 31.07 вечер, п.32).
+   Скин приходит из хаба: ?skin=<key> в URL айфрейма + postMessage {type:'hub:skin'}.
+   Ключи: crypto-light (дефолт) / crypto-dark / cream / corporate.
+   DOM и раскладка НЕ ветвятся: отличаются только токены ниже + видимость
+   декоративных элементов (--gtop-h, --chprice-display, --ch-flag).
+   Геометрия/хексы — из Figma REST (файл MwL2GyFM68cbkVYy4XueTY):
+     crypto-light = ноды 622:32349 / 32416 / 32513  (ДС-листа нет — выведено из экранов)
+     crypto-dark  = ноды 622:32566 / 32678 / 32832  (+ ДС 584:21407)
+     cream        = ноды 622:32881 / 32954 / 33063  (+ ДС 584:21749)
+     corporate    = ноды 622:33433 / 33534 / 33677  (+ ДС 584:22077)
+   Стейдж = фигма-фрейм @1x (375×812), в окне/айфрейме масштабируется. */
+
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html,body { height:100%; overflow:hidden; }
 @font-face {
-  font-family:'Nunito'; font-style:normal; font-weight:600 900; font-display:swap;
-  src:url('../../fonts/nunito-var.woff2') format('woff2');
+  font-family:'Inter'; font-style:normal; font-weight:100 900; font-display:swap;
+  src:url('../../fonts/inter-var.woff2') format('woff2');
 }
+@font-face {
+  font-family:'JetBrains Mono'; font-style:normal; font-weight:100 800; font-display:swap;
+  src:url('../../fonts/jetbrains-mono-var.woff2') format('woff2');
+}
+
+/* ============================================================================
+   TOKEN CONTRACT — :root = crypto-light (дефолт, вердикт 31.07)
+   ============================================================================ */
+:root {
+  --font-ui:'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-num:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-bal:var(--font-num);          /* цифры баланса/таймера */
+
+  /* поверхности */
+  --bg:#F9FAFB;
+  --card:#FFFFFF;                       /* карточки/панели */
+  --card2:#F9FAFB;                      /* вложенные боксы (Enter/Current) */
+  --line:#E5E7EB;
+  --line-w:2px;
+  --tx:#111827;
+  --tx-soft:#6B7280;
+  --tx-tert:#6B7280;
+
+  /* акценты */
+  --green:#16C784;
+  --red:#EA3943;
+  --accent:#228BEE;                     /* бренд-акцент варианта */
+  --warn:#FFB347;                       /* замок / кольцо таймера / залоченный 100% */
+  --coin:#F3AC00;
+  --coin-pnl:var(--coin);
+  --tint:rgba(22,199,132,.10);           /* мягкая подложка акцента */
+
+  /* монеты активов */
+  --dot-btc:#F3AC00; --dot-eth:#809CFF; --dot-sol:#A24FFF;
+
+  /* радиусы / метрика */
+  --r-card:16px; --r-chip:12px; --r-cta:12px; --r-pill:100px;
+  --pad-x:16px;
+
+  /* app-chrome band (только corporate) */
+  --gtop-h:0px; --gtop-bg:transparent; --gtop-tx:#fff;
+  --gtop-pad-l:60px; --gtop-fs:18px; --gtop-fw:700;
+
+  /* верхняя строка */
+  --top-pt:22px; --top-h:64px;
+  --sq:40px; --sq-r:12px; --sq-bg:#FFFFFF; --sq-line:var(--line); --sq-lw:2px; --sq-ico:#111827;
+  --sq2:40px; --sq2-r:12px;            /* кнопки шапки Deal */
+  --dbb-dir:row; --dbb-align:center;    /* подпись баланса на Deal: в строку или стопкой */
+  --dbb-case:none; --dbb-fs:var(--ballbl-fs);
+  --deal-title-pos:static;              /* absolute = заголовок центрован по фрейму */
+
+  /* таймер */
+  --timer-w:58px; --timer-h:30px; --timer-r:100px;
+  --timer-bg:#FFFFFF; --timer-track:rgba(255,179,71,.38); --timer-arc:#FFB347; --timer-rw:2px;
+  --timer-tx:#111827; --timer-fs:14px; --timer-fw:800; --timer-font:var(--font-bal);
+
+  /* баланс */
+  --bal-mt:8px;
+  --balrow-bg:#FFFFFF; --balrow-line:var(--line); --balrow-lw:2px; --balrow-r:100px;
+  --balrow-pad:6px 12px; --balrow-gap:6px;
+  --balpill-bg:transparent; --balpill-line:transparent; --balpill-pad:0; --balpill-gap:6px;
+  --ballbl-tx:#6B7280; --ballbl-fs:13px; --ballbl-fw:700; --ballbl-case:none;
+  --balval-tx:#111827; --balval-fs:14px; --balval-fw:800;
+  --coin-sz:14px;
+
+  /* карточка графика */
+  --chart-mt:12px; --chart-h:200px;
+  --chcard-bg:#FFFFFF; --chcard-line:var(--line); --chcard-lw:2px; --chcard-r:16px;
+  --chcard-pad:12px; --chcard-gap:0px; --chcard-shadow:none;
+  --chtag-bg:transparent; --chtag-tx:#6B7280; --chtag-fs:12px; --chtag-fw:800;
+  --chtag-case:uppercase; --chtag-pad:0; --chtag-r:0;
+  --chprice-display:block; --chprice-tx:#228BEE; --chprice-fs:12px; --chprice-fw:800;
+  --chprice-font:var(--font-num); --chprice-pre:"";
+
+  /* канвас графика (читается game.js через getComputedStyle) */
+  --ch-grid:#EDF0F3; --ch-dash:6 6; --ch-lines:3;
+  --ch-axis:#6B7280; --ch-axis-fs:10; --ch-axis-fw:400; --ch-axis-font:num;
+  --ch-up:#16C784; --ch-down:#EA3943; --ch-body:0.62; --ch-wick:2; --ch-brad:2;
+  --ch-zone:rgba(22,199,132,.10); --ch-zone-line:rgba(22,199,132,0);
+  --ch-liq:rgba(234,57,67,.85);
+  --ch-flag:0; --ch-flag-bg:#228BEE; --ch-flag-tx:#FFFFFF; --ch-flag-r:4;
+  --ch-flag-fs:11; --ch-flag-fw:700; --ch-flagline:0;
+
+  /* инфо-карточка (тикер / PnL) */
+  --info-mt:14px; --info-h:79px; --info-h-pos:188px;
+  --info-bg:var(--card); --info-line:var(--line); --info-lw:2px; --info-r:24px; --info-pad:14px;
+  --info-shadow:none;
+  --lbl2-fs:15px; --lbl2-fw:700;
+  --pnl-fs:32px; --pnl-fw:900; --pnl-pct-fs:16px; --pnl-pct-fw:700; --pnl-pct-font:var(--font-num);
+  --pnl-coin-sz:24px;
+  --box-bg:#F9FAFB; --box-line:transparent; --box-lw:0px; --box-r:12px; --box-align:center;
+  --box-lbl-fs:12px; --box-lbl-fw:700; --box-val-fs:15px; --box-val-fw:800;
+  --box-val-font:var(--font-num);
+
+  /* ряды контролов */
+  --ctl-mt:16px; --ctl-gap:16px;
+  --lbl-tx:#6B7280; --lbl-fs:14px; --lbl-fw:800; --lbl-case:none; --lbl-gap:6px;
+  --lock-tx:#FFB347;
+  --chip-h:38px; --chip-gap:6px; --chip-mt:8px;
+  --chip-bg:#FFFFFF; --chip-line:var(--line); --chip-lw:2px; --chip-tx:#111827;
+  --chip-fs:15px; --chip-fw:900;
+  --chip-on-bg:#228BEE; --chip-on-line:#228BEE; --chip-on-tx:#FFFFFF; --chip-on-fw:900;
+  --chip-lock-bg:rgba(255,179,71,.21); --chip-lock-line:#FFB347; --chip-lock-tx:#FFB347;
+  --chip-lock-op:.40;
+
+  /* CTA */
+  --cta-h:51px; --cta-r:12px; --cta-gap:9px; --cta-pb:20px;
+  --cta-fs:16px; --cta-fw:800; --cta-case:uppercase; --cta-ls:0;
+  --cta-tx:#FFFFFF; --cta-shadow:none; --cta-lw:2px;
+  --btn-green:#16C784; --btn-green-line:#16C784;
+  --btn-red:#EA3943;   --btn-red-line:#EA3943;
+  --btn-blue:#228BEE;  --btn-blue-line:#228BEE;
+  --btn-learn-bg:#228BEE; --btn-learn-tx:#FFFFFF; --btn-learn-r:12px;
+  --btn-learn-h:37px; --btn-learn-fs:14px; --btn-learn-fw:900; --btn-learn-case:none;
+  --btn-learn-shadow:none;
+
+  /* Deal-экран: y-координаты макета МИНУС фейковый iOS status-bar (его игра не рисует —
+     в хабе айфрейм занимает всё окно, статус-бар шелла лежит под ним) */
+  --deal-pt:24px; --deal-g-title:28px; --deal-g-bal:139px; --deal-g-head:15px;
+  --deal-g-asset:16px; --deal-g-card:16px;
+  --deal-title-fs:28px; --deal-title-fw:900; --deal-title-align:left;
+  --dealh-fs:22px; --dealh-fw:900; --dealsub-fs:13px; --dealsub-fw:400;
+  --asset-h:37px; --asset-r:12px; --asset-gap:6px; --asset-dot:16px;
+  --asset-bg:#FFFFFF; --asset-line:var(--line); --asset-lw:2px; --asset-tx:#6B7280;
+  --asset-fs:14px; --asset-fw:800;
+  --asset-on-bg:#FFFFFF; --asset-on-line:#16C784; --asset-on-lw:2px; --asset-on-tx:#111827;
+  --unlock-bg:var(--card); --unlock-line:var(--line); --unlock-lw:2px; --unlock-r:20px;
+  --unlock-pad:16px; --unlock-shadow:none;
+  --du-tag-tx:#16C784; --du-tag-fs:13px; --du-tag-fw:800; --du-tag-case:none;
+  --du-tag-bg:transparent; --du-tag-pad:0; --du-tag-r:0;
+  --duico-bg:transparent; --duico-sz:14px; --duico-r:0;
+  --du-name-fs:16px; --du-name-fw:900;
+  --du-desc-fs:12px; --du-desc-fw:400; --du-desc-lh:16.8px;
+
+  /* оверлеи */
+  --ov-bg:rgba(17,24,39,.55); --ov-card:var(--card); --ov-line:var(--line);
+  --ov-lw:2px; --ov-r:20px;
+  --ghost-bg:#F1F3F6; --ghost-tx:#111827;
+  --heart-on:#EA3943; --heart-off:#D7DBE0;
+  --home-bg:#111827; --home-tx:#FFFFFF;
+}
+
+/* ---------------------------------- crypto-dark ---------------------------- */
+html[data-skin="crypto-dark"] {
+  --bg:#0B0E14; --card:#141A26; --card2:#0B0E14;
+  --line:rgba(255,255,255,.10); --line-w:1px;
+  --tx:#FFFFFF; --tx-soft:#8F9CAE; --tx-tert:#8F9CAE;
+  --green:#16C784; --red:#EA3943; --accent:#22D3EE; --warn:#22D3EE;
+  --coin:#F3BA2F; --coin-pnl:#16C784; --tint:rgba(34,211,238,.13);
+  --dot-btc:#F3BA2F; --dot-eth:#627EEA; --dot-sol:#00FFA3;
+  --r-card:20px; --r-chip:12px; --r-cta:12px;
+
+  --top-pt:54px; --top-h:72px;
+  --sq:44px; --sq-r:12px; --sq-bg:#141A26; --sq-line:rgba(255,255,255,.10); --sq-lw:1px; --sq-ico:#FFFFFF;
+
+  --timer-w:72px; --timer-h:72px; --timer-r:36px;
+  --timer-bg:#141A26; --timer-track:rgba(34,211,238,.30); --timer-arc:#22D3EE; --timer-rw:3px;
+  --timer-tx:#FFFFFF; --timer-fs:20px; --timer-fw:900; --timer-font:var(--font-ui);
+
+  --bal-mt:16px;
+  --balrow-bg:transparent; --balrow-line:transparent; --balrow-lw:0px; --balrow-pad:0; --balrow-gap:6px;
+  --balpill-bg:#141A26; --balpill-line:rgba(255,255,255,.10); --balpill-pad:6px 12px;
+  --ballbl-tx:#8F9CAE; --ballbl-fw:500;
+  --balval-tx:#F3BA2F; --balval-fs:13px; --balval-fw:700;
+
+  --chart-mt:16px; --chart-h:196px;
+  --chcard-bg:transparent; --chcard-line:transparent; --chcard-lw:0px; --chcard-r:0px;
+  --chcard-pad:0px; --chcard-gap:8px;
+  --chtag-bg:rgba(34,211,238,.13); --chtag-tx:#22D3EE; --chtag-fs:11px; --chtag-fw:800;
+  --chtag-pad:4px 8px; --chtag-r:6px;
+  --chprice-display:none;
+
+  --ch-grid:rgba(255,255,255,.10); --ch-dash:4 4; --ch-lines:6;
+  --ch-axis:#8F9CAE; --ch-axis-fs:11; --ch-axis-font:ui;
+  --ch-body:0.56; --ch-wick:1.5;
+  --ch-zone:rgba(22,199,132,.08); --ch-zone-line:rgba(22,199,132,0);
+  --ch-flag:1; --ch-flag-bg:#22D3EE; --ch-flag-tx:#FFFFFF; --ch-flag-r:4;
+  --ch-flag-fs:11; --ch-flag-fw:700; --ch-flagline:1;
+
+  --info-mt:16px; --info-h:72px; --info-h-pos:152px;
+  --info-lw:1.5px; --info-r:20px; --info-pad:16px;
+  --lbl2-fs:13px;
+  --pnl-fs:24px; --pnl-pct-fs:14px; --pnl-pct-font:var(--font-ui); --pnl-coin-sz:16px;
+  --box-bg:#0B0E14; --box-r:12px;
+  --box-val-font:var(--font-ui); --box-lbl-fw:400;
+
+  --lbl-tx:#8F9CAE; --lbl-fs:13px; --lbl-fw:700; --lbl-case:uppercase;
+  --lock-tx:#22D3EE;
+  --chip-h:37px; --chip-gap:8px;
+  --chip-bg:#141A26; --chip-lw:1px; --chip-tx:#8F9CAE; --chip-fs:14px; --chip-fw:700;
+  --chip-on-bg:#22D3EE; --chip-on-line:#22D3EE; --chip-on-tx:#0B0E14; --chip-on-fw:800;
+  --chip-lock-bg:rgba(64,104,245,.31); --chip-lock-line:#22D3EE; --chip-lock-tx:#FFFFFF;
+
+  --cta-h:54px; --cta-fs:18px; --cta-fw:900; --cta-case:none; --cta-lw:0px; --cta-pb:24px;
+  --cta-tx:#0B0E14;
+  --btn-green:#16C784; --btn-blue:#16C784; --btn-blue-line:#16C784;
+  --btn-learn-bg:#22D3EE; --btn-learn-tx:#0B0E14; --btn-learn-r:8px;
+  --btn-learn-h:40px; --btn-learn-fs:13px; --btn-learn-fw:800;
+
+  --sq2:36px; --sq2-r:100px;
+  --dbb-dir:column; --dbb-align:center; --dbb-case:uppercase; --dbb-fs:12px;
+  --deal-pt:20px; --deal-g-title:16px; --deal-g-bal:99px; --deal-g-head:21px;
+  --deal-g-asset:67px; --deal-g-card:16px;
+  --dealh-fs:24px; --dealsub-fs:14px;
+  --asset-h:37px; --asset-r:16px; --asset-gap:8px;
+  --asset-bg:#141A26; --asset-lw:1px; --asset-tx:#8F9CAE;
+  --asset-on-bg:#141A26; --asset-on-line:#16C784; --asset-on-lw:1.5px; --asset-on-tx:#FFFFFF;
+  --unlock-lw:1.5px; --unlock-r:20px;
+  --du-tag-tx:#22D3EE; --du-tag-fs:12px; --du-tag-case:uppercase;
+  --du-name-fs:18px;
+  --du-desc-fs:13px; --du-desc-lh:16px;
+
+  --ov-bg:rgba(0,0,0,.66); --ov-lw:1.5px;
+  --ghost-bg:#141A26; --ghost-tx:#FFFFFF;
+  --heart-off:#2A3240;
+  --home-bg:#141A26;
+}
+/* ------------------------------------ cream ------------------------------- */
+html[data-skin="cream"] {
+  --font-num:'Inter', system-ui, sans-serif;
+  --font-bal:var(--font-num);
+  --bg:#FDF8F0; --card:#FFFDF6; --card2:#FFFDF6;
+  --line:#E5E7EB; --line-w:1px;
+  --tx:#4C334A; --tx-soft:#6B5C4C; --tx-tert:#8C7E6E;
+  --green:#1E9E4A; --red:#CC0000; --accent:#1B5E20; --warn:#D97706;
+  --coin:#E8A013; --coin-pnl:#E8A013; --tint:#E8F5E9;
+  --dot-btc:#E8A013; --dot-eth:#5462D6; --dot-sol:#9945FF;
+  --r-card:16px;
+
+  --top-pt:12px; --top-h:48px;
+  --sq:32px; --sq-r:100px; --sq-bg:#FFFDF6; --sq-line:#E5E7EB; --sq-lw:1px; --sq-ico:#4C334A;
+
+  --timer-w:65px; --timer-h:29px; --timer-r:100px;
+  --timer-bg:#FFFDF6; --timer-track:#E5E7EB; --timer-arc:#1E9E4A; --timer-rw:1.5px;
+  --timer-tx:#4C334A; --timer-fs:14px; --timer-fw:800; --timer-font:var(--font-ui);
+
+  --bal-mt:12px;
+  --balrow-bg:#FFFDF6; --balrow-line:#E5E7EB; --balrow-lw:1px; --balrow-pad:6px 16px;
+  --balpill-bg:transparent; --balpill-line:transparent; --balpill-pad:0;
+  --ballbl-tx:#6B5C4C; --ballbl-fw:600;
+  --balval-tx:#4C334A; --balval-fs:13px; --balval-fw:800;
+  --coin-sz:12px;
+
+  --chart-mt:12px; --chart-h:332px;
+  --chcard-bg:#FFFFFF; --chcard-line:#FFFFFF; --chcard-lw:1px; --chcard-r:16px;
+  --chcard-pad:16px; --chcard-gap:8px;
+  --chtag-tx:#6B5C4C; --chtag-fs:11px; --chtag-fw:700;
+  --chprice-tx:#6B5C4C; --chprice-fs:11px; --chprice-fw:700; --chprice-font:var(--font-ui);
+
+  --ch-grid:rgba(76,51,74,.06); --ch-dash:0; --ch-lines:3;
+  --ch-axis:rgba(140,126,110,.75); --ch-axis-fs:10; --ch-axis-font:ui;
+  --ch-up:#1E9E4A; --ch-down:#CC0000; --ch-body:0.44; --ch-wick:1.5;
+  --ch-zone:rgba(30,158,74,.10); --ch-zone-line:rgba(30,158,74,0);
+  --ch-liq:rgba(204,0,0,.8);
+  --ch-flag:1; --ch-flag-bg:#1E9E4A; --ch-flag-tx:#FFFFFF; --ch-flag-r:4;
+  --ch-flag-fs:10; --ch-flag-fw:800; --ch-flagline:0;
+
+  --info-mt:14px; --info-h:70px; --info-h-pos:150px;
+  --info-bg:#FFFDF6; --info-line:#E5E7EB; --info-lw:1px; --info-r:16px; --info-pad:16px;
+  --info-shadow:0 4px 12px rgba(109,117,143,.06);
+  --lbl2-fs:12px; --lbl2-fw:700;
+  --pnl-fs:24px; --pnl-pct-fs:16px; --pnl-pct-font:var(--font-ui); --pnl-coin-sz:14px;
+  --box-bg:#FFFDF6; --box-r:12px; --box-val-fs:14px; --box-val-font:var(--font-ui);
+  --box-lbl-fs:11px; --box-lbl-fw:600;
+
+  --lbl-tx:#4C334A; --lbl-fs:13px; --lbl-fw:700; --lbl-gap:4px;
+  --lock-tx:#6B5C4C;
+  --chip-h:37px; --chip-gap:8px;
+  --chip-bg:#FFFDF6; --chip-lw:1px; --chip-tx:#4C334A; --chip-fs:14px; --chip-fw:700;
+  --chip-on-bg:#1B5E20; --chip-on-line:#1B5E20; --chip-on-tx:#FFFFFF; --chip-on-fw:800;
+  --chip-lock-bg:#1B5E20; --chip-lock-line:#1B5E20; --chip-lock-tx:#FFFFFF;
+
+  --cta-h:51px; --cta-r:16px; --cta-fs:16px; --cta-fw:800; --cta-case:none; --cta-lw:0px;
+  --cta-shadow:0 8px 18px rgba(0,0,0,.15);
+  --btn-green:linear-gradient(90deg,#1E9E4A,#0F6B2E);
+  --btn-red:linear-gradient(90deg,#CC0000,#8E0000);
+  --btn-blue:linear-gradient(90deg,#1E9E4A,#0F6B2E);
+  --btn-learn-bg:linear-gradient(90deg,#4A7BD5,#224192); --btn-learn-r:8px;
+  --btn-learn-h:37px; --btn-learn-fs:13px; --btn-learn-fw:800; --btn-learn-case:uppercase;
+  --btn-learn-shadow:0 6px 14px rgba(0,0,0,.12), inset 0 -2px 4px rgba(255,255,255,.4);
+
+  --sq2:32px; --sq2-r:100px; --deal-title-pos:absolute;
+  --deal-pt:12px; --deal-g-title:34px; --deal-g-bal:98px; --deal-g-head:26px;
+  --deal-g-asset:93px; --deal-g-card:16px;
+  --cta-pb:38px;
+  --deal-title-fs:18px; --deal-title-fw:900; --deal-title-align:center;
+  --dealh-fs:24px; --dealsub-fs:13px;
+  --asset-h:32px; --asset-r:12px; --asset-gap:8px;
+  --asset-bg:#FFFDF6; --asset-lw:1px; --asset-tx:#6B5C4C; --asset-fs:13px; --asset-fw:700;
+  --asset-on-bg:#FFFDF6; --asset-on-line:#1B5E20; --asset-on-lw:2px; --asset-on-tx:#4C334A;
+  --unlock-bg:#FFFDF6; --unlock-line:#E5E7EB; --unlock-lw:1px; --unlock-r:16px;
+  --unlock-shadow:0 4px 12px rgba(109,117,143,.06);
+  --du-tag-tx:#1B5E20; --du-tag-fs:10px; --du-tag-case:uppercase;
+  --du-tag-bg:#E8F5E9; --du-tag-pad:4px 8px; --du-tag-r:6px;
+  --duico-sz:10px;
+  --du-name-fs:16px; --du-name-fw:800;
+
+  --ov-bg:rgba(60,40,20,.5); --ov-lw:1px; --ov-r:20px;
+  --ghost-bg:#F3EDE0; --ghost-tx:#4C334A;
+  --heart-on:#CC0000; --heart-off:#E0D8CC;
+  --home-bg:#1B5E20;
+}
+
+/* ---------------------------------- corporate ----------------------------- */
+html[data-skin="corporate"] {
+  --font-num:'Inter', system-ui, sans-serif;
+  --font-bal:var(--font-num);
+  --bg:#FFFFFF; --card:#F6F8FC; --card2:#FFFFFF;
+  --line:#E4E7EC; --line-w:1px;
+  --tx:#1A2333; --tx-soft:#8F9CAE; --tx-tert:#8F9CAE;
+  --green:#2ECC71; --red:#E74C3C; --accent:#2D7D5A; --warn:#D49E2F;
+  --coin:#D49E2F; --coin-pnl:#D49E2F; --tint:#E8F5E9;
+  --dot-btc:#D49E2F; --dot-eth:#5C6BC0; --dot-sol:#9575CD;
+  --r-card:16px; --r-chip:10px;
+
+  /* navy app-chrome (мокапы v4: status-bar 37 + header-bar 56 = 93) */
+  --gtop-h:93px; --gtop-bg:#1B2838; --gtop-tx:#FFFFFF;
+
+  --top-pt:8px; --top-h:48px;
+  --sq:32px; --sq-r:100px; --sq-bg:#FFFDF6; --sq-line:#E5E7EB; --sq-lw:1px; --sq-ico:#4C334A;
+
+  --timer-w:56px; --timer-h:56px; --timer-r:28px;
+  --timer-bg:#F6F8FC; --timer-track:rgba(45,125,90,.30); --timer-arc:#2D7D5A; --timer-rw:2px;
+  --timer-tx:#1A2333; --timer-fs:15px; --timer-fw:800; --timer-font:var(--font-ui);
+
+  --bal-mt:14px;
+  --balrow-bg:transparent; --balrow-line:transparent; --balrow-lw:0px; --balrow-pad:0;
+  --balrow-gap:8px;
+  --balpill-bg:#F6F8FC; --balpill-line:transparent; --balpill-pad:4px 10px; --balpill-gap:4px;
+  --ballbl-tx:#8F9CAE; --ballbl-fw:600;
+  --balval-tx:#1A2333; --balval-fs:14px; --balval-fw:800;
+
+  --chart-mt:14px; --chart-h:253px;
+  --chcard-bg:#F6F8FC; --chcard-line:transparent; --chcard-lw:0px; --chcard-r:16px;
+  --chcard-pad:14px; --chcard-gap:10px;
+  --chtag-tx:#8F9CAE; --chtag-fs:11px; --chtag-fw:700;
+  --chprice-tx:#E74C3C; --chprice-fs:12px; --chprice-fw:700; --chprice-font:var(--font-ui);
+  --chprice-pre:"Live • ";
+
+  --ch-grid:#E4E7EC; --ch-dash:0; --ch-lines:5;
+  --ch-axis:rgba(143,156,174,.85); --ch-axis-fs:10; --ch-axis-font:ui;
+  --ch-up:#2ECC71; --ch-down:#E74C3C; --ch-body:0.58; --ch-wick:1.5;
+  --ch-zone:rgba(46,204,113,.12); --ch-zone-line:rgba(46,204,113,0);
+  --ch-liq:rgba(231,76,60,.85);
+  --ch-flag:0; --ch-flag-bg:#2D7D5A;
+
+  --info-mt:14px; --info-h:74px; --info-h-pos:154px;
+  --info-bg:#F6F8FC; --info-line:#E4E7EC; --info-lw:1px; --info-r:16px; --info-pad:16px;
+  --lbl2-fs:12px; --lbl2-fw:700;
+  --pnl-fs:24px; --pnl-pct-fs:16px; --pnl-pct-font:var(--font-ui); --pnl-coin-sz:18px;
+  --box-bg:#FFFFFF; --box-line:#E4E7EC; --box-lw:1px; --box-r:10px; --box-align:flex-start;
+  --box-lbl-fs:11px; --box-lbl-fw:400; --box-val-fs:14px; --box-val-fw:700;
+  --box-val-font:var(--font-ui);
+
+  --lbl-tx:#8F9CAE; --lbl-fs:13px; --lbl-fw:700;
+  --lock-tx:#8F9CAE;
+  --chip-h:36px; --chip-gap:6px;
+  --chip-bg:#F6F8FC; --chip-lw:1px; --chip-tx:#1A2333; --chip-fs:13px; --chip-fw:700;
+  --chip-on-bg:#2D7D5A; --chip-on-line:#2D7D5A; --chip-on-tx:#FFFFFF; --chip-on-fw:700;
+  --chip-lock-bg:#E8F5E9; --chip-lock-line:#2D7D5A; --chip-lock-tx:#2D7D5A;
+
+  --cta-h:51px; --cta-r:12px; --cta-fs:16px; --cta-fw:600; --cta-case:none; --cta-lw:0px;
+  --cta-shadow:0 4px 12px rgba(46,204,113,.20);
+  --btn-green:#2D7D5A; --btn-red:#E74C3C; --btn-blue:#2D7D5A;
+  --btn-learn-bg:#1F3A5F; --btn-learn-tx:#FFFFFF; --btn-learn-r:10px;
+  --btn-learn-h:36px; --btn-learn-fs:13px; --btn-learn-fw:700;
+
+  --sq2:32px; --sq2-r:100px;
+  --deal-pt:17px; --deal-g-title:0px; --deal-g-bal:100px; --deal-g-head:15px;
+  --deal-g-asset:76px; --deal-g-card:16px;
+  --cta-pb:31px;
+  --deal-title-fs:26px; --deal-title-fw:800; --deal-title-align:left;
+  --dealh-fs:26px; --dealh-fw:800; --dealsub-fs:13px;
+  --asset-h:42px; --asset-r:12px; --asset-gap:8px; --asset-dot:18px;
+  --asset-bg:#F6F8FC; --asset-lw:1px; --asset-tx:#1A2333; --asset-fs:14px; --asset-fw:800;
+  --asset-on-bg:#E8F5E9; --asset-on-line:#2D7D5A; --asset-on-lw:2px; --asset-on-tx:#2D7D5A;
+  --unlock-bg:#F6F8FC; --unlock-line:#E4E7EC; --unlock-lw:1px; --unlock-r:16px;
+  --du-tag-tx:#2D7D5A; --du-tag-fs:11px; --du-tag-case:uppercase;
+  --duico-bg:#E8F5E9; --duico-sz:16px; --duico-r:100px;
+  --du-name-fs:16px; --du-name-fw:800;
+  --du-desc-fs:13px; --du-desc-lh:18px;
+
+  --ov-bg:rgba(26,35,51,.55); --ov-lw:1px;
+  --ghost-bg:#F2F4F7; --ghost-tx:#1A2333;
+  --heart-on:#E74C3C; --heart-off:#E4E7EC;
+  --home-bg:#1F3A5F;
+}
+
+/* ============================================================================
+   SHELL / STAGE
+   ============================================================================ */
 body {
-  background:#2a2118;
-  font-family:"Nunito", ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+  background:var(--bg);
+  font-family:var(--font-ui);
   -webkit-user-select:none; user-select:none;
   touch-action:manipulation;
 }
-#app { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; }
-
-:root {
-  --bg:#F0DFC2;          /* фон фрейма (Figma) */
-  --card:#F0DFC2;        /* карточки того же тона, отличаются белой обводкой */
-  --line:#d9c9a4;
-  --ink:#4C334A;         /* основной тёмный */
-  --ink-soft:rgba(76,51,74,.70);
-  --ink-mut:#7D6972;     /* подписи Liquidation */
-  --green:#13A86D;
-  --green-dark:#108859;   /* 3D-цоколь зелёных CTA (DS TapTrade 622) */
-  --red:#F54040;
-  --red-dark:#C02F2F;
-  --blue:#4068F5;
-  --blue-dark:#3353C4;    /* 3D-цоколь кобальтовых CTA (Button component 622) */
-  --lock:#DE8225;
-  --edge:rgba(0,0,0,.20); /* 3D-низ кнопок (Figma: drop-shadow (0,10) r0 20%) */
-}
-
+#app { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:var(--bg); }
 #stage {
   position:relative; width:375px; height:812px; overflow:hidden;
   transform-origin:center center;
   transform:scale(var(--s,1));
   background:var(--bg);
-  border-radius:30px;
-  box-shadow:0 30px 80px rgba(30,20,10,.55);
-  color:var(--ink);
-}
-#stage::before { /* бумажная фактура Paper_02 из макетов (alpha 15% вшита в webp) */
-  content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
-  background:url('../../paper.webp') center / cover no-repeat;
+  border-radius:24px;
+  box-shadow:0 30px 80px rgba(20,25,35,.35);
+  color:var(--tx);
 }
 
-.screen { position:absolute; inset:0; display:flex; flex-direction:column; z-index:1; }
+.screen { position:absolute; inset:0; padding-top:var(--gtop-h); display:flex; flex-direction:column; z-index:1; }
 .hidden { display:none !important; }
 
-/* ===================== BUTTONS ===================== */
-.action-zone {
-  margin-top:auto; padding:0 16px calc(24px + env(safe-area-inset-bottom));
-  flex-shrink:0; display:flex; gap:9px;
+/* app-chrome band (corporate only; 0-height elsewhere) */
+#gtopbar {
+  position:absolute; top:0; left:0; right:0; height:var(--gtop-h);
+  background:var(--gtop-bg); color:var(--gtop-tx); z-index:0;
+  display:flex; align-items:flex-end; padding:0 var(--pad-x) 17px var(--gtop-pad-l);
+  font-size:var(--gtop-fs); font-weight:var(--gtop-fw);
+  pointer-events:none;
 }
-/* CTA по Button component (622): тело 60, r16, цоколь 6px цветом-тенью (#3353C4 /
-   #108859), сверху лёгкий внутренний блик 6px, снизу внутренняя кромка 2px */
-.bigbtn {
-  flex:1; border:none; cursor:pointer; position:relative;
-  border-radius:16px; height:60px; margin-bottom:10px;
+html[data-skin="crypto-light"] #gtopbar,
+html[data-skin="crypto-dark"] #gtopbar,
+html[data-skin="cream"] #gtopbar { display:none; }
+
+/* ============================================================================
+   PRIMITIVES
+   ============================================================================ */
+/* solid coin dot (все четыре варианта рисуют монету заливкой, не контуром) */
+.coin-dot {
+  width:var(--coin-sz); height:var(--coin-sz); border-radius:50%;
+  background:var(--coin); flex:0 0 auto; display:inline-block;
+}
+.coin-dot[data-coin="BTC"] { background:var(--dot-btc); }
+.coin-dot[data-coin="ETH"] { background:var(--dot-eth); }
+.coin-dot[data-coin="SOL"] { background:var(--dot-sol); }
+
+/* верхние квадратные/круглые кнопки */
+.squarebtn {
+  width:var(--sq); height:var(--sq); min-width:var(--sq); cursor:pointer;
+  background:var(--sq-bg); border:var(--sq-lw) solid var(--sq-line); border-radius:var(--sq-r);
   display:flex; align-items:center; justify-content:center;
-  color:#fff;
-  transition:transform .07s ease, box-shadow .12s ease, background .15s ease;
+  font-family:inherit; color:var(--sq-ico); flex:0 0 auto;
+}
+.squarebtn:active { transform:scale(.94); }
+.squarebtn.dark {
+  width:56px; height:var(--cta-h); min-width:56px; border:none;
+  background:var(--home-bg); color:var(--home-tx);
+  font-size:26px; border-radius:var(--cta-r);
+}
+.pause-ico { position:relative; width:11px; height:13px; }
+.pause-ico::before, .pause-ico::after {
+  content:""; position:absolute; top:0; bottom:0; width:4px; border-radius:1.5px; background:currentColor;
+}
+.pause-ico::before { left:0; } .pause-ico::after { right:0; }
+
+/* CTA */
+.action-zone {
+  margin-top:auto; padding:0 var(--pad-x) calc(var(--cta-pb) + env(safe-area-inset-bottom));
+  flex-shrink:0; display:flex; gap:var(--cta-gap);
+}
+.bigbtn {
+  flex:1; cursor:pointer; position:relative;
+  border:var(--cta-lw) solid transparent; border-radius:var(--cta-r);
+  height:var(--cta-h);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--cta-tx); box-shadow:var(--cta-shadow);
+  transition:transform .07s ease, filter .12s ease;
   font-family:inherit;
 }
-.bigbtn .btn-label { font-size:20px; font-weight:900; line-height:1; text-shadow:0 2px 0 rgba(0,0,0,.15); }
-.bigbtn.slim { height:48px; margin-bottom:8px; }
-.bigbtn.slim .btn-label { font-size:18px; }
-.bigbtn.green { background:var(--green); box-shadow:0 6px 0 var(--green-dark), 0 10px 4px rgba(0,0,0,.18), inset 0 6px 0 rgba(255,255,255,.25), inset 0 -2px 2px rgba(0,0,0,.10); }
-.bigbtn.red   { background:var(--red);   box-shadow:0 6px 0 var(--red-dark), 0 10px 4px rgba(0,0,0,.18), inset 0 6px 0 rgba(255,255,255,.25), inset 0 -2px 2px rgba(0,0,0,.10); }
-.bigbtn.blue  { background:var(--blue);  box-shadow:0 6px 0 var(--blue-dark), 0 10px 4px rgba(0,0,0,.18), inset 0 6px 0 rgba(255,255,255,.25), inset 0 -2px 2px rgba(0,0,0,.10); }
-.bigbtn.slim.green { box-shadow:0 4px 0 var(--green-dark), 0 8px 4px rgba(0,0,0,.15), inset 0 5px 0 rgba(255,255,255,.25), inset 0 -2px 2px rgba(0,0,0,.10); }
-.bigbtn:active, .bigbtn.pressed { transform:translateY(4px); }
-.bigbtn.green:active { box-shadow:0 2px 0 var(--green-dark), inset 0 6px 0 rgba(255,255,255,.25); }
-.bigbtn.red:active   { box-shadow:0 2px 0 var(--red-dark), inset 0 6px 0 rgba(255,255,255,.25); }
-.bigbtn.blue:active  { box-shadow:0 2px 0 var(--blue-dark), inset 0 6px 0 rgba(255,255,255,.25); }
+.bigbtn .btn-label {
+  font-size:var(--cta-fs); font-weight:var(--cta-fw); line-height:1.2;
+  text-transform:var(--cta-case); letter-spacing:var(--cta-ls);
+}
+.bigbtn.slim { height:44px; }
+.bigbtn.slim .btn-label { font-size:calc(var(--cta-fs) - 1px); }
+.bigbtn.green { background:var(--btn-green); border-color:var(--btn-green-line); }
+.bigbtn.red   { background:var(--btn-red);   border-color:var(--btn-red-line); }
+.bigbtn.blue  { background:var(--btn-blue);  border-color:var(--btn-blue-line); }
+.bigbtn:active, .bigbtn.pressed { transform:translateY(2px); filter:brightness(.94); }
 .bigbtn.bounce { animation:btnBounce .3s ease; }
 @keyframes btnBounce { 0%{transform:scale(1)} 40%{transform:scale(.96)} 75%{transform:scale(1.02)} 100%{transform:scale(1)} }
 
-/* верхние квадратные кнопки: 40×40, r12, белая обводка 2, мягкая тень */
-.squarebtn {
-  width:40px; height:40px; min-width:40px; border:2px solid #fff; cursor:pointer;
-  background:var(--bg); border-radius:12px;
-  box-shadow:0 4px 0 rgba(0,0,0,.10);
-  display:flex; align-items:center; justify-content:center;
-  font-family:inherit; color:var(--ink);
-}
-.squarebtn:active { transform:translateY(3px); box-shadow:0 1px 0 rgba(0,0,0,.10); }
-.squarebtn.dark { width:64px; height:auto; min-width:64px; border:none; background:#3c2b33; color:#fff; box-shadow:0 7px 0 #241a1f; font-size:30px; border-radius:20px; }
-.squarebtn.dark:active { box-shadow:0 2px 0 #241a1f; }
-.pause-ico { position:relative; width:17px; height:18px; filter:drop-shadow(0 1.5px 0 rgba(0,0,0,.15)); }
-.pause-ico::before, .pause-ico::after {
-  content:""; position:absolute; top:0; bottom:0; width:6px; border-radius:3px; background:var(--ink);
-}
-.pause-ico::before { left:0; } .pause-ico::after { right:0; }
-#btnKebab svg { filter:drop-shadow(0 1.5px 0 rgba(0,0,0,.15)); }
-
 .ghostbtn {
-  border:none; background:#e6d5b4; color:var(--ink);
-  font-family:inherit; font-weight:800; font-size:15px;
-  padding:12px 18px; border-radius:16px; cursor:pointer;
-  box-shadow:0 3px 0 var(--line);
+  border:none; background:var(--ghost-bg); color:var(--ghost-tx);
+  font-family:inherit; font-weight:700; font-size:15px;
+  padding:12px 18px; border-radius:var(--r-chip); cursor:pointer;
 }
 
-/* ===================== PILLS / CHIPS (start/result) ===================== */
+/* pills (result screen) */
 .chips-row { display:flex; gap:10px; justify-content:center; }
 .pill {
-  background:rgba(255,255,255,.5); border-radius:22px; padding:9px 20px;
-  font-size:18px; font-weight:800; color:var(--ink);
+  background:var(--card); border:var(--line-w) solid var(--line); border-radius:var(--r-pill);
+  padding:7px 16px; font-size:15px; font-weight:800; color:var(--tx);
   display:flex; align-items:center; gap:8px;
-  box-shadow:0 3px 10px rgba(120,90,40,.1);
 }
-.coin-img { width:22px; height:22px; display:block; }
-/* контурная монета (Phosphor CoinVertical из макета), красится currentColor */
-.coin-v { fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; }
+.pill .coin-dot { width:16px; height:16px; }
 
-/* ===================== START: «Deal» pre-round screen (Figma f2055, 375×812) ===== */
-.deal-inner { position:relative; flex:1; }
+/* ============================================================================
+   DEAL (pre-round level settings)
+   ============================================================================ */
+.deal-inner {
+  flex:1; display:flex; flex-direction:column;
+  padding:var(--deal-pt) var(--pad-x) 0;
+}
 .deal-top {
-  position:absolute; top:0; left:0; right:0; height:80px;
-  display:flex; align-items:flex-start; justify-content:space-between;
-  padding:16px 16px 0;
+  position:relative;
+  display:flex; align-items:center; justify-content:space-between;
+  min-height:var(--sq2); margin-bottom:var(--deal-g-title);
 }
-.deal-title { font-size:24px; font-weight:900; line-height:36px; color:var(--ink); margin-top:2px; }
-.deal-topbtns { display:flex; gap:9px; align-items:flex-start; }
-/* info-кнопка: тёмная (чернила), тело 40 + цоколь 4 (спека: Box 41×40, DROP 0,4) */
-.infobtn {
-  width:41px; height:40px; border:none; cursor:pointer; border-radius:12px;
-  background:var(--ink); color:#fff;
-  box-shadow:0 4px 0 #362435, 0 6px 3px rgba(0,0,0,.15), inset 0 -2px 2px rgba(0,0,0,.10);
-  display:flex; align-items:center; justify-content:center; font-family:inherit;
+.deal-topbtns .squarebtn {
+  width:var(--sq2); height:var(--sq2); min-width:var(--sq2); border-radius:var(--sq2-r);
 }
-.infobtn:active { transform:translateY(3px); box-shadow:0 1px 0 #362435; }
-.infobtn svg { filter:drop-shadow(0 1.5px 0 rgba(0,0,0,.15)); }
-/* полоса баланса (0,80) 375×97: белые кромки, по центру подпись + монета и сумма */
-.deal-balband {
-  position:absolute; top:80px; left:0; right:0; height:97px;
-  background:var(--bg); border-top:2px solid #fff; border-bottom:2px solid #fff;
-  box-shadow:0 5px 0 rgba(0,0,0,.06);
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+.deal-title {
+  flex:1; font-size:var(--deal-title-fs); font-weight:var(--deal-title-fw);
+  line-height:1.21; color:var(--tx); text-align:var(--deal-title-align);
+  position:var(--deal-title-pos); left:0; right:0;
 }
-.dbb-label { font-size:14px; font-weight:600; line-height:21px; color:var(--ink-soft); }
-.dbb-row { display:flex; align-items:center; gap:3px; color:var(--ink); }
-.dbb-row .coin-v { width:25px; height:25px; stroke-width:1.6; }
-#dealBal { font-size:24px; font-weight:900; line-height:36px; }
-.deal-head { position:absolute; top:255px; left:0; right:0; text-align:center; }
-.deal-h { font-size:24px; font-weight:900; line-height:31px; color:var(--ink); }
-.deal-sub { margin-top:12px; font-size:14px; font-weight:600; line-height:21px; color:var(--ink); }
-/* селектор актива (0,335) 375×109 на полупрозрачной белой полосе */
-.asset-band {
-  position:absolute; top:335px; left:0; right:0; height:109px;
-  background:rgba(255,255,255,.20); padding:16px 16px 0;
-}
-.asset-lbl { font-size:14px; font-weight:600; line-height:21px; color:var(--ink); }
-.asset-chips { display:flex; gap:8px; margin-top:8px; }
+.deal-topbtns { display:flex; gap:8px; align-items:center; margin-left:auto; }
+html[data-skin="corporate"] .deal-top { position:absolute; top:0; left:0; right:0;
+  height:var(--gtop-h); padding:0 var(--pad-x) 17px; align-items:flex-end; z-index:5; }
+html[data-skin="corporate"] .deal-title { color:var(--gtop-tx); }
+html[data-skin="corporate"] .deal-topbtns .squarebtn {
+  background:rgba(255,255,255,.10); border-color:transparent; color:#fff; }
+html[data-skin="corporate"] #screen-start .deal-inner { padding-top:var(--deal-pt); }
+/* corporate: на Deal заголовок даёт сама шапка экрана (внутри navy-полосы),
+   поэтому #gtopTitle там пустой — см. syncChrome() в game.js */
+.deal-balband { margin-bottom:var(--deal-g-bal); display:flex; justify-content:center; }
+.deal-balband .bal-row { margin:0; flex-direction:var(--dbb-dir); align-items:var(--dbb-align); }
+.deal-balband .dbb-label { text-transform:var(--dbb-case); font-size:var(--dbb-fs); }
+
+.deal-head { text-align:center; margin-bottom:var(--deal-g-head); }
+.deal-h { font-size:var(--dealh-fs); font-weight:var(--dealh-fw); line-height:1.21; color:var(--tx); }
+.deal-sub { margin-top:5px; font-size:var(--dealsub-fs); font-weight:var(--dealsub-fw); line-height:1.25; color:var(--tx-soft); }
+
+.asset-band { margin-bottom:var(--deal-g-asset); }
+.asset-chips { display:flex; gap:var(--asset-gap); margin-top:8px; }
 .asset-chip {
-  flex:1; height:48px; border-radius:16px; cursor:pointer; font-family:inherit;
-  background:var(--bg); border:2px solid #fff;
-  display:flex; align-items:center; gap:8px; padding:8px 10px 8px 8px;
-  font-size:14px; font-weight:600; color:var(--ink);
-  transition:border-color .12s ease;
+  flex:1; height:var(--asset-h); border-radius:var(--asset-r); cursor:pointer; font-family:inherit;
+  background:var(--asset-bg); border:var(--asset-lw) solid var(--asset-line);
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  font-size:var(--asset-fs); font-weight:var(--asset-fw); color:var(--asset-tx);
+  transition:border-color .12s ease, background .12s ease, color .12s ease;
 }
-.asset-chip img { width:32px; height:32px; display:block; }
-.asset-chip.on { border-color:var(--green); }
-/* баннер «новая механика» (16,523) 343×178, r20 */
+.asset-chip .coin-dot { width:var(--asset-dot); height:var(--asset-dot); }
+.asset-chip.on {
+  background:var(--asset-on-bg); border:var(--asset-on-lw) solid var(--asset-on-line);
+  color:var(--asset-on-tx);
+}
+
+/* unlock banner */
 .deal-unlock {
-  position:absolute; top:523px; left:16px; right:16px; height:178px;
-  background:var(--bg); border:1px solid #fff; border-radius:20px;
-  padding:16px 18px; text-align:left;
+  background:var(--unlock-bg); border:var(--unlock-lw) solid var(--unlock-line);
+  border-radius:var(--unlock-r); box-shadow:var(--unlock-shadow);
+  padding:var(--unlock-pad); text-align:left; margin-bottom:var(--deal-g-card);
 }
-.du-head { display:flex; align-items:center; gap:8px; font-size:15px; font-weight:600; line-height:20px; color:#19213D; }
-.du-name { margin-top:8px; font-size:18px; font-weight:600; line-height:25px; color:#19213D; }
-.du-desc { margin-top:4px; font-size:12px; font-weight:600; line-height:16px; color:#7D676F; }
-.bigbtn.learn { height:42px; margin:8px 0 0; width:100%; border-radius:12px;
-  box-shadow:0 4px 0 var(--blue-dark), 0 7px 3px rgba(0,0,0,.15), inset 0 5px 0 rgba(255,255,255,.25), inset 0 -2px 2px rgba(0,0,0,.10); }
-.bigbtn.learn:active { box-shadow:0 1px 0 var(--blue-dark); }
-.bigbtn.learn .btn-label { font-size:16.5px; }
-.deal-cta { position:absolute; top:731px; left:16px; right:16px; }
-.deal-cta .bigbtn { width:100%; margin-bottom:0; }
-/* онбординг-сим (?tut=1): Deal-экран пропускается — шелл сам стартует раунд;
-   контент прячем, чтобы игрок не тапнул Start в окне ожидания фида (★draft) */
-#stage.tutboot #screen-start .deal-inner { visibility:hidden; }
-/* правила игры в (i)-оверлее (бывший стартовый howto-список) */
+.du-head { display:flex; align-items:center; gap:6px; margin-bottom:10px; }
+.du-ico {
+  width:var(--duico-sz); height:var(--duico-sz); border-radius:var(--duico-r);
+  background:var(--duico-bg); color:var(--du-tag-tx);
+  display:flex; align-items:center; justify-content:center; flex:0 0 auto;
+}
+html[data-skin="corporate"] .du-ico { width:32px; height:32px; }
+.du-ico svg { width:var(--duico-sz); height:var(--duico-sz); }
+.du-tag {
+  font-size:var(--du-tag-fs); font-weight:var(--du-tag-fw); line-height:1.21;
+  color:var(--du-tag-tx); text-transform:var(--du-tag-case);
+  background:var(--du-tag-bg); padding:var(--du-tag-pad); border-radius:var(--du-tag-r);
+}
+.du-name { font-size:var(--du-name-fs); font-weight:var(--du-name-fw); line-height:1.21; color:var(--tx); }
+.du-desc { margin-top:4px; font-size:var(--du-desc-fs); font-weight:var(--du-desc-fw); line-height:var(--du-desc-lh); color:var(--tx-soft); }
+.bigbtn.learn {
+  height:var(--btn-learn-h); margin:12px 0 0; width:100%;
+  border-radius:var(--btn-learn-r); border:none;
+  background:var(--btn-learn-bg); color:var(--btn-learn-tx); box-shadow:var(--btn-learn-shadow);
+}
+.bigbtn.learn .btn-label {
+  font-size:var(--btn-learn-fs); font-weight:var(--btn-learn-fw);
+  text-transform:var(--btn-learn-case); color:var(--btn-learn-tx);
+}
+.deal-cta { margin-top:auto; padding-bottom:calc(var(--cta-pb) + env(safe-area-inset-bottom)); }
+.deal-cta .bigbtn { width:100%; }
+
+/* онбординг-сим (?tut=1): Deal пропускается — шелл сам стартует раунд */
+#stage.tutboot #screen-start .deal-inner,
+#stage.tutboot #screen-start .deal-top { visibility:hidden; }
+
 .howto { list-style:none; text-align:left; display:flex; flex-direction:column; gap:8px; width:100%; }
 .howto li {
-  background:var(--card); border-radius:14px; padding:10px 14px;
-  font-size:14px; font-weight:700; border:2px solid #fff;
-  box-shadow:0 4px 12px rgba(120,90,40,.1);
+  background:var(--card2); border:var(--line-w) solid var(--line); border-radius:var(--r-chip);
+  padding:10px 14px; font-size:14px; font-weight:700; color:var(--tx);
 }
 .how-ico { margin-right:8px; }
 
-/* ===================== TOP BAR (макет: pause 16/24, таймер 150/12 76×76, кебаб 319/16) ===================== */
+/* ============================================================================
+   TOP BAR (pause / timer / hearts-menu)
+   ============================================================================ */
 #topbar {
-  height:108px; display:grid; grid-template-columns:1fr auto 1fr; align-items:start;
-  padding:24px 16px 0; flex-shrink:0; position:relative; z-index:2;
+  min-height:var(--top-h); display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+  padding:var(--top-pt) var(--pad-x) 0; flex-shrink:0; position:relative; z-index:2;
 }
 #btnPause { justify-self:start; }
-#timerCircle { position:relative; width:76px; height:76px; justify-self:center; margin-top:-12px; }
-#timerCircle svg { width:76px; height:76px; transform:rotate(-90deg); }
-.ring-track { fill:none; stroke:rgba(255,255,255,.5); stroke-width:6; }
-.ring-arc {
-  fill:none; stroke:var(--blue); stroke-width:6; stroke-linecap:round;
-  stroke-dasharray:0 219.9;
-}
-#timerText {
-  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  font-size:18px; font-weight:900; color:var(--ink);
-}
-#timerText.hot { color:var(--red); animation:hotPulse .5s ease infinite; }
-@keyframes hotPulse { 50%{transform:scale(1.1)} }
-#topRight { justify-self:end; margin-top:-8px; display:flex; align-items:center; }
-#hearts { display:flex; gap:2px; }
-.heart { width:26px; height:25px; position:relative; display:inline-block; filter:drop-shadow(0 2px 0 #fff); }
+#topRight { justify-self:end; display:flex; align-items:center; gap:6px; }
+#hearts { display:flex; gap:3px; }
+.heart { width:22px; height:20px; position:relative; display:inline-block; }
 .heart::before {
-  content:"❤"; font-size:22px; line-height:25px; color:#f04f4f;
-  -webkit-text-stroke:2px #fff;
+  content:"♥"; font-size:20px; line-height:20px; color:var(--heart-on);
   position:absolute; inset:0; text-align:center;
 }
-.heart.lost::before { color:#d9c9a4; }
+.heart.lost::before { color:var(--heart-off); }
 .heart.pop { animation:heartPop .5s ease; }
 @keyframes heartPop { 30%{transform:scale(1.6) rotate(-12deg)} 60%{transform:scale(.7)} 100%{transform:scale(1)} }
 
-/* ===================== BALANCE BAND (0,108) 375×40 ===================== */
+/* таймер: одна геометрия, токены задают пилюлю или круг.
+   Прогресс — обводка <rect rx>, поэтому одна механика работает и для пилюли, и для круга. */
+#timerCircle {
+  position:relative; width:var(--timer-w); height:var(--timer-h);
+  justify-self:center; border-radius:var(--timer-r); background:var(--timer-bg);
+}
+#timerRing { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+#timerRing rect { fill:none; vector-effect:non-scaling-stroke; }
+.ring-track { stroke:var(--timer-track); stroke-width:var(--timer-rw); }
+.ring-arc { stroke:var(--timer-arc); stroke-width:var(--timer-rw); stroke-linecap:round; }
+#timerText {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-family:var(--timer-font); font-size:var(--timer-fs); font-weight:var(--timer-fw);
+  color:var(--timer-tx); font-variant-numeric:tabular-nums;
+}
+#timerText.hot { color:var(--red); animation:hotPulse .5s ease infinite; }
+@keyframes hotPulse { 50%{transform:scale(1.1)} }
+
+/* ============================================================================
+   BALANCE ROW
+   ============================================================================ */
 #balanceBand {
-  height:40px; flex-shrink:0;
-  background:var(--bg);
-  border-top:2px solid #fff; border-bottom:2px solid #fff;
-  box-shadow:0 4px 0 rgba(0,0,0,.06);
-  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; margin-top:var(--bal-mt); display:flex; justify-content:center;
   position:relative; z-index:2;
 }
-.bal-pill {
-  height:24px; padding:0 8px; border-radius:37px; background:rgba(255,255,255,.30);
-  display:flex; align-items:center; gap:3px;
+.bal-row {
+  display:flex; align-items:center; gap:var(--balrow-gap);
+  background:var(--balrow-bg); border:var(--balrow-lw) solid var(--balrow-line);
+  border-radius:var(--balrow-r); padding:var(--balrow-pad);
 }
-.bal-lbl { font-size:12px; font-weight:600; color:var(--ink-soft); margin-right:2px; }
-.bal-pill .coin-v { width:16px; height:16px; stroke-width:1.6; color:var(--ink); }
-#balTop { font-size:16px; font-weight:900; color:var(--ink); }
-#offlineBadge {
-  position:absolute; top:152px; right:10px; z-index:3;
-  background:#e9dcbd; color:#7a6a52; border:1.5px solid var(--line);
-  font-size:12px; font-weight:800; padding:4px 10px; border-radius:12px;
+.bal-lbl {
+  font-size:var(--ballbl-fs); font-weight:var(--ballbl-fw); color:var(--ballbl-tx);
+  text-transform:var(--ballbl-case); line-height:1.21;
+}
+.bal-pill {
+  display:flex; align-items:center; gap:var(--balpill-gap);
+  background:var(--balpill-bg); border:1px solid var(--balpill-line);
+  border-radius:var(--r-pill); padding:var(--balpill-pad);
+}
+#balTop, #dealBal {
+  font-family:var(--font-bal); font-size:var(--balval-fs); font-weight:var(--balval-fw);
+  color:var(--balval-tx); font-variant-numeric:tabular-nums; line-height:1.28;
 }
 
-/* ===================== CHART (148..451, фикс 303 — карточка всегда на 451) ===================== */
-#chartWrap { position:relative; flex:0 0 303px; min-height:0; z-index:1; }
+/* ============================================================================
+   CHART CARD
+   ============================================================================ */
+#chartWrap {
+  position:relative; flex:0 0 var(--chart-h); min-height:0; z-index:1;
+  margin:var(--chart-mt) var(--pad-x) 0;
+  background:var(--chcard-bg); border:var(--chcard-lw) solid var(--chcard-line);
+  border-radius:var(--chcard-r); box-shadow:var(--chcard-shadow);
+  padding:var(--chcard-pad);
+  display:flex; flex-direction:column; gap:var(--chcard-gap);
+}
+.chart-head { display:flex; align-items:center; justify-content:space-between; flex:0 0 auto; }
+#chartTag {
+  background:var(--chtag-bg); border-radius:var(--chtag-r); padding:var(--chtag-pad);
+  font-size:var(--chtag-fs); font-weight:var(--chtag-fw); color:var(--chtag-tx);
+  text-transform:var(--chtag-case); white-space:nowrap; letter-spacing:.2px; line-height:1.21;
+}
+#chartPrice {
+  display:var(--chprice-display);
+  font-family:var(--chprice-font); font-size:var(--chprice-fs); font-weight:var(--chprice-fw);
+  color:var(--chprice-tx); font-variant-numeric:tabular-nums; white-space:nowrap; line-height:1.3;
+}
+#chartPrice::before { content:var(--chprice-pre); }
+#chartPlot { position:relative; flex:1 1 auto; min-height:0; }
 #chart { position:absolute; inset:0; width:100%; height:100%; }
-#chartTag { /* плашка «BITCOIN CHART (BTC/USD)» слева, скругление только справа (f2057) */
-  position:absolute; left:0; top:50px; height:37px;
-  background:rgba(255,255,255,.30); border-radius:0 12px 12px 0;
-  display:flex; align-items:center; padding:0 12px;
-  font-size:14px; font-weight:600; color:var(--ink-soft);
-  text-transform:uppercase; white-space:nowrap; letter-spacing:.2px;
+#offlineBadge {
+  position:absolute; top:6px; right:6px; z-index:3;
+  background:var(--card2); color:var(--tx-soft); border:1px solid var(--line);
+  font-size:11px; font-weight:800; padding:3px 8px; border-radius:10px;
 }
 #meltWarn {
-  position:absolute; left:50%; transform:translateX(-50%); bottom:10px;
-  font-size:14px; font-weight:900; color:#fff; white-space:nowrap;
-  background:#f59a23; padding:7px 16px; border-radius:16px;
-  box-shadow:0 4px 0 #c47207, 0 8px 18px rgba(245,154,35,.4);
+  position:absolute; left:50%; transform:translateX(-50%); bottom:8px;
+  font-size:13px; font-weight:900; color:#fff; white-space:nowrap;
+  background:var(--warn); padding:6px 14px; border-radius:14px;
   animation:meltShake .3s linear infinite; z-index:2;
 }
 @keyframes meltShake {
@@ -265,164 +713,211 @@ body {
   75%{transform:translateX(calc(-50% + 3px)) rotate(1.2deg)}
 }
 
-/* ===================== НИЖНИЙ БЛОК (карточка + контролы) ===================== */
-#belowChart { flex-shrink:0; padding:0 16px; }
+/* ============================================================================
+   INFO CARD (ticker / P&L) + CONTROLS
+   ============================================================================ */
+#belowChart { flex-shrink:0; padding:0 var(--pad-x); }
 
-/* инфо-карточка: без позиции 343×79; в позиции 247 (или 237 с бейджами) */
 #infoCard {
-  position:relative;
-  background:var(--card); border:2px solid #fff; border-radius:16px;
-  height:79px;
-  display:flex; flex-direction:column; justify-content:center;
-  text-align:center;
+  position:relative; margin-top:var(--info-mt);
+  background:var(--info-bg); border:var(--info-lw) solid var(--info-line);
+  border-radius:var(--info-r); box-shadow:var(--info-shadow);
+  min-height:var(--info-h); padding:var(--info-pad);
+  display:flex; flex-direction:column; justify-content:center; text-align:center;
 }
-#infoCard.inpos { height:247px; }
-#infoCard.inpos.haslev { height:237px; }
-.card-label { font-size:12px; font-weight:600; color:var(--ink-soft); line-height:18px; }
-.ticker-line { display:flex; align-items:baseline; justify-content:center; gap:4px; }
-#tickerPrice { font-size:24px; font-weight:900; color:var(--ink); line-height:36px; }
-#tickerChg { font-size:14px; font-weight:600; }
+#infoCard.inpos { min-height:var(--info-h-pos); }
+.card-label {
+  font-size:var(--lbl2-fs); font-weight:var(--lbl2-fw); color:var(--tx-soft); line-height:1.21;
+}
+.ticker-line { display:flex; align-items:baseline; justify-content:center; gap:6px; margin-top:4px; }
+#tickerPrice {
+  font-family:var(--font-num); font-size:22px; font-weight:800; color:var(--tx);
+  font-variant-numeric:tabular-nums;
+}
+#tickerChg { font-size:13px; font-weight:700; }
 #tickerChg.up { color:var(--green); } #tickerChg.down { color:var(--red); }
+#tickerAsset { font-weight:800; letter-spacing:.4px; }
 
-/* позиция: бейджи в углах (со стадии плеча) */
+/* бейджи позиции (со стадии плеча) */
 .pos-badge {
-  position:absolute; color:#fff; font-weight:700; font-size:12px; line-height:18px;
-  border:2px solid #fff; display:flex; align-items:center; justify-content:center;
+  position:absolute; color:#fff; font-weight:800; font-size:11px; line-height:16px;
+  display:flex; align-items:center; justify-content:center;
 }
-.pos-badge.lev { left:12px; top:12px; min-width:30px; height:24px; border-radius:10px; background:var(--blue); padding:0 6px; }
-.pos-badge.dir { right:12px; top:14px; height:20px; border-radius:8px; padding:0 6px; }
+.pos-badge.lev { left:12px; top:12px; min-width:28px; height:20px; border-radius:8px; background:var(--accent); padding:0 6px; }
+.pos-badge.dir { right:12px; top:12px; height:20px; border-radius:8px; padding:0 7px; }
 .pos-badge.dir.long { background:var(--green); }
 .pos-badge.dir.short { background:var(--red); }
 
 #pnlBox { display:flex; flex-direction:column; justify-content:center; height:100%; }
-.pnl-line { display:flex; align-items:center; justify-content:center; gap:4px; margin-top:4px; }
-.pnl-line .coin-v { width:24px; height:24px; stroke-width:1.5; }
-#pnlBox .pnl-line { color:var(--green); }
-#uPnlUsd { font-size:24px; font-weight:900; color:var(--green); line-height:36px; will-change:transform; }
-#uPnlPct { font-size:14px; font-weight:600; color:var(--green); align-self:center; margin-top:6px; }
-#pnlBox.neg .pnl-line { color:var(--red); }
-#pnlBox.neg #uPnlUsd, #pnlBox.neg #uPnlPct { color:var(--red); }
-#pnlBox.melt .pnl-line { color:#e98708; }
-#pnlBox.melt #uPnlUsd, #pnlBox.melt #uPnlPct { color:#e98708; }
-.pnl-chips { display:flex; gap:8px; margin-top:8px; justify-content:center; }
-.pnl-chip { width:101px; height:41px; background:rgba(255,255,255,.30); border-radius:12px; padding-top:4px; }
-.pc-label { font-size:10px; font-weight:600; color:var(--ink-soft); line-height:15px; }
-.pc-val { font-size:12px; font-weight:900; color:var(--ink); line-height:18px; }
-
-/* ликвидационная полоса (со стадии плеча) */
-#liqBlock { padding:0 24px; margin-top:16px; }
-.liq-lbl { font-size:10px; font-weight:600; color:var(--ink-mut); text-align:left; line-height:14px; }
-.liq-track { margin-top:4px; height:4px; border-radius:2px; background:#fff; overflow:hidden; }
-#liqFill { height:100%; width:0%; border-radius:2px; background:linear-gradient(90deg,#FF9E9E,#FF4A4A); transition:width .2s linear; }
-.liq-cap { margin-top:16px; font-size:10px; font-weight:600; color:var(--ink-mut); line-height:14px; }
-
-/* ===================== КОНТРОЛЫ: Leverage / Trade size ===================== */
-#ctlBar { margin-top:8px; }
-.ctl-row { margin-top:0; }
-.ctl-row + .ctl-row { margin-top:8px; }
-.ctl-head { display:flex; align-items:center; gap:8px; height:20px; }
-.lock-ico { width:20px; height:20px; flex:0 0 20px; }
-.lock-ico svg { width:20px; height:20px; display:block; }
-.ctl-lbl { font-size:14px; font-weight:700; color:var(--ink); line-height:20px; }
-.pills { display:flex; gap:8px; margin-top:8px; height:48px; }
-.pills button {
-  flex:1; border:none; cursor:pointer; font-family:inherit;
-  background:var(--bg); color:var(--ink); font-size:20px; font-weight:900;
-  height:43px; border-radius:12px;
-  box-shadow:0 5px 0 var(--edge), 0 6px 3px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.55);
-  transition:background .12s ease, transform .07s ease;
+.pnl-line { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:6px; }
+.pnl-coin { width:var(--pnl-coin-sz); height:var(--pnl-coin-sz); background:var(--coin-pnl); }
+#uPnlUsd {
+  font-size:var(--pnl-fs); font-weight:var(--pnl-fw); color:var(--green); line-height:1.21;
+  will-change:transform; font-variant-numeric:tabular-nums;
 }
-.pills button:active { transform:translateY(3px); box-shadow:0 2px 0 var(--edge); }
-.pills button.on { background:var(--blue); color:#fff; box-shadow:0 5px 0 rgba(0,0,0,.28), 0 6px 3px rgba(0,0,0,.10); }
-/* залоченный ряд: пилюли гаснут (opacity .30 как в макете), замок горит;
-   кнопка 🔒 Open (основная игра, stage 3) остаётся яркой и тапабельной */
-.ctl-row.locked .pills button { opacity:.30; pointer-events:none; }
-.ctl-row.locked .pills button.unlock { opacity:1; pointer-events:auto; }
-.pills button.unlock { flex:0 0 auto; background:var(--lock); color:#fff; font-size:15px; box-shadow:0 5px 0 rgba(0,0,0,.25); padding:0 12px; }
+#uPnlPct {
+  font-family:var(--pnl-pct-font); font-size:var(--pnl-pct-fs); font-weight:var(--pnl-pct-fw);
+  color:var(--green); align-self:center;
+}
+#pnlBox.neg #uPnlUsd, #pnlBox.neg #uPnlPct { color:var(--red); }
+#pnlBox.melt #uPnlUsd, #pnlBox.melt #uPnlPct { color:var(--warn); }
+.pnl-chips { display:flex; gap:12px; margin-top:14px; justify-content:center; }
+.pnl-chip {
+  flex:1; background:var(--box-bg); border:var(--box-lw) solid var(--box-line);
+  border-radius:var(--box-r); padding:10px;
+  display:flex; flex-direction:column; align-items:var(--box-align); gap:4px;
+}
+.pc-label { font-size:var(--box-lbl-fs); font-weight:var(--box-lbl-fw); color:var(--tx-soft); line-height:1.21; }
+.pc-val {
+  font-family:var(--box-val-font); font-size:var(--box-val-fs); font-weight:var(--box-val-fw);
+  color:var(--tx); line-height:1.28; font-variant-numeric:tabular-nums;
+}
 
-/* ===================== RESULT ===================== */
-.res-scroll { flex:1; overflow-y:auto; padding:26px 0 18px; display:flex; flex-direction:column; }
+/* ликвидационная полоса */
+#liqBlock { padding:0 4px; margin-top:12px; }
+.liq-lbl { font-size:10px; font-weight:700; color:var(--tx-tert); text-align:left; line-height:14px; }
+.liq-track { margin-top:4px; height:4px; border-radius:2px; background:var(--line); overflow:hidden; }
+#liqFill { height:100%; width:0%; border-radius:2px; background:var(--red); transition:width .2s linear; }
+.liq-cap { margin-top:8px; font-size:10px; font-weight:600; color:var(--tx-tert); line-height:14px; text-align:left; }
+
+/* Leverage / Trade size */
+#ctlBar { margin-top:var(--ctl-mt); }
+.ctl-row + .ctl-row { margin-top:var(--ctl-gap); }
+.ctl-head { display:flex; align-items:center; gap:var(--lbl-gap); min-height:16px; }
+.lock-ico { width:14px; height:14px; flex:0 0 14px; color:var(--lock-tx); display:flex; }
+.lock-ico svg { width:14px; height:14px; display:block; }
+.ctl-lbl {
+  font-size:var(--lbl-fs); font-weight:var(--lbl-fw); color:var(--lbl-tx);
+  text-transform:var(--lbl-case); line-height:1.21;
+}
+.pills { display:flex; gap:var(--chip-gap); margin-top:var(--chip-mt); }
+.pills button {
+  flex:1; cursor:pointer; font-family:inherit;
+  background:var(--chip-bg); border:var(--chip-lw) solid var(--chip-line); color:var(--chip-tx);
+  font-size:var(--chip-fs); font-weight:var(--chip-fw);
+  height:var(--chip-h); border-radius:var(--r-chip);
+  transition:background .12s ease, color .12s ease, border-color .12s ease, transform .07s ease;
+}
+.pills button:active { transform:scale(.96); }
+.pills button.on {
+  background:var(--chip-on-bg); border-color:var(--chip-on-line);
+  color:var(--chip-on-tx); font-weight:var(--chip-on-fw);
+}
+/* залоченный ряд: пилюли гаснут (op .40 как в макетах), «выбранный» 100% —
+   собственная подсветка варианта; кнопка 🔒 Open остаётся яркой и тапабельной */
+.ctl-row.locked .pills button:not(.unlock) { opacity:var(--chip-lock-op); }
+.ctl-row.locked .pills button { pointer-events:none; }
+.ctl-row.locked .pills button.on {
+  background:var(--chip-lock-bg); border-color:var(--chip-lock-line); color:var(--chip-lock-tx);
+}
+.ctl-row.locked .pills button.unlock { opacity:1; pointer-events:auto; }
+.pills button.unlock {
+  flex:0 0 auto; background:var(--warn); color:#fff; border-color:var(--warn);
+  font-size:13px; padding:0 12px;
+}
+
+/* ============================================================================
+   RESULT (standalone)
+   ============================================================================ */
+.res-scroll { flex:1; overflow-y:auto; padding:20px 0 12px; display:flex; flex-direction:column; }
 .res-head { text-align:center; padding:0 20px; }
-.res-title { font-size:31px; font-weight:900; letter-spacing:1px; margin-bottom:12px; white-space:nowrap; }
+.res-title { font-size:26px; font-weight:900; letter-spacing:.5px; margin-bottom:12px; white-space:nowrap; color:var(--tx); }
 .score-band {
-  margin-top:18px; background:#ead9b8;
-  border-top:2px solid #fff; border-bottom:2px solid #fff;
-  box-shadow:inset 0 2px 6px rgba(120,90,40,.08);
-  padding:18px 20px 20px; text-align:center;
+  margin:16px var(--pad-x) 0; background:var(--card);
+  border:var(--line-w) solid var(--line); border-radius:var(--r-card);
+  padding:16px 20px 18px; text-align:center;
   animation:cardIn .45s cubic-bezier(.2,1.4,.4,1) both;
 }
-.score-label { font-size:17px; font-weight:700; color:var(--ink-soft); }
-.score-value { font-size:56px; font-weight:900; line-height:1.15; color:var(--ink); }
-.score-mult { margin-top:2px; font-size:19px; font-weight:900; color:#8a55d6; }
-.score-best { margin-top:4px; font-size:16px; font-weight:700; color:var(--ink-soft); }
+.score-label { font-size:15px; font-weight:700; color:var(--tx-soft); }
+.score-value { font-size:46px; font-weight:900; line-height:1.15; color:var(--tx); }
+.score-mult { margin-top:2px; font-size:16px; font-weight:800; color:var(--accent); }
+.score-best { margin-top:4px; font-size:14px; font-weight:700; color:var(--tx-soft); }
 .best-badge {
-  display:inline-block; margin-top:10px; font-size:15px; font-weight:900; color:#7a4c00;
-  background:#ffd977; padding:6px 16px; border-radius:14px;
-  box-shadow:0 3px 0 #dfa92f;
+  display:inline-block; margin-top:10px; font-size:13px; font-weight:900; color:#fff;
+  background:var(--warn); padding:6px 14px; border-radius:12px;
   animation:hotPulse .8s ease infinite;
 }
 @keyframes cardIn { from{transform:translateY(24px); opacity:0} to{transform:none; opacity:1} }
-.sect-head {
-  display:flex; align-items:baseline; justify-content:space-between;
-  padding:22px 22px 10px;
-}
-.sect-title { font-size:24px; font-weight:900; color:var(--ink); }
-.sect-link { font-size:16px; font-weight:800; color:var(--blue); }
+.sect-head { display:flex; align-items:baseline; justify-content:space-between; padding:18px var(--pad-x) 8px; }
+.sect-title { font-size:20px; font-weight:900; color:var(--tx); }
+.sect-link { font-size:14px; font-weight:800; color:var(--accent); }
 .list-card {
-  margin:0 18px; background:var(--card); border:2px solid #fff; border-radius:16px;
-  box-shadow:0 8px 22px rgba(120,90,40,.12);
-  padding:6px 14px; animation:cardIn .5s cubic-bezier(.2,1.4,.4,1) both;
+  margin:0 var(--pad-x); background:var(--card); border:var(--line-w) solid var(--line);
+  border-radius:var(--r-card); padding:6px 14px;
+  animation:cardIn .5s cubic-bezier(.2,1.4,.4,1) both;
 }
 .trade-row, .lb-row { display:flex; align-items:center; gap:12px; padding:10px 2px; }
-.trade-row + .trade-row, .lb-row + .lb-row { border-top:1.5px solid rgba(120,90,40,.08); }
+.trade-row + .trade-row, .lb-row + .lb-row { border-top:1px solid var(--line); }
 .trade-ico {
-  width:44px; height:44px; border-radius:12px; background:rgba(255,255,255,.35);
-  display:flex; align-items:center; justify-content:center; font-size:20px;
+  width:38px; height:38px; border-radius:10px; background:var(--card2);
+  display:flex; align-items:center; justify-content:center; font-size:18px;
 }
 .trade-main { flex:1; text-align:left; }
-.trade-pair { font-size:18px; font-weight:900; color:var(--ink); }
-.trade-dur { font-size:13px; font-weight:700; color:var(--ink-soft); }
-.trade-pnl { font-size:20px; font-weight:900; }
+.trade-pair { font-size:16px; font-weight:900; color:var(--tx); }
+.trade-dur { font-size:12px; font-weight:700; color:var(--tx-soft); }
+.trade-pnl { font-size:18px; font-weight:900; }
 .trade-pnl.win { color:var(--green); } .trade-pnl.loss { color:var(--red); }
+.dir-badge { font-weight:800; }
 .liq-badge {
-  background:var(--red); color:#fff; font-size:12px; font-weight:900;
-  padding:4px 9px; border-radius:9px; margin-right:8px; letter-spacing:.5px;
+  background:var(--red); color:#fff; font-size:11px; font-weight:900;
+  padding:3px 8px; border-radius:8px; margin-right:8px; letter-spacing:.4px;
 }
-.res-none { font-size:14.5px; color:var(--ink-soft); font-weight:700; padding:12px 4px; text-align:center; }
+.res-none { font-size:14px; color:var(--tx-soft); font-weight:700; padding:12px 4px; text-align:center; }
 .lb-place {
-  width:38px; height:38px; border-radius:11px; background:rgba(255,255,255,.35);
+  width:34px; height:34px; border-radius:10px; background:var(--card2);
   display:flex; align-items:center; justify-content:center;
-  font-size:17px; font-weight:900; color:var(--ink-soft);
+  font-size:15px; font-weight:900; color:var(--tx-soft);
 }
-.lb-row.me { background:rgba(255,255,255,.45); border-radius:14px; margin:2px -6px; padding:10px 8px; }
-.lb-row.me .lb-place { background:var(--blue); color:#fff; }
-.lb-name { flex:1; text-align:left; font-size:19px; font-weight:900; color:var(--ink); }
-.lb-score { font-size:20px; font-weight:900; color:var(--ink); }
-.res-action { display:flex; gap:12px; padding-top:12px; }
-.res-action .bigbtn { margin-bottom:0; }
+.lb-row.me .lb-place { background:var(--accent); color:#fff; }
+.lb-name { flex:1; text-align:left; font-size:16px; font-weight:900; color:var(--tx); }
+.lb-score { font-size:17px; font-weight:900; color:var(--tx); }
+.res-action { display:flex; gap:var(--cta-gap); padding-top:12px; }
+#unlockBand {
+  margin:14px var(--pad-x) 0; padding:12px 16px; border-radius:var(--r-card);
+  background:var(--tint); color:var(--accent); font-size:15px; font-weight:900;
+  display:flex; align-items:center; gap:10px;
+  animation:cardIn .5s cubic-bezier(.2,1.4,.4,1) both;
+}
+.ub-ico { font-size:20px; }
 
-/* ===================== OVERLAYS ===================== */
+/* ============================================================================
+   OVERLAYS
+   ============================================================================ */
 .overlay { position:absolute; inset:0; z-index:40; display:flex; align-items:center; justify-content:center; }
-#pauseOverlay { background:rgba(60,40,20,.45); backdrop-filter:blur(5px); }
-.pause-card {
-  background:var(--card); border:3px solid #fff; border-radius:26px; padding:26px 24px;
-  display:flex; flex-direction:column; gap:12px; width:280px; text-align:center;
-  box-shadow:0 20px 50px rgba(30,20,10,.4);
+#pauseOverlay, .intro-overlay { background:var(--ov-bg); backdrop-filter:blur(4px); }
+.intro-overlay { z-index:44; }
+.pause-card, .intro-card {
+  position:relative;
+  background:var(--ov-card); border:var(--ov-lw) solid var(--ov-line); border-radius:var(--ov-r);
+  padding:24px 22px 22px; display:flex; flex-direction:column; gap:12px;
+  width:300px; text-align:center; color:var(--tx);
+  box-shadow:0 20px 50px rgba(0,0,0,.28);
 }
-.pause-title { font-size:28px; font-weight:900; margin-bottom:4px; }
+.intro-card { width:320px; }
+.pause-title { font-size:24px; font-weight:900; margin-bottom:4px; }
+.intro-title { font-size:22px; font-weight:900; }
+.intro-body p { font-size:14px; font-weight:600; color:var(--tx); line-height:1.4; margin-bottom:10px; text-align:left; }
+.intro-demo { display:flex; gap:6px; justify-content:center; margin:2px 0 4px; flex-wrap:wrap; }
+.demo-pill { font-size:14px; font-weight:800; padding:7px 12px; border-radius:var(--r-chip); color:#fff; }
+.demo-pill.long { background:var(--green); }
+.demo-pill.short { background:var(--red); }
+.demo-pill.lev { background:var(--chip-bg); color:var(--chip-tx); border:var(--chip-lw) solid var(--chip-line); }
+.demo-pill.lev.on { background:var(--chip-on-bg); color:var(--chip-on-tx); border-color:var(--chip-on-line); }
 
 #liqOverlay {
-  background:radial-gradient(circle at 50% 50%, rgba(245,64,64,.22) 0%, rgba(120,20,10,.5) 100%);
+  background:radial-gradient(circle at 50% 50%, rgba(234,57,67,.22) 0%, rgba(90,15,10,.62) 100%);
   flex-direction:column; pointer-events:none;
 }
 #cracks { position:absolute; inset:0; width:100%; height:100%; animation:crackIn .25s ease-out both; }
+.crack-dark { stroke:rgba(30,12,12,.85); }
+.crack-light { stroke:#fff; }
 @keyframes crackIn { from{transform:scale(.2); opacity:0} to{transform:scale(1); opacity:1} }
 .liq-text {
-  font-size:42px; font-weight:900; letter-spacing:1px; color:#fff;
-  text-shadow:0 4px 0 var(--red-dark), 0 14px 30px rgba(120,10,0,.6);
+  font-size:38px; font-weight:900; letter-spacing:1px; color:#fff;
+  text-shadow:0 4px 14px rgba(80,10,0,.7);
   animation:liqPop .5s cubic-bezier(.2,1.8,.4,1) both;
 }
-.liq-sub { margin-top:8px; font-size:17px; font-weight:800; color:#ffe0d7; }
+.liq-sub { margin-top:8px; font-size:16px; font-weight:700; color:#ffe0d7; }
 @keyframes liqPop { from{transform:scale(3); opacity:0} to{transform:scale(1); opacity:1} }
 
 #stage.shake { animation:stageShake .5s linear; }
@@ -442,19 +937,9 @@ body {
 #flash.on { animation:flashAnim .45s ease-out; }
 @keyframes flashAnim { 0%{opacity:.7} 100%{opacity:0} }
 
-/* плашка «открыта новая механика» на экране результата (game.js finishRound
-   показывает её при stagedUp — CSS обязан жить, иначе голый текст; драфт-дизайн) */
-#unlockBand {
-  margin:16px 18px 0; padding:12px 16px; border-radius:18px;
-  background:#ffd977; color:#7a4c00; font-size:16px; font-weight:900;
-  display:flex; align-items:center; gap:10px;
-  box-shadow:0 4px 0 #dfa92f;
-  animation:cardIn .5s cubic-bezier(.2,1.4,.4,1) both;
-}
-#unlockBand.draftable::after { top:-8px; right:8px; }
-.ub-ico { font-size:22px; }
-
-/* ===================== ЛЕСЕНКА / ДРАФТ-МЕТКИ ===================== */
+/* ============================================================================
+   DRAFT MARKS
+   ============================================================================ */
 .draftable { outline:1.5px dashed rgba(230,162,60,.6); outline-offset:2px; position:relative; }
 .draftable::after {
   content:"★ draft"; position:absolute; top:-9px; right:-6px; z-index:6;
@@ -466,22 +951,3 @@ body {
   background:#f0a92e; color:#fff; font-size:10px; font-weight:800;
   padding:2px 8px; border-radius:9px; letter-spacing:.3px;
 }
-
-/* интро-оверлеи анлоков (шорты/плечо — теперь только вне онбординга; частичные — как были) */
-.intro-overlay { background:rgba(60,40,20,.5); backdrop-filter:blur(5px); z-index:44; }
-.intro-card {
-  position:relative;
-  background:var(--card); border:3px solid #fff; border-radius:26px; padding:26px 22px 22px;
-  display:flex; flex-direction:column; gap:12px; width:320px; text-align:center;
-  box-shadow:0 20px 50px rgba(30,20,10,.4);
-}
-.intro-title { font-size:25px; font-weight:900; }
-.intro-body p { font-size:15px; font-weight:700; color:var(--ink); line-height:1.35; margin-bottom:10px; text-align:left; }
-.intro-demo { display:flex; gap:8px; justify-content:center; margin:2px 0 4px; }
-.demo-pill {
-  font-size:15px; font-weight:900; padding:7px 14px; border-radius:13px; color:#fff;
-}
-.demo-pill.long { background:var(--green); box-shadow:0 3px 0 var(--green-dark); }
-.demo-pill.short { background:var(--red); box-shadow:0 3px 0 var(--red-dark); }
-.demo-pill.lev { background:var(--bg); color:var(--ink); box-shadow:0 3px 0 var(--edge); padding:7px 11px; }
-.demo-pill.lev.on { background:var(--blue); color:#fff; box-shadow:0 3px 0 var(--blue-dark); }

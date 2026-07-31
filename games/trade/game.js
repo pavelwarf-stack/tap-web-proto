@@ -58,10 +58,14 @@ const NICKS = [
    графика и сид цены; движок симуляции ЕДИНЫЙ. ★draft: живой фид Binance в игре
    только BTC — ETH/SOL идут на том же генераторе режимов от типичного сида
    (честный минимум по заданию 31.07); выбор живёт в рамках iframe, дефолт BTC */
+/* ★draft: макеты 31.07 рисуют монету активов ПЛОСКИМ кружком в цвете тикера
+   (у каждого варианта свои: --dot-btc/-eth/-sol), поэтому 3D-webp монеты кремовой
+   итерации (coin-*.webp) больше не подключаются; файлы оставлены в папке, если
+   владелец захочет вернуть картиночные монеты. */
 const ASSETS = {
-  BTC: { name: 'Bitcoin',  ticker: 'BTC', seed: 63370, live: true,  icon: 'coin-btc.webp' },
-  ETH: { name: 'Ethereum', ticker: 'ETH', seed: 3420,  live: false, icon: 'coin-eth.webp' },
-  SOL: { name: 'Solana',   ticker: 'SOL', seed: 180,   live: false, icon: 'coin-sol.webp' },
+  BTC: { name: 'Bitcoin',  ticker: 'BTC', seed: 63370, live: true  },
+  ETH: { name: 'Ethereum', ticker: 'ETH', seed: 3420,  live: false },
+  SOL: { name: 'Solana',   ticker: 'SOL', seed: 180,   live: false },
 };
 
 // ============================== PROGRESS (ladder) ==============================
@@ -110,6 +114,28 @@ const Tasks = {
     try { localStorage.setItem('trade.tasks', JSON.stringify(t)); } catch (e) {}
   },
 };
+
+// ============================== SKIN (вердикт владельца 31.07 вечер, п.32) ==============================
+/* Игра больше НЕ едина по виду: у каждого из четырёх вариантов приложения свои игровые
+   экраны. Скин приходит из хаба двумя каналами:
+     1) ?skin=<key> в URL айфрейма (shell.js openGame) — читаем на буте;
+     2) postMessage {type:'hub:skin', skin:'<key>'} — дев-переключатель Style в Settings,
+        перекрашиваем ЖИВУЮ игру без перезагрузки.
+   Скин = ТОЛЬКО набор CSS-токенов на html[data-skin] (+ цвета канваса читаются из тех же
+   переменных). DOM и раскладка не ветвятся (п.20 в силе). */
+const SKINS = ['crypto-light', 'crypto-dark', 'cream', 'corporate'];
+// когортные ссылки прошлой итерации не должны ломаться (те же алиасы, что в shell.js)
+const SKIN_ALIAS = { narodny: 'cream', terminal: 'crypto-dark', editorial: 'corporate', taptrade: 'cream' };
+const normSkin = s => (SKINS.includes(s) ? s : (SKIN_ALIAS[s] || null));
+let SKIN = 'crypto-light';
+function applySkin(s) {
+  const k = normSkin(s);
+  if (!k) return false;
+  SKIN = k;
+  document.documentElement.dataset.skin = k;
+  return true;
+}
+try { applySkin(new URLSearchParams(location.search).get('skin')); } catch (e) {}
 
 // ============================== GAME I18N (новые строки — 8 языков) ==============================
 /* Язык берём из настроек хаба (hub.state.lang). Торговые термины (Long/Short/
@@ -166,6 +192,7 @@ en: {
   'deal.mech.partial.d': 'Now you can choose your position size and control your risk',
   'deal.howto.t': 'How to play',
   'ui.chartlbl': '{0} chart ({1}/USD)',
+  'ui.gtitle': 'Trade',
 },
 es: {
   'stage.badge': 'Etapa {0} de {1}',
@@ -211,6 +238,7 @@ es: {
   'deal.mech.partial.d': 'Ahora puedes elegir el tamaño de tu posición y controlar el riesgo',
   'deal.howto.t': 'Cómo jugar',
   'ui.chartlbl': 'Gráfico de {0} ({1}/USD)',
+  'ui.gtitle': 'Trade',
 },
 fr: {
   'stage.badge': 'Étape {0} sur {1}',
@@ -256,6 +284,7 @@ fr: {
   'deal.mech.partial.d': 'Tu peux maintenant choisir la taille de ta position et contrôler ton risque',
   'deal.howto.t': 'Comment jouer',
   'ui.chartlbl': 'Graphique {0} ({1}/USD)',
+  'ui.gtitle': 'Trade',
 },
 de: {
   'stage.badge': 'Stufe {0} von {1}',
@@ -301,6 +330,7 @@ de: {
   'deal.mech.partial.d': 'Jetzt kannst du deine Positionsgröße wählen und dein Risiko steuern',
   'deal.howto.t': 'So wird gespielt',
   'ui.chartlbl': '{0}-Chart ({1}/USD)',
+  'ui.gtitle': 'Trade',
 },
 ja: {
   'stage.badge': 'ステージ {0} / {1}',
@@ -346,6 +376,7 @@ ja: {
   'deal.mech.partial.d': 'ポジションのサイズを選んでリスクをコントロールできるようになりました',
   'deal.howto.t': '遊び方',
   'ui.chartlbl': '{0}チャート ({1}/USD)',
+  'ui.gtitle': 'Trade',
 },
 zh: {
   'stage.badge': '第 {0} 阶段，共 {1} 阶段',
@@ -391,6 +422,7 @@ zh: {
   'deal.mech.partial.d': '现在你可以选择仓位大小并控制风险',
   'deal.howto.t': '玩法说明',
   'ui.chartlbl': '{0}图表 ({1}/USD)',
+  'ui.gtitle': 'Trade',
 },
 pt: {
   'stage.badge': 'Fase {0} de {1}',
@@ -436,6 +468,7 @@ pt: {
   'deal.mech.partial.d': 'Agora você pode escolher o tamanho da sua posição e controlar o risco',
   'deal.howto.t': 'Como jogar',
   'ui.chartlbl': 'Gráfico de {0} ({1}/USD)',
+  'ui.gtitle': 'Trade',
 },
 ar: {
   'stage.badge': 'المرحلة {0} من {1}',
@@ -481,6 +514,7 @@ ar: {
   'deal.mech.partial.d': 'يمكنك الآن اختيار حجم صفقتك والتحكم في المخاطر',
   'deal.howto.t': 'طريقة اللعب',
   'ui.chartlbl': 'مخطط {0} ({1}/USD)',
+  'ui.gtitle': 'Trade',
 },
 };
 function gt(key) {
@@ -774,22 +808,98 @@ function balTotal() { return G.cash + (G.pos ? G.pos.stake : 0); }
 const chart = $('chart');
 const ctx = chart.getContext('2d');
 let chartW = 0, chartH = 0;
-// стейдж = фигма-фрейм онбординг-макетов @1x (375×812); в окне/айфрейме масштабируется
+// стейдж = фигма-фрейм макетов @1x (375×812); в окне/айфрейме масштабируется
 const SW = 375, SH = 812;
-const RING_LEN = 219.9; // 2π×35 — кольцо таймера из макета (76×76, страйк 6)
+let RING_LEN = 220, RING_OFF = 0; // периметр обводки таймера — пересчитывается под скин
+
+/* ---------- тема канваса: цвета/метрика графика живут в ТЕХ ЖЕ CSS-переменных,
+   что и остальной скин (--ch-*), канвас их читает через getComputedStyle.
+   Пересчитывается на буте, на смене скина и на ресайзе. ---------- */
+const TH = {};
+function readTheme() {
+  const cs = getComputedStyle(document.documentElement);
+  const v = n => cs.getPropertyValue(n).trim();
+  const num = (n, d) => { const x = parseFloat(v(n)); return isFinite(x) ? x : d; };
+  const famUI = v('--font-ui') || 'Inter, sans-serif';
+  const famNum = v('--font-num') || famUI;
+  TH.grid = v('--ch-grid') || 'rgba(0,0,0,.08)';
+  const dash = v('--ch-dash').split(/[\s,]+/).map(Number).filter(n => isFinite(n));
+  TH.dash = (dash.length && dash.some(n => n > 0)) ? dash : [];
+  TH.lines = Math.max(2, num('--ch-lines', 4));
+  TH.axis = v('--ch-axis') || 'rgba(0,0,0,.45)';
+  TH.axisFont = num('--ch-axis-fw', 400) + ' ' + num('--ch-axis-fs', 10) + 'px ' +
+    (v('--ch-axis-font') === 'num' ? famNum : famUI);
+  TH.up = v('--ch-up') || '#16C784';
+  TH.down = v('--ch-down') || '#EA3943';
+  TH.body = num('--ch-body', 0.6);
+  TH.wick = num('--ch-wick', 2);
+  TH.brad = num('--ch-brad', 2);
+  TH.zone = v('--ch-zone') || 'rgba(22,199,132,.10)';
+  TH.zoneLine = v('--ch-zone-line') || 'rgba(0,0,0,0)';
+  TH.liq = v('--ch-liq') || 'rgba(234,57,67,.85)';
+  TH.flag = num('--ch-flag', 0) > 0;
+  TH.flagBg = v('--ch-flag-bg') || '#228BEE';
+  TH.flagTx = v('--ch-flag-tx') || '#fff';
+  TH.flagR = num('--ch-flag-r', 4);
+  TH.flagFont = num('--ch-flag-fw', 700) + ' ' + num('--ch-flag-fs', 11) + 'px ' + famUI;
+  TH.flagLine = num('--ch-flagline', 0) > 0;
+}
+
+/* обводка-прогресс таймера: <rect rx> вместо круга — одна механика работает
+   и для пилюли (crypto-light / cream), и для круга (crypto-dark / corporate) */
+function layoutTimer() {
+  const box = $('timerCircle'), svg = $('timerRing');
+  if (!box || !svg) return;
+  const w = box.offsetWidth || 58, h = box.offsetHeight || 30;
+  const cs = getComputedStyle(box);
+  const sw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--timer-rw')) || 2;
+  const rx = Math.min(parseFloat(cs.borderTopLeftRadius) || 0, w / 2, h / 2);
+  const ins = sw / 2;
+  const rw = Math.max(1, w - sw), rh = Math.max(1, h - sw);
+  const rr = clamp(rx - ins, 0, Math.min(rw, rh) / 2);
+  svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+  for (const el of svg.querySelectorAll('rect')) {
+    el.setAttribute('x', ins); el.setAttribute('y', ins);
+    el.setAttribute('width', rw); el.setAttribute('height', rh);
+    el.setAttribute('rx', rr);
+  }
+  const topEdge = Math.max(0, rw - 2 * rr);
+  RING_LEN = 2 * topEdge + 2 * Math.max(0, rh - 2 * rr) + 2 * Math.PI * rr;
+  RING_OFF = -topEdge / 2; // дуга начинается от 12 часов и растёт по часовой
+  const arc = $('ringArc');
+  arc.style.strokeDashoffset = RING_OFF;
+  arc.style.strokeDasharray = '0 ' + RING_LEN.toFixed(1);
+}
 
 function resizeAll() {
   const s = Math.min(window.innerWidth / SW, window.innerHeight / SH);
   $('stage').style.setProperty('--s', s);
   const dpr = Math.min(2, window.devicePixelRatio || 1);
-  const r = $('chartWrap').getBoundingClientRect();
+  const r = $('chartPlot').getBoundingClientRect();
   const st = $('stage').getBoundingClientRect();
-  chartW = st.width > 0 ? r.width / (st.width / SW) : SW;
-  chartH = st.height > 0 ? r.height / (st.height / SH) : 300;
+  chartW = st.width > 0 ? r.width / (st.width / SW) : SW - 2 * 16;
+  chartH = st.height > 0 ? r.height / (st.height / SH) : 200;
   chart.width = Math.max(10, Math.round(chartW * dpr));
   chart.height = Math.max(10, Math.round(chartH * dpr));
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  layoutTimer();
   FX.resize();
+}
+
+/* смена скина на живой игре (postMessage hub:skin из дев-переключателя Style) */
+function setSkin(s) {
+  if (!applySkin(s)) return;
+  readTheme();
+  resizeAll();
+  if (G.screen === 'start') renderStart();
+  syncChrome();
+}
+/* заголовок в navy-баре (corporate): «Deal» на пред-раунде, имя игры в раунде */
+function syncChrome() {
+  const el = $('gtopTitle');
+  // на Deal заголовок рисует сама шапка экрана (.deal-title внутри navy-полосы) —
+  // полосу оставляем без подписи, чтобы не было двух «Deal»
+  if (el) el.textContent = G.screen === 'start' ? '' : gt('ui.gtitle');
 }
 
 /* PnL позиции в % от стейка: dir-осознанный (шорты по модели «Лонг/Шорт»),
@@ -810,6 +920,7 @@ function show(name) {
   $('screen-game').classList.toggle('hidden', name !== 'game');
   $('screen-result').classList.toggle('hidden', name !== 'result');
   if (name === 'start') renderStart();
+  syncChrome();
   resizeAll();
 }
 
@@ -927,7 +1038,7 @@ function startRound() {
   // онбординг-раунд светил статикой «1:00» при 15-секундном раунде)
   $('timerText').textContent = fmtTimer(G.roundMs / 1000);
   $('timerText').classList.remove('hot');
-  $('ringArc').style.strokeDasharray = '0 ' + RING_LEN;
+  layoutTimer();
   G.startPrice = G.engine.vis;
   G.dispPrice = G.engine.vis;
   G.txtAcc = 9; G.axisTxt = '';
@@ -1015,9 +1126,11 @@ function renderControls() {
   // в позиции ряды скрыты — карточка PnL раскрывается на их место (макеты onb1-5/onb3-5)
   $('ctlBar').classList.toggle('hidden', inPos);
   $('infoCard').classList.toggle('inpos', inPos);
-  $('infoCard').classList.toggle('haslev', inPos && caps.lev);
   $('liqBlock').classList.toggle('hidden', !inPos || !caps.lev);
-  $('ctlBar').classList.toggle('draftable', DRAFTS_ON && !inPos);
+  // ★draft: карточка цены под графиком — в макетах 31.07 её нет (цена там живёт в шапке
+  // карточки графика), но живой игре нужен тикер и на неё якорится бабл онбординга
+  // ob1.1 (#tickerBox в shell.js) — помечаем драфтом, ряды Leverage/Size канон макета
+  $('infoCard').classList.toggle('draftable', DRAFTS_ON && !inPos);
 }
 
 // ---------- позиция ----------
@@ -1258,7 +1371,7 @@ function finishRound() {
 
   // шапка результата: актив раунда (пилюля с 3D-монетой из Deal-селектора)
   const rA = ASSETS[G.asset] || ASSETS.BTC;
-  $('resAssetIco').src = rA.icon;
+  $('resAssetIco').dataset.coin = rA.ticker; // монета-заливка (все четыре варианта рисуют кружок)
   $('resAssetLbl').textContent = rA.ticker;
 
   // история сделок
@@ -1305,14 +1418,12 @@ function finishRound() {
 }
 
 // ============================== CHART RENDER ==============================
-/* по онбординг-макетам: сетка/свечи на всю ширину, подписи шкалы ПОВЕРХ справа
-   (Nunito 600 14, чернила 70%, точка-тысячи), белый пунктир 1px [6,6], свечи
-   #13A86D/#F54040 (тело ~0.68 слота, r1, фитиль 1px), синий флаг цены прижат к
-   правому краю (r12, белая обводка 2), зелёная зона профита #22C55E 30% c белыми
-   кромками, линия ликвидации — красный пунктир без подписи (onb3-3) */
-const C_GREEN = '#13A86D', C_RED = '#F54040', C_BLUE = '#4068F5';
-const AXIS_FONT = '600 14px Nunito, ui-rounded, system-ui, sans-serif';
-
+/* Одна отрисовка на все четыре скина: ВСЕ цвета и метрика берутся из --ch-* токенов
+   (см. readTheme). По макетам различаются: плотность сетки (--ch-lines), пунктир или
+   солид (--ch-dash), ширина тела свечи (--ch-body), наличие флага текущей цены
+   (--ch-flag: у crypto-light и corporate цена живёт в шапке карточки графика,
+   у crypto-dark и cream — флагом на плоте) и горизонтальная линия цены (--ch-flagline).
+   Зелёная зона профита, линия ликвидации, шкала — есть во всех, цветами варианта. */
 function niceStep(raw) {
   const pow = Math.pow(10, Math.floor(Math.log10(raw)));
   const m = raw / pow;
@@ -1327,7 +1438,7 @@ function drawChart() {
   const plotW = W;
   const candles = e.candles;
   const slot = plotW / CFG.VISIBLE;
-  const bodyW = slot * 0.68;
+  const bodyW = Math.max(3, slot * TH.body);
   const cur = candles[candles.length - 1];
   const progress = clamp((e.simTime - cur.t0) / CFG.CANDLE_DUR, 0, 1);
   const first = Math.max(0, candles.length - (CFG.VISIBLE + 1));
@@ -1350,14 +1461,14 @@ function drawChart() {
 
   const pnl = pnlNow();
 
-  // зелёная зона: сторона профита от уровня входа до текущей цены (для лонга выше
-  // входа, для шорта ниже — onb1-3/onb2-3); в минусе зоны нет (макет onb3-3)
+  // зона профита: от уровня входа до текущей цены (лонг — выше входа, шорт — ниже);
+  // в минусе зоны нет
   if (G.pos && pnl >= 0 && Math.abs(Y(G.pos.entryPrice) - Y(e.vis)) >= 3) {
     const eY = Y(G.pos.entryPrice), cY = Y(e.vis);
     const top = Math.min(eY, cY), hgt = Math.abs(cY - eY);
-    ctx.fillStyle = 'rgba(34,197,94,0.30)';
+    ctx.fillStyle = TH.zone;
     ctx.fillRect(0, top, plotW, hgt);
-    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.strokeStyle = TH.zoneLine;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, top + 0.5); ctx.lineTo(plotW, top + 0.5);
@@ -1365,50 +1476,41 @@ function drawChart() {
     ctx.stroke();
   }
 
-  // сетка: белый пунктир 1px [6,6]; подписи над линиями у правого края
+  // сетка + подписи шкалы у правого края
   const range = G.yMax - G.yMin;
-  const step = Math.max(niceStep(range / 5.5), 1); // ~4–5 линий, плотность как в макете
+  const step = Math.max(niceStep(range / (TH.lines + 0.5)), 1);
   const firstLine = Math.ceil(G.yMin / step) * step;
   const lines = [];
-  let gridTop = H, gridBot = 0;
-  for (let p = firstLine; p < G.yMax; p += step) {
-    const y = Y(p);
-    lines.push([p, y]);
-    if (y < gridTop) gridTop = y;
-    if (y > gridBot) gridBot = y;
-  }
-  ctx.setLineDash([6, 6]);
-  ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+  for (let p = firstLine; p < G.yMax; p += step) lines.push([p, Y(p)]);
+  ctx.setLineDash(TH.dash);
+  ctx.strokeStyle = TH.grid;
   ctx.lineWidth = 1;
   for (const [, y] of lines) {
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(plotW, y); ctx.stroke();
-  }
-  // вертикальный пунктир — между крайними линиями сетки (как в макете)
-  if (lines.length > 1) {
-    for (let i = first; i < candles.length; i++) {
-      if (Math.round(candles[i].t0 / CFG.CANDLE_DUR) % 2 !== 0) continue;
-      const x = xOf(i);
-      if (x < -4 || x > plotW + 4) continue;
-      ctx.beginPath(); ctx.moveTo(x, gridTop); ctx.lineTo(x, gridBot); ctx.stroke();
-    }
+    ctx.beginPath(); ctx.moveTo(0, Math.round(y) + 0.5); ctx.lineTo(plotW, Math.round(y) + 0.5); ctx.stroke();
   }
   ctx.setLineDash([]);
-  ctx.font = AXIS_FONT;
-  ctx.fillStyle = 'rgba(76,51,74,0.70)';
+  ctx.font = TH.axisFont;
+  ctx.fillStyle = TH.axis;
   ctx.textAlign = 'right';
   ctx.textBaseline = 'bottom';
-  for (const [p, y] of lines) ctx.fillText(fmtAxis(p), plotW - 1, y - 2);
+  /* подпись оси, попавшую под флаг текущей цены, НЕ рисуем: флаг кладётся поверх и
+     оставлял торчащие половинки цифр (QA 31.07). Полосу флага считаем заранее — он
+     отрисовывается ниже, у него та же curY. */
+  const flagBand = TH.flag ? (() => { const cy = clamp(Y(e.vis), 14, H - 14); return [cy - 13, cy + 13]; })() : null;
+  for (const [p, y] of lines) {
+    if (flagBand && y - 2 > flagBand[0] && y - 2 < flagBand[1] + 12) continue;
+    ctx.fillText(fmtAxis(p), plotW - 1, y - 2);
+  }
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
 
-  // линия ликвидации: красный пунктир на всю ширину, без подписи (onb3-3);
-  // только с открытым плечом (гейт caps.lev) — в симах 1–2 ликвидацию ещё не учили,
-  // макеты onb1-5/onb2-5 линии не показывают (скрытый LEV_BASE мог её засветить)
+  // линия ликвидации: пунктир на всю ширину, без подписи; только с открытым плечом
+  // (в симах 1–2 ликвидацию ещё не учили — скрытый LEV_BASE не светим)
   if (G.pos && G.caps.lev) {
     const lY = Y(liqPriceOf(G.pos));
     if (lY > 0 && lY < H) {
       ctx.setLineDash([6, 6]);
-      ctx.strokeStyle = 'rgba(245,64,64,0.85)';
+      ctx.strokeStyle = TH.liq;
       ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.moveTo(0, lY); ctx.lineTo(plotW, lY); ctx.stroke();
       ctx.setLineDash([]);
@@ -1420,38 +1522,38 @@ function drawChart() {
     const cd = candles[i];
     const x = xOf(i);
     if (x < -slot || x > plotW + slot) continue;
-    const up = cd.c >= cd.o;
-    const col = up ? C_GREEN : C_RED;
+    const col = cd.c >= cd.o ? TH.up : TH.down;
     ctx.fillStyle = col;
-    ctx.fillRect(x - 0.5, Y(cd.h), 1, Math.max(1, Y(cd.l) - Y(cd.h)));
+    ctx.fillRect(x - TH.wick / 2, Y(cd.h), TH.wick, Math.max(1, Y(cd.l) - Y(cd.h)));
     const y1 = Y(Math.max(cd.o, cd.c)), y2 = Y(Math.min(cd.o, cd.c));
     const bh = Math.max(3, y2 - y1);
     if (typeof ctx.roundRect === 'function') {
-      ctx.beginPath(); ctx.roundRect(x - bodyW / 2, y1, bodyW, bh, 1); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(x - bodyW / 2, y1, bodyW, bh, TH.brad); ctx.fill();
     } else ctx.fillRect(x - bodyW / 2, y1, bodyW, bh);
   }
 
-  // флаг текущей цены: прижат к правому краю (заходит за него), r12, белая обводка.
-  // Ширина от ТЕКСТА (QA 30.07: фикс fX=W−54 резал последнюю цифру у широких цен —
-  // в макете onb1-1 цена видна целиком, справа воздух ~4px, флаг уходит за край)
-  const curY = clamp(Y(e.vis), 20, H - 20);
-  ctx.font = AXIS_FONT;
-  const label = G.axisTxt || fmtAxis(e.vis);
-  const tw = ctx.measureText(label).width;
-  const fH = 36, fX = Math.round(W - tw - 12), fW = Math.round(tw + 26);
-  ctx.beginPath();
-  if (typeof ctx.roundRect === 'function') ctx.roundRect(fX, curY - fH / 2, fW, fH, 12);
-  else ctx.rect(fX, curY - fH / 2, fW, fH);
-  ctx.fillStyle = C_BLUE;
-  ctx.fill();
-  ctx.strokeStyle = '#fff';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  ctx.font = AXIS_FONT;
-  ctx.fillStyle = '#fff';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(label, fX + 8, curY + 1);
-  ctx.textBaseline = 'alphabetic';
+  // флаг текущей цены (crypto-dark / cream): прижат к правому краю, ширина от ТЕКСТА
+  if (TH.flag) {
+    const curY = clamp(Y(e.vis), 14, H - 14);
+    ctx.font = TH.flagFont;
+    const label = G.axisTxt || fmtAxis(e.vis);
+    const tw = ctx.measureText(label).width;
+    const fH = 19, fW = Math.round(tw + 12), fX = Math.round(plotW - fW);
+    if (TH.flagLine) {
+      ctx.strokeStyle = TH.flagBg;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(0, Math.round(curY) + .5); ctx.lineTo(fX, Math.round(curY) + .5); ctx.stroke();
+    }
+    ctx.beginPath();
+    if (typeof ctx.roundRect === 'function') ctx.roundRect(fX, curY - fH / 2, fW, fH, TH.flagR);
+    else ctx.rect(fX, curY - fH / 2, fW, fH);
+    ctx.fillStyle = TH.flagBg;
+    ctx.fill();
+    ctx.fillStyle = TH.flagTx;
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, fX + 6, curY + 1);
+    ctx.textBaseline = 'alphabetic';
+  }
 }
 
 // ============================== HUD ==============================
@@ -1466,7 +1568,7 @@ function updateHUD(dt) {
   $('timerText').textContent = fmtTimer(left);
   // кольцо по макету: синяя дуга = ПРОЙДЕННОЕ время, растёт по часовой от 12 часов
   const elapsed = clamp(1 - left / total, 0, 1);
-  $('ringArc').style.strokeDasharray = (elapsed * RING_LEN).toFixed(1) + ' ' + RING_LEN;
+  $('ringArc').style.strokeDasharray = (elapsed * RING_LEN).toFixed(1) + ' ' + RING_LEN.toFixed(1);
   const hot = left <= 10;
   $('timerText').classList.toggle('hot', hot);
   if (hot && sec !== G.lastCountSec && sec <= 5 && sec > 0) Sound.count();
@@ -1474,7 +1576,13 @@ function updateHUD(dt) {
 
   G.txtAcc += dt;
   const txtTick = G.txtAcc >= CFG.TXT_EVERY;
-  if (txtTick) { G.txtAcc = 0; G.axisTxt = fmtAxis(G.dispPrice); }
+  if (txtTick) {
+    G.txtAcc = 0;
+    G.axisTxt = fmtAxis(G.dispPrice);
+    // цена в шапке карточки графика (crypto-light / cream / corporate; в crypto-dark
+    // строка скрыта токеном --chprice-display, там цена идёт флагом на плоте)
+    $('chartPrice').textContent = G.axisTxt;
+  }
 
   if (G.pos) {
     const pnl = pnlNow();
@@ -1660,6 +1768,24 @@ function bind() {
     $('btnSound').textContent = Sound.on ? '🔊 Sound: on' : '🔇 Sound: off';
   });
   window.addEventListener('resize', resizeAll);
+  /* Канвас графика привязан к размеру #chartPlot, а тот устаканивается ПОЗЖЕ первого
+     resizeAll() (шрифты, иконки, разная высота хрома у скинов). Без наблюдателя
+     crypto-dark стартовал с нулевой геометрией и график оставался пустым до первого
+     ресайза окна (найдено QA 31.07). ResizeObserver лечит весь класс: любое изменение
+     плота — пересчёт канваса. */
+  if (window.ResizeObserver) {
+    let lastW = 0, lastH = 0;
+    const ro = new ResizeObserver(entries => {
+      const r = entries[0] && entries[0].contentRect;
+      if (!r) return;
+      // без дребезга: реагируем только на реальное изменение
+      if (Math.abs(r.width - lastW) < 0.5 && Math.abs(r.height - lastH) < 0.5) return;
+      lastW = r.width; lastH = r.height;
+      resizeAll();
+      drawChart();
+    });
+    ro.observe($('chartPlot'));
+  }
 }
 
 // ============================== BOOT ==============================
@@ -1668,8 +1794,19 @@ function bind() {
 function applyGT() {
   document.querySelectorAll('[data-gt]').forEach(el => { el.textContent = gt(el.dataset.gt); });
 }
-window.__trade = { G, CFG, Feed, P, saveP, targetStage, roundCaps, startRound, enterPos, exitPos, Tasks, OB_ROUNDS }; // QA hook
+window.__trade = { G, CFG, Feed, P, saveP, targetStage, roundCaps, startRound, enterPos, exitPos, Tasks, OB_ROUNDS,
+  get skin() { return SKIN; }, setSkin }; // QA hook
 applyGT();
+readTheme();
+
+/* живая смена скина из хаба (дев-переключатель Style в Settings). Сообщение —
+   ДАННЫЕ, а не команда: принимаем только известный ключ из белого списка (К27). */
+window.addEventListener('message', ev => {
+  const d = ev.data;
+  if (!d || d.type !== 'hub:skin') return;
+  if (window.parent !== window && ev.source !== window.parent) return;
+  setSkin(d.skin);
+});
 /* онбординг-сим из хаба (?tut=1): Deal-экран пропускается — шелл сам зовёт startRound()
    через __trade (★draft: контент Deal прячем, чтобы он не мигал и не ловил тап Start
    в окне ожидания фида; вне iframe класс не вешаем — прямое открытие живёт как обычно) */
@@ -1678,6 +1815,9 @@ FX.init();
 bind();
 show('start');
 resizeAll();
+// второй проход после первой раскладки: к этому моменту шрифты/иконки применены,
+// геометрия плота финальная (страховка к ResizeObserver выше)
+requestAnimationFrame(() => { resizeAll(); drawChart(); });
 requestAnimationFrame(frame);
 if (DEMO) {
   const t0 = performance.now();

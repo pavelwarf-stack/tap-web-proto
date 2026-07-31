@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-skin="crypto-light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -11,24 +11,30 @@
 <div id="app">
   <div id="stage">
 
-    <!-- ===== START: «Deal» pre-round Level settings (Figma 622 / f2055) ===== -->
+    <!-- ===== app chrome band (corporate: navy header bar with the screen title; the other
+         three variants draw no app bar over the game → --gtop-h:0 collapses it) ===== -->
+    <div id="gtopbar"><span id="gtopTitle">Trade</span></div>
+
+    <!-- ===== START: «Deal» pre-round Level settings ===== -->
     <section id="screen-start" class="screen">
       <div class="deal-inner">
         <header class="deal-top">
           <h1 class="deal-title" data-gt="deal.title">Deal</h1>
           <div class="deal-topbtns">
-            <button id="btnInfo" class="infobtn" aria-label="How to play">
-              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11.2v4.6"/><circle cx="12" cy="8" r="1.15" fill="#fff" stroke="none"/></svg>
+            <button id="btnInfo" class="squarebtn" aria-label="How to play">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.2"/><path d="M12 11.2v5"/><circle cx="12" cy="7.8" r="1.15" fill="currentColor" stroke="none"/></svg>
             </button>
             <button id="btnDealKebab" class="squarebtn" aria-label="Menu">
-              <svg viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="5.5" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="18.5" r="2" fill="currentColor"/></svg>
+              <svg viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="5.5" r="1.9" fill="currentColor"/><circle cx="12" cy="12" r="1.9" fill="currentColor"/><circle cx="12" cy="18.5" r="1.9" fill="currentColor"/></svg>
             </button>
           </div>
         </header>
 
         <div class="deal-balband">
-          <div class="dbb-label" data-gt="deal.balance">Your balance</div>
-          <div class="dbb-row"><svg class="coin-v" viewBox="0 0 24 24"><ellipse cx="10" cy="12" rx="4.2" ry="8.6"/><path d="M10 3.4h3.6c2.5 0 4.4 3.8 4.4 8.6s-1.9 8.6-4.4 8.6H10"/><path d="M13.4 7.5h3.4M14.6 12h3.4M13.4 16.5h3.4"/></svg><span id="dealBal">1 000</span></div>
+          <div class="bal-row">
+            <span class="bal-lbl dbb-label" data-gt="deal.balance">Your balance</span>
+            <span class="bal-pill"><span class="coin-dot"></span><span id="dealBal">1 000</span></span>
+          </div>
         </div>
 
         <div class="deal-head">
@@ -37,28 +43,28 @@
         </div>
 
         <div class="asset-band">
-          <div class="asset-lbl" data-gt="deal.asset">Trading asset</div>
+          <div class="asset-lbl ctl-lbl" data-gt="deal.asset">Trading asset</div>
           <div class="asset-chips" id="assetChips">
-            <button class="asset-chip on" data-asset="BTC"><img src="coin-btc.webp" alt="">BTC</button>
-            <button class="asset-chip" data-asset="ETH"><img src="coin-eth.webp" alt="">ETH</button>
-            <button class="asset-chip" data-asset="SOL"><img src="coin-sol.webp" alt="">SOL</button>
+            <button class="asset-chip on" data-asset="BTC"><span class="coin-dot" data-coin="BTC"></span>BTC</button>
+            <button class="asset-chip" data-asset="ETH"><span class="coin-dot" data-coin="ETH"></span>ETH</button>
+            <button class="asset-chip" data-asset="SOL"><span class="coin-dot" data-coin="SOL"></span>SOL</button>
           </div>
         </div>
 
-        <!-- unlock banner: показывается, когда игроку реально доступна новая механика
-             (частичные позиции на stage 3 — ровно кейс макета f2055) -->
+        <!-- unlock banner: shown when a new mechanic is actually available to learn
+             (partial positions on stage 3 — exactly the mockup case) -->
         <div id="dealUnlock" class="deal-unlock hidden">
           <div class="du-head">
-            <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="#13A86D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 9V6.4a3.8 3.8 0 0 1 7.4-1.1"/><rect x="3.5" y="9" width="13" height="8.5" rx="2"/></svg>
-            <span data-gt="deal.unlock.t">New mechanic unlocked!</span>
+            <span class="du-ico"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 9V6.4a3.8 3.8 0 0 1 7.4-1.1"/><rect x="3.5" y="9" width="13" height="8.5" rx="2"/></svg></span>
+            <span class="du-tag" data-gt="deal.unlock.t">New mechanic unlocked!</span>
           </div>
           <div class="du-name" id="duName"></div>
           <div class="du-desc" id="duDesc"></div>
-          <button id="btnLearn" class="bigbtn blue learn"><span class="btn-label" data-gt="deal.learn">Learn</span></button>
+          <button id="btnLearn" class="bigbtn learn"><span class="btn-label" data-gt="deal.learn">Learn</span></button>
         </div>
 
         <div class="deal-cta">
-          <button id="btnPlay" class="bigbtn blue"><span class="btn-label" data-gt="deal.start">Start game</span></button>
+          <button id="btnPlay" class="bigbtn green"><span class="btn-label" data-gt="deal.start">Start game</span></button>
         </div>
       </div>
     </section>
@@ -68,9 +74,9 @@
       <header id="topbar">
         <button id="btnPause" class="squarebtn" aria-label="Pause"><span class="pause-ico"></span></button>
         <div id="timerCircle">
-          <svg viewBox="0 0 76 76">
-            <circle class="ring-track" cx="38" cy="38" r="35"/>
-            <circle id="ringArc" class="ring-arc" cx="38" cy="38" r="35"/>
+          <svg id="timerRing" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <rect class="ring-track" x="0" y="0" width="100" height="100" rx="10"/>
+            <rect id="ringArc" class="ring-arc" x="0" y="0" width="100" height="100" rx="10"/>
           </svg>
           <div id="timerText">1:00</div>
         </div>
@@ -79,36 +85,42 @@
             <span class="heart"></span><span class="heart"></span><span class="heart"></span>
           </div>
           <button id="btnKebab" class="squarebtn hidden" aria-label="Menu">
-            <svg viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="5.5" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="18.5" r="2" fill="currentColor"/></svg>
+            <svg viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="5.5" r="1.9" fill="currentColor"/><circle cx="12" cy="12" r="1.9" fill="currentColor"/><circle cx="12" cy="18.5" r="1.9" fill="currentColor"/></svg>
           </button>
         </div>
       </header>
 
       <div id="balanceBand">
-        <div class="bal-pill"><span class="bal-lbl" data-gt="ui.balance">Balance</span><svg class="coin-v" viewBox="0 0 24 24"><ellipse cx="10" cy="12" rx="4.2" ry="8.6"/><path d="M10 3.4h3.6c2.5 0 4.4 3.8 4.4 8.6s-1.9 8.6-4.4 8.6H10"/><path d="M13.4 7.5h3.4M14.6 12h3.4M13.4 16.5h3.4"/></svg><span id="balTop">1 000</span></div>
+        <div class="bal-row">
+          <span class="bal-lbl" data-gt="ui.balance">Balance</span>
+          <span class="bal-pill"><span class="coin-dot"></span><span id="balTop">1 000</span></span>
+        </div>
       </div>
-      <div id="offlineBadge" class="hidden">⚡ offline mode</div>
 
       <div id="chartWrap">
-        <canvas id="chart"></canvas>
-        <div id="chartTag">Bitcoin chart (BTC/USD)</div>
+        <div class="chart-head">
+          <div id="chartTag">Bitcoin chart (BTC/USD)</div>
+          <div id="chartPrice">63 370</div>
+        </div>
+        <div id="chartPlot"><canvas id="chart"></canvas></div>
+        <div id="offlineBadge" class="hidden">⚡ offline mode</div>
         <div id="meltWarn" class="hidden">⚠ Profit is melting — lock it in!</div>
       </div>
 
       <div id="belowChart">
         <div id="infoCard">
-          <!-- flat: тикер -->
+          <!-- flat: ticker -->
           <div id="tickerBox">
             <div class="card-label" id="tickerAsset">BTC</div>
             <div class="ticker-line"><span id="tickerPrice">63 370</span><span id="tickerChg" class="up">+0.00%</span></div>
           </div>
-          <!-- в позиции: PnL -->
+          <!-- in position: PnL -->
           <div id="pnlBox" class="hidden">
             <span id="posLevBadge" class="pos-badge lev hidden">x2</span>
             <span id="posDirBadge" class="pos-badge dir long hidden">Long</span>
             <div class="pnl-mid">
               <div class="card-label" data-gt="ui.upnl">Unrealized P&amp;L</div>
-              <div class="pnl-line"><svg class="coin-v" viewBox="0 0 24 24"><ellipse cx="10" cy="12" rx="4.2" ry="8.6"/><path d="M10 3.4h3.6c2.5 0 4.4 3.8 4.4 8.6s-1.9 8.6-4.4 8.6H10"/><path d="M13.4 7.5h3.4M14.6 12h3.4M13.4 16.5h3.4"/></svg><span id="uPnlUsd">+0.00</span><span id="uPnlPct">+0.00%</span></div>
+              <div class="pnl-line"><span class="coin-dot pnl-coin"></span><span id="uPnlUsd">+0.00</span><span id="uPnlPct">+0.00%</span></div>
               <div class="pnl-chips">
                 <div class="pnl-chip"><div class="pc-label" data-gt="ui.enter">Enter</div><div id="entryPriceEl" class="pc-val">63 370</div></div>
                 <div class="pnl-chip"><div class="pc-label" data-gt="ui.current">Current</div><div id="curPriceEl" class="pc-val">63 420</div></div>
@@ -122,16 +134,16 @@
           </div>
         </div>
 
-        <!-- контролы лесенки: плечо и доля котлеты -->
+        <!-- ladder controls: leverage and stack fraction -->
         <div id="ctlBar">
           <div class="ctl-row" id="levCtl">
-            <div class="ctl-head"><span class="lock-ico hidden"><svg viewBox="0 0 20 20"><path fill="#DE8225" d="M10 1.8a4.1 4.1 0 0 0-4.1 4.1v1.6H5.2A1.9 1.9 0 0 0 3.3 9.4v6.4a1.9 1.9 0 0 0 1.9 1.9h9.6a1.9 1.9 0 0 0 1.9-1.9V9.4a1.9 1.9 0 0 0-1.9-1.9h-.7V5.9A4.1 4.1 0 0 0 10 1.8Zm2.3 5.7H7.7V5.9a2.3 2.3 0 1 1 4.6 0Z"/></svg></span><span class="ctl-lbl" data-gt="ui.leverage">Leverage</span></div>
+            <div class="ctl-head"><span class="lock-ico hidden"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 9V6.2a3.6 3.6 0 0 1 7.2 0V9"/><rect x="3.8" y="9" width="12.4" height="8.4" rx="2"/></svg></span><span class="ctl-lbl" data-gt="ui.leverage">Leverage</span></div>
             <div class="pills">
               <button data-lev="1">x1</button><button data-lev="2" class="on">x2</button><button data-lev="3">x3</button><button data-lev="4">x4</button><button data-lev="5">x5</button>
             </div>
           </div>
           <div class="ctl-row" id="fracCtl">
-            <div class="ctl-head"><span class="lock-ico hidden"><svg viewBox="0 0 20 20"><path fill="#DE8225" d="M10 1.8a4.1 4.1 0 0 0-4.1 4.1v1.6H5.2A1.9 1.9 0 0 0 3.3 9.4v6.4a1.9 1.9 0 0 0 1.9 1.9h9.6a1.9 1.9 0 0 0 1.9-1.9V9.4a1.9 1.9 0 0 0-1.9-1.9h-.7V5.9A4.1 4.1 0 0 0 10 1.8Zm2.3 5.7H7.7V5.9a2.3 2.3 0 1 1 4.6 0Z"/></svg></span><span class="ctl-lbl" data-gt="ui.size">Trade size</span></div>
+            <div class="ctl-head"><span class="lock-ico hidden"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 9V6.2a3.6 3.6 0 0 1 7.2 0V9"/><rect x="3.8" y="9" width="12.4" height="8.4" rx="2"/></svg></span><span class="ctl-lbl" data-gt="ui.size">Trade size</span></div>
             <div class="pills">
               <button data-frac="0.25">25%</button><button data-frac="0.5">50%</button><button data-frac="0.75">75%</button><button data-frac="1" class="on">100%</button>
               <button id="fracUnlock" class="unlock hidden">🔒 Open</button>
@@ -147,13 +159,13 @@
       </div>
     </section>
 
-    <!-- ===== RESULT ===== -->
+    <!-- ===== RESULT (standalone only — in the hub the shell draws Round Complete) ===== -->
     <section id="screen-result" class="screen hidden">
       <div class="res-scroll">
         <div class="res-head">
           <div class="res-title">ROUND COMPLETE</div>
           <div class="chips-row">
-            <div class="pill"><img id="resAssetIco" class="coin-img" src="coin-btc.webp" alt=""><span id="resAssetLbl">BTC</span></div>
+            <div class="pill"><span id="resAssetIco" class="coin-dot" data-coin="BTC"></span><span id="resAssetLbl">BTC</span></div>
             <div class="pill js-roundlen">60 sec</div>
           </div>
         </div>
@@ -190,7 +202,7 @@
       </div>
     </div>
 
-    <!-- one-time онбординг ступеней (шорты / плечо) -->
+    <!-- one-time stage onboarding (shorts / leverage) -->
     <div id="introOverlay" class="overlay intro-overlay hidden">
       <div class="intro-card">
         <span id="introDraft" class="draft-chip hidden">★ draft</span>
@@ -200,8 +212,8 @@
       </div>
     </div>
 
-    <!-- ★draft: (i) на Deal-экране — в макете f2055 кнопка есть, контент не задан;
-         показываем правила игры (бывший стартовый список howto) -->
+    <!-- ★draft: (i) on the Deal screen — the mockups draw the button but no content;
+         we show the game rules (the former start-screen howto list) -->
     <div id="infoOverlay" class="overlay intro-overlay hidden">
       <div class="intro-card">
         <div class="intro-title" data-gt="deal.howto.t">How to play</div>
@@ -210,7 +222,7 @@
       </div>
     </div>
 
-    <!-- ★draft: кебаб на Deal-экране — меню в макете не задано; звук + выход в хаб -->
+    <!-- ★draft: Deal kebab — no menu in the mockups; sound + exit to hub -->
     <div id="dealMenu" class="overlay intro-overlay hidden">
       <div class="pause-card">
         <button id="btnDealSound" class="ghostbtn">🔊 Sound: on</button>
@@ -221,7 +233,7 @@
 
     <div id="liqOverlay" class="overlay hidden">
       <svg id="cracks" viewBox="0 0 375 812" preserveAspectRatio="none">
-        <g stroke="#3a2222" stroke-width="3" fill="none" opacity="0.8">
+        <g class="crack-dark" stroke-width="3" fill="none" opacity="0.8">
           <path d="M188 405 L145 330 L155 242 L106 175 L116 87 L77 19"/>
           <path d="M188 405 L250 347 L245 251 L308 202 L298 96 L346 38"/>
           <path d="M188 405 L115 453 L58 434 L19 501"/>
@@ -230,7 +242,7 @@
           <path d="M188 405 L96 578 L115 674 L58 771"/>
           <path d="M188 405 L288 569 L269 665 L327 762"/>
         </g>
-        <g stroke="#ffffff" stroke-width="1.5" fill="none" opacity="0.85">
+        <g class="crack-light" stroke-width="1.5" fill="none" opacity="0.85">
           <path d="M188 405 L146 331 L156 244 L108 177"/>
           <path d="M188 405 L248 349 L243 253 L306 204"/>
           <path d="M188 405 L175 519 L210 615"/>

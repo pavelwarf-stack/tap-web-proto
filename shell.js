@@ -55,7 +55,7 @@ const DEF_STATE = {
   dailyOffer: null,         // дата последнего авто-оффера дейлика (once per day)
   lang: 0,                  // выбранный язык в Settings (visual only)
   setFlags: { notif: true, music: true }, // editorial row toggles (mockup B; prototype-only master flags)
-  skin: 'narodny',          // визуальный скин (вердикт 29.07: один скелет, три стиля)
+  skin: 'crypto-light',     // визуальный скин (вердикт 31.07 п.32: один скелет, четыре варианта)
   btc: null,                // кэш цен BTC {open, price, openDate, ts, live} — оффлайн-фолбэк
   peakDay: null,            // дата последнего «пикового» оффера (max 1/день; webv1 п.5)
 };
@@ -82,7 +82,8 @@ function loadState() {
   out.offerEnd = Number.isFinite(+out.offerEnd) ? +out.offerEnd : 0;
   out.started = Number.isFinite(+out.started) ? +out.started : 0;
   out.lang = +out.lang || 0;
-  if (out.skin !== 'terminal' && out.skin !== 'editorial') out.skin = 'narodny';
+  // старые ключи скинов из прошлых сессий чинятся алиасом ниже (normSkin), здесь только тип
+  if (typeof out.skin !== 'string' || !out.skin) out.skin = 'crypto-light';
   if (typeof out.btc !== 'object') out.btc = null;
   return out;
 }
@@ -115,28 +116,37 @@ const FLAPPY_MIN_TOTAL = 30;
    Реферальные +500 — только вёрстка/строки (начислений за рефералов в прототипе нет). */
 const VIDEO_REWARD = 100;
 
-/* ---------- skins (вердикт владельца 29.07: ОДИН скелет, три визуальных стиля) ----------
-   Скин = body[data-skin] + CSS-токены в shell.css; DOM не ветвится.
-   Вердикт 31.07 (п.25): скин = разметка КОГОРТЫ, не выбор юзера. ?skin= приходит из
-   пролива (МЛМ-ленд → narodny, крипто-ленд → terminal и т.д.), применяется И ПЕРСИСТИТСЯ
-   (S.skin): юзер пришёл по когортной ссылке один раз — скин остаётся и без параметра.
-   (Раньше ?skin= был симуляцией когорт и НЕ персистился — семантика изменена п.25.)
-   Приоритет: ?skin= в URL > сохранённый скин > narodny. Строка «Style» в Settings —
-   дев-инструмент за drafts-тумблером (юзерского переключателя в проде нет);
-   игра скин НЕ получает — дизайн игры един для всех скинов (вердикт 29.07, п.21). */
-const SKINS = ['narodny', 'terminal', 'editorial'];
+/* ---------- skins (вердикт владельца 31.07 вечер: ЧЕТЫРЕ варианта, п.32) ----------
+   Скин = body[data-skin] + CSS-токены в shell.css; DOM не ветвится (п.20 в силе).
+   ЧЕТЫРЕ стиля из ноды 652 (группы 652:10785/10786/10787, у каждого полный набор
+   экранов + дизайн-система): crypto-light (светлый крипто), crypto-dark (чёрный крипто),
+   cream (кремовый эко), corporate (белый с navy-топбаром).
+   ⚠️ Вердикт 31.07 (вечер) ОТМЕНЯЕТ п.21/24 в части «игра и онбординг не скинуются»:
+   теперь скинуются ВСЕ поверхности — оболочка, онбординг И игра (у каждого варианта
+   свои игровые экраны Trading-Buy / Active-Position / Round-Complete / Deal-Settings).
+   Поэтому ?skin= ПРОБРАСЫВАЕТСЯ в iframe игры.
+   Скин = разметка КОГОРТЫ, не выбор юзера (п.25): ?skin= из пролива персистится в S.skin.
+   Приоритет: ?skin= в URL > сохранённый скин > crypto-light. Строка «Style» в Settings —
+   дев-инструмент за drafts-тумблером (юзерского переключателя в проде нет). */
+const SKINS = ['crypto-light', 'crypto-dark', 'cream', 'corporate'];
+// когортные ссылки прошлой итерации не должны 404-ить по смыслу: старые ключи → новые
+const SKIN_ALIAS = { narodny: 'cream', terminal: 'crypto-dark', editorial: 'corporate', taptrade: 'cream' };
+const normSkin = s => (SKINS.includes(s) ? s : (SKIN_ALIAS[s] || null));
 const URL_SKIN = (() => {
-  try {
-    const s = new URLSearchParams(location.search).get('skin');
-    return SKINS.includes(s) ? s : null;
-  } catch (e) { return null; }
+  try { return normSkin(new URLSearchParams(location.search).get('skin')); } catch (e) { return null; }
 })();
-let SKIN = URL_SKIN || (SKINS.includes(S.skin) ? S.skin : 'narodny');
+let SKIN = URL_SKIN || normSkin(S.skin) || 'crypto-light';
 function applySkin(skin, opts = {}) {
-  if (!SKINS.includes(skin)) return;
+  skin = normSkin(skin);
+  if (!skin) return;
   SKIN = skin;
   document.body.dataset.skin = skin;
   if (opts.persist) { S.skin = skin; save(); }
+  // живая игра должна перекраситься вместе с оболочкой (дев-переключатель Style)
+  const fr = document.getElementById('gameframe');
+  if (fr && fr.contentWindow && fr.src && fr.src.indexOf('about:blank') < 0) {
+    try { fr.contentWindow.postMessage({ type: 'hub:skin', skin }, '*'); } catch (e) {}
+  }
 }
 // сразу, до первого рендера (скрипт стоит в конце <body>); когортный ?skin=
 // закрепляется в S.skin (вердикт 31.07 п.25: разметка когорты = назначение скина)
@@ -1556,7 +1566,7 @@ const SUBS = {
   // Figma node 440:21476 — ровно эти 8, без русского; endonyms are NOT translated
   'Language':            { type: 'list',    titleKey: 'sub.language', items: ['English', 'Español', 'Français', 'Deutsch', '日本語', '中文', 'Português', 'العربية'], checked: () => S.lang },
   // skin names stay English in all languages (same convention as course tiers Basic/Pro/Expert)
-  'Style':               { type: 'list',    titleKey: 'sub.style', items: ['Narodny', 'Terminal', 'Editorial'], checked: () => SKINS.indexOf(SKIN), act: 'skin-pick' },
+  'Style':               { type: 'list',    titleKey: 'sub.style', items: ['Crypto light', 'Crypto dark', 'Cream', 'Corporate'], checked: () => SKINS.indexOf(SKIN), act: 'skin-pick' },
   'Music and vibration': { type: 'toggles', titleKey: 'sub.music', items: ['subitem.music', 'subitem.sfx', 'subitem.vibro'] },
   'Help & Support':      { type: 'text', titleKey: 'sub.help', textKey: 'sub.help.text' },
   'About app':           { type: 'text', titleKey: 'sub.about', textKey: 'sub.about.text' },
@@ -1928,9 +1938,10 @@ function openGame(g, opts = {}) {
   const frame = $('#gameframe');
   if (tutMode) frame.addEventListener('load', tutBoot, { once: true });
   // онбординг (longshort): игра сама ограничивает раунд 5 закрытыми сделками по ?tut=1.
-  // ?skin= в игру НЕ пробрасываем: скины трогают только оболочку хаба, игра одинакова
-  // во всех трёх стилях (вердикт владельца 29.07, DESIGN-ADDITIONS п.21)
-  const query = g === 'flappy' ? 'hub=1' : (tutMode ? 'tut=1' : (opts.query || ''));
+  // ?skin= ПРОБРАСЫВАЕТСЯ в игру: вердикт 31.07 (вечер, п.32) — у каждого из четырёх
+  // вариантов свои игровые экраны, игра больше не едина (отмена п.21 в этой части)
+  let query = g === 'flappy' ? 'hub=1' : (tutMode ? 'tut=1' : (opts.query || ''));
+  if (g !== 'flappy') query += (query ? '&' : '') + 'skin=' + encodeURIComponent(SKIN);
   frame.src = 'games/' + g + '/index.html' + (query ? '?' + query : '');
   $('#tutorial').hidden = true;
   $('#gamelayer').hidden = false;
@@ -3118,7 +3129,7 @@ const ACT = {
     }
   },
   'skin-pick': el => {
-    const skin = SKINS[+el.dataset.idx || 0] || 'narodny';
+    const skin = SKINS[+el.dataset.idx || 0] || 'crypto-light';
     if (skin !== SKIN) {
       applySkin(skin, { persist: true });     // мгновенно, без перезагрузки
       logIntent('skin-pick:' + skin);         // экспозиция когорт — тот же лог, что peak-view
