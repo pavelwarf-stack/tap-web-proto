@@ -189,16 +189,33 @@ en: {
   'ach.shorts.t': 'Short seller', 'ach.shorts.d': 'Unlock shorts (stage 2)', 'ach.shorts.done': 'You unlocked shorts',
   'ach.ladder.t': 'Full arsenal', 'ach.ladder.d': 'Unlock all 4 mechanics', 'ach.ladder.done': 'You unlocked all 4 mechanics',
   'welcome.title': 'Welcome to Reptiloid Capital!', 'welcome.sub': 'You\'re our new trainee trader. Training starts right now – first practice round is on us.', 'welcome.start': 'Start game →', 'welcome.skip': 'Skip',
-  /* onboarding bubbles ×9 (mockups onb1..3, verbatim) + new Round Complete (onb1-6) */
-  'ob1.1': 'Analyze the Bitcoin chart and make a decision.',
-  'ob1.2': 'Open a long position based on the chart and levels. Close it when you deem appropriate — either to take your profit or accept the loss.',
-  'ob1.3': 'A position is in profit when it is above the entry point; try to close it at maximum profit.',
-  'ob2.1': 'In the market, you can profit not only from a position rising in value but also from it falling - if you know how.',
-  'ob2.2': 'When opening a long position, profit increases if the asset\'s value is above the entry point.',
-  'ob2.3': 'When opening a short position, profit increases if the asset\'s price is below the entry point.',
-  'ob3.1': 'As your confidence in your skills grows, you can act more boldly - this is where leverage comes in; it multiplies returns but also increases risk.',
-  'ob3.2': 'Leverage allows you to increase the entry amount.',
-  'ob3.3': 'Keep an eye on the liquidation levels. If you get liquidated, 50% of the trade amount will be deducted.',
+  /* onboarding v3 bubbles (вердикт 31.07 п.36, интерактив): 6/6/7 шагов + 6 у частичных
+     (★draft: число шагов и тексты мои); жирные акценты <b> — часть строки */
+  'ob1.1': 'Welcome to your first <b>practice round</b>! This is the <b>Bitcoin</b> chart.',
+  'ob1.2': '<b>Green</b> candles — the price is rising. <b>Red</b> — it is falling. Watch it move!',
+  'ob1.3': 'The dip is over, the price is bouncing — press <b>Buy</b> now!',
+  'ob1.4': 'You are <b>in position</b>! Profit grows while the price stays <b>above entry</b>.',
+  'ob1.5': 'The rise is fading — <b>close the trade</b> and lock in your profit!',
+  'ob1.6': 'Your first <b>profit</b> is in! Trade freely until the timer runs out.',
+  'ob2.1': 'You earned on a <b>rising</b> price. You can also earn when it <b>falls</b>.',
+  'ob2.2': 'That is a <b>Short</b> — open it when you expect the price to drop.',
+  'ob2.3': 'The price is topping out — open a <b>Short</b> now!',
+  'ob2.4': 'You are short: profit grows while the price stays <b>below entry</b>.',
+  'ob2.5': 'The fall is slowing — <b>close the trade</b> and take your profit!',
+  'ob2.6': 'Now you can earn in <b>any market</b> — rising or falling.',
+  'ob3.1': 'Feeling confident? Time for <b>leverage</b> — it multiplies your position.',
+  'ob3.2': 'With <b>x3</b> leverage a 1% move changes your stake by 3%. We set <b>x3</b> for you.',
+  'ob3.3': 'Careful: at <b>−50%</b> the position is <b>liquidated</b>. Watch the risk!',
+  'ob3.4': 'The dip is over — open a <b>Long</b> with x3 leverage!',
+  'ob3.5': 'See the <b>liquidation</b> bar below — do not let it fill up.',
+  'ob3.6': 'Great run — <b>close the trade</b> before the market turns!',
+  'ob3.7': 'Training complete! Real rounds are next — entry costs <b>100 chips</b>. Good luck!',
+  'obp.1': 'Choose your <b>position size</b> as a percentage and control your trading more precisely.',
+  'obp.2': 'Pick a share — say <b>25%</b>. The rest stays safely <b>in cash</b>.',
+  'obp.3': 'The dip is over — press <b>Buy</b>: only your chosen <b>part</b> goes in!',
+  'obp.4': 'Look up: <b>Balance</b> is your free cash, <b>Trade</b> — the coins in the position.',
+  'obp.5': 'Same move, smaller <b>risk</b>: <b>close the trade</b> and lock the profit!',
+  'obp.6': '<b>Partial positions</b> are yours! Same percentage move — smaller absolute risk.',
   'rc.next': 'Next round', 'rc.repeat': 'Repeat round', 'rc.unlock': 'New mechanic unlocked!', 'rc.fwbonus': 'First win bonus',
   'mech.short': 'Short selling', 'mech.short.d': 'Now you can open short positions and bet on the price falling',
   'mech.lev': 'Leverage', 'mech.lev.d': 'Now you can multiply your entry with ×2–×5 leverage',
@@ -340,15 +357,31 @@ es: {
   'ach.shorts.t': 'Vendedor en corto', 'ach.shorts.d': 'Desbloquea los shorts (etapa 2)', 'ach.shorts.done': 'Desbloqueaste los shorts',
   'ach.ladder.t': 'Arsenal completo', 'ach.ladder.d': 'Desbloquea las 4 mecánicas', 'ach.ladder.done': 'Desbloqueaste las 4 mecánicas',
   'welcome.title': '¡Bienvenido a Reptiloid Capital!', 'welcome.sub': 'Eres nuestro nuevo trader en prácticas. La formación empieza ya – la primera ronda de práctica corre por nuestra cuenta.', 'welcome.start': 'Empezar el juego →', 'welcome.skip': 'Omitir',
-  'ob1.1': 'Analiza el gráfico de Bitcoin y toma una decisión.',
-  'ob1.2': 'Abre una posición Long según el gráfico y los niveles. Ciérrala cuando lo creas oportuno: para tomar tu beneficio o asumir la pérdida.',
-  'ob1.3': 'Una posición está en beneficio cuando está por encima del punto de entrada; intenta cerrarla en el máximo beneficio.',
-  'ob2.1': 'En el mercado puedes ganar no solo cuando una posición sube de valor, sino también cuando cae, si sabes cómo.',
-  'ob2.2': 'Al abrir una posición Long, el beneficio crece si el valor del activo está por encima del punto de entrada.',
-  'ob2.3': 'Al abrir una posición Short, el beneficio crece si el precio del activo está por debajo del punto de entrada.',
-  'ob3.1': 'A medida que crece la confianza en tus habilidades puedes actuar con más audacia: aquí entra el apalancamiento; multiplica las ganancias pero también aumenta el riesgo.',
-  'ob3.2': 'El apalancamiento te permite aumentar el importe de entrada.',
-  'ob3.3': 'Vigila los niveles de liquidación. Si te liquidan, se descontará el 50% del importe de la operación.',
+  'ob1.1': '¡Bienvenido a tu primera <b>ronda de práctica</b>! Este es el gráfico de <b>Bitcoin</b>.',
+  'ob1.2': 'Velas <b>verdes</b>: el precio sube. <b>Rojas</b>: baja. ¡Mira cómo se mueve!',
+  'ob1.3': 'La caída terminó, el precio rebota — ¡pulsa <b>Buy</b> ahora!',
+  'ob1.4': '¡Estás <b>en posición</b>! La ganancia crece mientras el precio esté <b>sobre la entrada</b>.',
+  'ob1.5': 'La subida se agota — ¡<b>cierra la operación</b> y asegura tu ganancia!',
+  'ob1.6': '¡Tu primera <b>ganancia</b> está dentro! Opera libremente hasta que acabe el tiempo.',
+  'ob2.1': 'Ganaste con la <b>subida</b> del precio. También puedes ganar cuando <b>cae</b>.',
+  'ob2.2': 'Eso es un <b>Short</b>: ábrelo cuando esperes una caída.',
+  'ob2.3': 'El precio toca techo — ¡abre un <b>Short</b> ahora!',
+  'ob2.4': 'Estás en corto: la ganancia crece mientras el precio esté <b>bajo la entrada</b>.',
+  'ob2.5': 'La caída se frena — ¡<b>cierra la operación</b> y toma tu ganancia!',
+  'ob2.6': 'Ahora ganas en <b>cualquier mercado</b>, suba o baje.',
+  'ob3.1': '¿Con confianza? Llega el <b>apalancamiento</b>: multiplica tu posición.',
+  'ob3.2': 'Con <b>x3</b>, un movimiento del 1% cambia tu apuesta un 3%. Te pusimos <b>x3</b>.',
+  'ob3.3': 'Cuidado: en <b>−50%</b> la posición se <b>liquida</b>. ¡Vigila el riesgo!',
+  'ob3.4': 'La caída terminó — ¡abre un <b>Long</b> con apalancamiento x3!',
+  'ob3.5': 'Mira la barra de <b>liquidación</b> abajo: no dejes que se llene.',
+  'ob3.6': 'Buena racha — ¡<b>cierra la operación</b> antes de que el mercado gire!',
+  'ob3.7': '¡Entrenamiento completado! Vienen rondas reales: la entrada cuesta <b>100 fichas</b>. ¡Suerte!',
+  'obp.1': 'Elige el <b>tamaño de tu posición</b> en porcentaje y controla tu trading con más precisión.',
+  'obp.2': 'Elige una parte — por ejemplo <b>25%</b>. El resto queda seguro <b>en efectivo</b>.',
+  'obp.3': 'La caída terminó — pulsa <b>Buy</b>: ¡solo entra la <b>parte</b> elegida!',
+  'obp.4': 'Mira arriba: <b>Balance</b> es tu efectivo libre, <b>Trade</b> — las monedas en la posición.',
+  'obp.5': 'Mismo movimiento, menos <b>riesgo</b>: ¡<b>cierra la operación</b> y asegura la ganancia!',
+  'obp.6': '¡Las <b>posiciones parciales</b> son tuyas! Mismo porcentaje — menor riesgo absoluto.',
   'rc.next': 'Siguiente ronda', 'rc.repeat': 'Repetir ronda', 'rc.unlock': '¡Nueva mecánica desbloqueada!', 'rc.fwbonus': 'Bono por primera victoria',
   'mech.short': 'Venta Short', 'mech.short.d': 'Ahora puedes abrir posiciones Short y apostar a la caída del precio',
   'mech.lev': 'Apalancamiento', 'mech.lev.d': 'Ahora puedes multiplicar tu entrada con apalancamiento ×2–×5',
@@ -489,15 +522,31 @@ fr: {
   'ach.shorts.t': 'Vendeur à découvert', 'ach.shorts.d': 'Débloque les shorts (étape 2)', 'ach.shorts.done': 'Tu as débloqué les shorts',
   'ach.ladder.t': 'Arsenal complet', 'ach.ladder.d': 'Débloque les 4 mécaniques', 'ach.ladder.done': 'Tu as débloqué les 4 mécaniques',
   'welcome.title': 'Bienvenue chez Reptiloid Capital !', 'welcome.sub': 'Tu es notre nouveau trader stagiaire. La formation commence maintenant – la première manche d\'entraînement est offerte.', 'welcome.start': 'Commencer le jeu →', 'welcome.skip': 'Passer',
-  'ob1.1': 'Analyse le graphique du Bitcoin et prends une décision.',
-  'ob1.2': 'Ouvre une position Long selon le graphique et les niveaux. Ferme-la quand tu le juges opportun — pour prendre ton profit ou accepter la perte.',
-  'ob1.3': 'Une position est gagnante quand elle est au-dessus du point d\'entrée ; essaie de la fermer au profit maximal.',
-  'ob2.1': 'Sur le marché, on peut gagner non seulement quand une position monte, mais aussi quand elle baisse — si on sait comment.',
-  'ob2.2': 'Avec une position Long, le profit augmente si la valeur de l\'actif est au-dessus du point d\'entrée.',
-  'ob2.3': 'Avec une position Short, le profit augmente si le prix de l\'actif est en dessous du point d\'entrée.',
-  'ob3.1': 'Plus tu prends confiance en tes compétences, plus tu peux agir audacieusement — c\'est là qu\'intervient le levier ; il multiplie les gains mais augmente aussi le risque.',
-  'ob3.2': 'Le levier permet d\'augmenter le montant d\'entrée.',
-  'ob3.3': 'Surveille les niveaux de liquidation. En cas de liquidation, 50 % du montant de la position sera déduit.',
+  'ob1.1': 'Bienvenue dans ta première <b>manche d\'entraînement</b> ! Voici le graphique du <b>Bitcoin</b>.',
+  'ob1.2': 'Bougies <b>vertes</b> : le prix monte. <b>Rouges</b> : il baisse. Regarde-le bouger !',
+  'ob1.3': 'La chute est finie, le prix rebondit — appuie sur <b>Buy</b> maintenant !',
+  'ob1.4': 'Tu es <b>en position</b> ! Le profit grandit tant que le prix reste <b>au-dessus de l\'entrée</b>.',
+  'ob1.5': 'La hausse s\'essouffle — <b>ferme le trade</b> et encaisse ton profit !',
+  'ob1.6': 'Ton premier <b>profit</b> est là ! Trade librement jusqu\'à la fin du chrono.',
+  'ob2.1': 'Tu as gagné sur la <b>hausse</b>. On peut aussi gagner quand le prix <b>baisse</b>.',
+  'ob2.2': 'C\'est un <b>Short</b> : ouvre-le quand tu attends une chute.',
+  'ob2.3': 'Le prix plafonne — ouvre un <b>Short</b> maintenant !',
+  'ob2.4': 'Tu es short : le profit grandit tant que le prix reste <b>sous l\'entrée</b>.',
+  'ob2.5': 'La chute ralentit — <b>ferme le trade</b> et prends ton profit !',
+  'ob2.6': 'Tu peux maintenant gagner sur <b>tous les marchés</b> — à la hausse comme à la baisse.',
+  'ob3.1': 'Confiant ? Voici le <b>levier</b> — il multiplie ta position.',
+  'ob3.2': 'Avec <b>x3</b>, un mouvement de 1% change ta mise de 3%. On t\'a mis <b>x3</b>.',
+  'ob3.3': 'Attention : à <b>−50%</b> la position est <b>liquidée</b>. Surveille le risque !',
+  'ob3.4': 'La chute est finie — ouvre un <b>Long</b> avec le levier x3 !',
+  'ob3.5': 'Regarde la barre de <b>liquidation</b> en bas — ne la laisse pas se remplir.',
+  'ob3.6': 'Belle course — <b>ferme le trade</b> avant que le marché tourne !',
+  'ob3.7': 'Entraînement terminé ! Place aux manches réelles : l\'entrée coûte <b>100 jetons</b>. Bonne chance !',
+  'obp.1': 'Choisis la <b>taille de ta position</b> en pourcentage et contrôle ton trading plus finement.',
+  'obp.2': 'Prends une part — par exemple <b>25%</b>. Le reste attend en sécurité <b>en cash</b>.',
+  'obp.3': 'La chute est finie — appuie sur <b>Buy</b> : seule la <b>part</b> choisie entre !',
+  'obp.4': 'Regarde en haut : <b>Balance</b> = ton cash libre, <b>Trade</b> = les pièces en position.',
+  'obp.5': 'Même mouvement, moins de <b>risque</b> : <b>ferme le trade</b> et sécurise le profit !',
+  'obp.6': 'Les <b>positions partielles</b> sont à toi ! Même pourcentage — risque absolu plus faible.',
   'rc.next': 'Manche suivante', 'rc.repeat': 'Rejouer la manche', 'rc.unlock': 'Nouvelle mécanique débloquée !', 'rc.fwbonus': 'Bonus de première victoire',
   'mech.short': 'Vente Short', 'mech.short.d': 'Tu peux désormais ouvrir des positions Short et parier sur la baisse du prix',
   'mech.lev': 'Levier', 'mech.lev.d': 'Tu peux désormais multiplier ton entrée avec un levier ×2–×5',
@@ -638,15 +687,31 @@ de: {
   'ach.shorts.t': 'Leerverkäufer', 'ach.shorts.d': 'Schalte Shorts frei (Stufe 2)', 'ach.shorts.done': 'Du hast Shorts freigeschaltet',
   'ach.ladder.t': 'Volles Arsenal', 'ach.ladder.d': 'Schalte alle 4 Mechaniken frei', 'ach.ladder.done': 'Du hast alle 4 Mechaniken freigeschaltet',
   'welcome.title': 'Willkommen bei Reptiloid Capital!', 'welcome.sub': 'Du bist unser neuer Trainee-Trader. Das Training beginnt sofort – die erste Übungsrunde geht auf uns.', 'welcome.start': 'Spiel starten →', 'welcome.skip': 'Überspringen',
-  'ob1.1': 'Analysiere den Bitcoin-Chart und triff eine Entscheidung.',
-  'ob1.2': 'Eröffne eine Long-Position nach Chart und Levels. Schließe sie, wann du es für richtig hältst — um den Gewinn mitzunehmen oder den Verlust zu akzeptieren.',
-  'ob1.3': 'Eine Position ist im Gewinn, wenn sie über dem Einstiegspunkt liegt; versuche, sie beim maximalen Gewinn zu schließen.',
-  'ob2.1': 'Am Markt kannst du nicht nur verdienen, wenn eine Position steigt, sondern auch, wenn sie fällt — wenn du weißt, wie.',
-  'ob2.2': 'Bei einer Long-Position wächst der Gewinn, wenn der Wert des Assets über dem Einstiegspunkt liegt.',
-  'ob2.3': 'Bei einer Short-Position wächst der Gewinn, wenn der Preis des Assets unter dem Einstiegspunkt liegt.',
-  'ob3.1': 'Mit wachsendem Vertrauen in deine Fähigkeiten kannst du mutiger handeln — hier kommt der Hebel ins Spiel; er vervielfacht die Gewinne, erhöht aber auch das Risiko.',
-  'ob3.2': 'Der Hebel erlaubt dir, den Einstiegsbetrag zu erhöhen.',
-  'ob3.3': 'Behalte die Liquidationslevel im Blick. Wirst du liquidiert, werden 50 % des Einsatzbetrags abgezogen.',
+  'ob1.1': 'Willkommen zu deiner ersten <b>Übungsrunde</b>! Das ist der <b>Bitcoin</b>-Chart.',
+  'ob1.2': '<b>Grüne</b> Kerzen: der Preis steigt. <b>Rote</b>: er fällt. Sieh zu, wie er sich bewegt!',
+  'ob1.3': 'Der Dip ist vorbei, der Preis springt zurück — drück jetzt <b>Buy</b>!',
+  'ob1.4': 'Du bist <b>in Position</b>! Der Gewinn wächst, solange der Preis <b>über dem Einstieg</b> bleibt.',
+  'ob1.5': 'Der Anstieg lässt nach — <b>schließe den Trade</b> und sichere deinen Gewinn!',
+  'ob1.6': 'Dein erster <b>Gewinn</b> ist drin! Trade frei, bis der Timer abläuft.',
+  'ob2.1': 'Du hast am <b>steigenden</b> Preis verdient. Man verdient auch, wenn er <b>fällt</b>.',
+  'ob2.2': 'Das ist ein <b>Short</b> — öffne ihn, wenn du einen Fall erwartest.',
+  'ob2.3': 'Der Preis toppt aus — öffne jetzt einen <b>Short</b>!',
+  'ob2.4': 'Du bist short: der Gewinn wächst, solange der Preis <b>unter dem Einstieg</b> bleibt.',
+  'ob2.5': 'Der Fall wird langsamer — <b>schließe den Trade</b> und nimm deinen Gewinn!',
+  'ob2.6': 'Jetzt verdienst du in <b>jedem Markt</b> — steigend oder fallend.',
+  'ob3.1': 'Selbstbewusst? Zeit für den <b>Hebel</b> — er multipliziert deine Position.',
+  'ob3.2': 'Mit <b>x3</b> ändert eine 1%-Bewegung deinen Einsatz um 3%. Wir haben <b>x3</b> gesetzt.',
+  'ob3.3': 'Vorsicht: bei <b>−50%</b> wird die Position <b>liquidiert</b>. Behalte das Risiko im Blick!',
+  'ob3.4': 'Der Dip ist vorbei — öffne einen <b>Long</b> mit Hebel x3!',
+  'ob3.5': 'Sieh die <b>Liquidations</b>-Leiste unten — lass sie nicht volllaufen.',
+  'ob3.6': 'Starker Lauf — <b>schließe den Trade</b>, bevor der Markt dreht!',
+  'ob3.7': 'Training geschafft! Jetzt kommen echte Runden — der Einstieg kostet <b>100 Chips</b>. Viel Glück!',
+  'obp.1': 'Wähle deine <b>Positionsgröße</b> in Prozent und steuere dein Trading präziser.',
+  'obp.2': 'Nimm einen Teil — z. B. <b>25%</b>. Der Rest wartet sicher <b>im Cash</b>.',
+  'obp.3': 'Der Dip ist vorbei — drück <b>Buy</b>: nur dein gewählter <b>Teil</b> geht rein!',
+  'obp.4': 'Blick nach oben: <b>Balance</b> = dein freies Geld, <b>Trade</b> = die Coins in der Position.',
+  'obp.5': 'Gleiche Bewegung, weniger <b>Risiko</b>: <b>schließe den Trade</b> und sichere den Gewinn!',
+  'obp.6': '<b>Teilpositionen</b> gehören dir! Gleicher Prozentsatz — kleineres absolutes Risiko.',
   'rc.next': 'Nächste Runde', 'rc.repeat': 'Runde wiederholen', 'rc.unlock': 'Neue Mechanik freigeschaltet!', 'rc.fwbonus': 'Bonus für den ersten Sieg',
   'mech.short': 'Short-Verkauf', 'mech.short.d': 'Jetzt kannst du Short-Positionen eröffnen und auf fallende Preise setzen',
   'mech.lev': 'Hebel', 'mech.lev.d': 'Jetzt kannst du deinen Einstieg mit ×2–×5-Hebel vervielfachen',
@@ -787,15 +852,31 @@ ja: {
   'ach.shorts.t': 'ショートセラー', 'ach.shorts.d': 'ショートを解放（ステージ2）', 'ach.shorts.done': 'ショートを解放しました',
   'ach.ladder.t': 'フルアーセナル', 'ach.ladder.d': '4つのメカニクスを全て解放', 'ach.ladder.done': '4つのメカニクスを全て解放しました',
   'welcome.title': 'Reptiloid Capitalへようこそ！', 'welcome.sub': '君は新しい研修生トレーダーだ。トレーニングは今すぐ開始 – 最初の練習ラウンドは無料。', 'welcome.start': 'ゲームを始める →', 'welcome.skip': 'スキップ',
-  'ob1.1': 'ビットコインのチャートを分析して判断しよう。',
-  'ob1.2': 'チャートとレベルをもとにLongポジションを開こう。利益を確定するか損失を受け入れるか、好きなタイミングで閉じよう。',
-  'ob1.3': 'ポジションはエントリーポイントより上にあれば利益。最大の利益で閉じることを目指そう。',
-  'ob2.1': '市場ではポジションの値上がりだけでなく、値下がりでも稼げる――やり方を知っていれば。',
-  'ob2.2': 'Longポジションでは、資産の価値がエントリーポイントより上にあるほど利益が増える。',
-  'ob2.3': 'Shortポジションでは、資産の価格がエントリーポイントより下にあるほど利益が増える。',
-  'ob3.1': 'スキルに自信がついてきたら、もっと大胆に動ける――そこで登場するのがレバレッジ。リターンを倍増させるが、リスクも増える。',
-  'ob3.2': 'レバレッジを使えばエントリー額を増やせる。',
-  'ob3.3': '清算レベルに注意。清算されると取引額の50%が差し引かれる。',
+  'ob1.1': '初めての<b>練習ラウンド</b>へようこそ！これが<b>ビットコイン</b>のチャートだ。',
+  'ob1.2': '<b>緑</b>のローソクは上昇、<b>赤</b>は下落。動きを見てみよう！',
+  'ob1.3': '下落が終わって反発中 — 今すぐ<b>Buy</b>を押そう！',
+  'ob1.4': '<b>ポジション</b>に入った！価格が<b>エントリーより上</b>にある限り利益は増える。',
+  'ob1.5': '上昇が弱まってきた — <b>決済</b>して利益を確定しよう！',
+  'ob1.6': '初<b>利益</b>ゲット！タイマーが切れるまで自由にトレードしよう。',
+  'ob2.1': '上昇で稼いだね。価格が<b>下がる</b>ときにも稼げるんだ。',
+  'ob2.2': 'それが<b>Short</b> — 下落を予想したら開こう。',
+  'ob2.3': '価格が天井圏だ — 今すぐ<b>Short</b>を開こう！',
+  'ob2.4': 'ショート中：価格が<b>エントリーより下</b>にある限り利益は増える。',
+  'ob2.5': '下落が鈍ってきた — <b>決済</b>して利益を取ろう！',
+  'ob2.6': 'これで<b>どんな相場</b>でも稼げる — 上げでも下げでも。',
+  'ob3.1': '自信がついた？次は<b>レバレッジ</b> — ポジションを倍増させる。',
+  'ob3.2': '<b>x3</b>なら1%の値動きで賭け金は3%変わる。<b>x3</b>をセット済みだ。',
+  'ob3.3': '注意：<b>−50%</b>でポジションは<b>清算</b>される。リスクに気をつけて！',
+  'ob3.4': '下落が終わった — レバレッジx3で<b>Long</b>を開こう！',
+  'ob3.5': '下の<b>清算</b>バーを見て — 満タンにさせないこと。',
+  'ob3.6': 'いい伸びだ — 相場が反転する前に<b>決済</b>しよう！',
+  'ob3.7': 'トレーニング完了！次は本番ラウンド — 参加料は<b>100チップ</b>。健闘を祈る！',
+  'obp.1': '<b>ポジションサイズ</b>をパーセントで選んで、トレードをより精密にコントロールしよう。',
+  'obp.2': '一部を選ぼう — たとえば<b>25%</b>。残りは<b>現金のまま</b>安全に待機。',
+  'obp.3': '下落が終わった — <b>Buy</b>を押そう：選んだ<b>一部</b>だけが入る！',
+  'obp.4': '上を見て：<b>Balance</b>は自由な現金、<b>Trade</b>はポジション中のコイン。',
+  'obp.5': '同じ値動きでも<b>リスク</b>は小さい：<b>決済</b>して利益を確定！',
+  'obp.6': '<b>部分ポジション</b>をマスター！同じ変動率でも絶対リスクは小さい。',
   'rc.next': '次のラウンド', 'rc.repeat': 'ラウンドをやり直す', 'rc.unlock': '新メカニクス解放！', 'rc.fwbonus': '初勝利ボーナス',
   'mech.short': 'Short（空売り）', 'mech.short.d': 'Shortポジションを開いて価格の下落に賭けられるようになった',
   'mech.lev': 'レバレッジ', 'mech.lev.d': '×2–×5のレバレッジでエントリー額を増やせるようになった',
@@ -936,15 +1017,31 @@ zh: {
   'ach.shorts.t': '做空者', 'ach.shorts.d': '解锁做空（第2阶段）', 'ach.shorts.done': '你解锁了做空',
   'ach.ladder.t': '全套武器', 'ach.ladder.d': '解锁全部4种机制', 'ach.ladder.done': '你解锁了全部4种机制',
   'welcome.title': '欢迎加入 Reptiloid Capital！', 'welcome.sub': '你是我们新的实习交易员。培训现在开始 – 第一局练习由我们请客。', 'welcome.start': '开始游戏 →', 'welcome.skip': '跳过',
-  'ob1.1': '分析比特币走势图并做出决定。',
-  'ob1.2': '根据图表和价位开一个 Long 仓位。在你认为合适的时候平仓——获利了结或接受亏损。',
-  'ob1.3': '仓位高于入场点即为盈利；尽量在最大盈利时平仓。',
-  'ob2.1': '在市场上，不仅仓位上涨能赚钱，下跌也能——只要你懂方法。',
-  'ob2.2': '开 Long 仓位时，资产价值高于入场点，利润就会增加。',
-  'ob2.3': '开 Short 仓位时，资产价格低于入场点，利润就会增加。',
-  'ob3.1': '随着对自己技能的信心增强，你可以更大胆——这就是杠杆的用武之地；它放大收益，也放大风险。',
-  'ob3.2': '杠杆可以放大你的入场金额。',
-  'ob3.3': '注意清算线。一旦被清算，将扣除交易金额的 50%。',
+  'ob1.1': '欢迎来到你的第一个<b>练习回合</b>！这是<b>比特币</b>走势图。',
+  'ob1.2': '<b>绿色</b>蜡烛代表上涨，<b>红色</b>代表下跌。看看它怎么动！',
+  'ob1.3': '下跌结束，价格开始反弹 — 现在就按<b>Buy</b>！',
+  'ob1.4': '你已<b>进场</b>！只要价格保持在<b>入场点之上</b>，利润就会增长。',
+  'ob1.5': '涨势减弱 — <b>平仓</b>锁定你的利润！',
+  'ob1.6': '第一笔<b>利润</b>到手！在计时结束前自由交易吧。',
+  'ob2.1': '你靠<b>上涨</b>赚了钱。价格<b>下跌</b>时也能赚。',
+  'ob2.2': '这就是<b>Short</b> — 预期下跌时开仓。',
+  'ob2.3': '价格见顶 — 现在开一个<b>Short</b>！',
+  'ob2.4': '你在做空：只要价格保持在<b>入场点之下</b>，利润就会增长。',
+  'ob2.5': '跌势放缓 — <b>平仓</b>拿走你的利润！',
+  'ob2.6': '现在<b>任何行情</b>你都能赚 — 涨跌皆可。',
+  'ob3.1': '有信心了？该上<b>杠杆</b>了 — 它会放大你的仓位。',
+  'ob3.2': '用<b>x3</b>，价格动1%，本金变3%。我们已为你选好<b>x3</b>。',
+  'ob3.3': '小心：亏到<b>−50%</b>仓位会被<b>清算</b>。盯住风险！',
+  'ob3.4': '下跌结束 — 用x3杠杆开<b>Long</b>！',
+  'ob3.5': '看下方的<b>清算</b>条 — 别让它填满。',
+  'ob3.6': '涨得不错 — 在行情反转前<b>平仓</b>！',
+  'ob3.7': '训练完成！接下来是真实回合 — 入场费<b>100筹码</b>。祝好运！',
+  'obp.1': '按百分比选择你的<b>仓位大小</b>，更精准地掌控交易。',
+  'obp.2': '选一部分 — 比如<b>25%</b>。其余安全地留作<b>现金</b>。',
+  'obp.3': '下跌结束 — 按<b>Buy</b>：只有你选的<b>那部分</b>进场！',
+  'obp.4': '看上方：<b>Balance</b>是空闲资金，<b>Trade</b>是仓位中的金币。',
+  'obp.5': '同样的行情，更小的<b>风险</b>：<b>平仓</b>锁定利润！',
+  'obp.6': '<b>部分仓位</b>学会了！涨跌幅相同 — 绝对风险更小。',
   'rc.next': '下一局', 'rc.repeat': '重玩本局', 'rc.unlock': '解锁新机制！', 'rc.fwbonus': '首胜奖励',
   'mech.short': 'Short 卖空', 'mech.short.d': '现在你可以开 Short 仓位，押注价格下跌',
   'mech.lev': '杠杆', 'mech.lev.d': '现在你可以用 ×2–×5 杠杆放大入场金额',
@@ -1085,15 +1182,31 @@ pt: {
   'ach.shorts.t': 'Vendedor a descoberto', 'ach.shorts.d': 'Desbloqueie os shorts (fase 2)', 'ach.shorts.done': 'Você desbloqueou os shorts',
   'ach.ladder.t': 'Arsenal completo', 'ach.ladder.d': 'Desbloqueie as 4 mecânicas', 'ach.ladder.done': 'Você desbloqueou as 4 mecânicas',
   'welcome.title': 'Bem-vindo à Reptiloid Capital!', 'welcome.sub': 'Você é o nosso novo trader estagiário. O treinamento começa agora – a primeira rodada de prática é por nossa conta.', 'welcome.start': 'Começar o jogo →', 'welcome.skip': 'Pular',
-  'ob1.1': 'Analise o gráfico do Bitcoin e tome uma decisão.',
-  'ob1.2': 'Abra uma posição Long com base no gráfico e nos níveis. Feche quando achar oportuno — para realizar o lucro ou aceitar a perda.',
-  'ob1.3': 'Uma posição está no lucro quando está acima do ponto de entrada; tente fechá-la no lucro máximo.',
-  'ob2.1': 'No mercado dá para lucrar não só com a alta de uma posição, mas também com a queda — se você souber como.',
-  'ob2.2': 'Ao abrir uma posição Long, o lucro aumenta se o valor do ativo estiver acima do ponto de entrada.',
-  'ob2.3': 'Ao abrir uma posição Short, o lucro aumenta se o preço do ativo estiver abaixo do ponto de entrada.',
-  'ob3.1': 'Conforme a confiança nas suas habilidades cresce, você pode agir com mais ousadia — é aí que entra a alavancagem; ela multiplica os ganhos, mas também aumenta o risco.',
-  'ob3.2': 'A alavancagem permite aumentar o valor de entrada.',
-  'ob3.3': 'Fique de olho nos níveis de liquidação. Se for liquidado, 50% do valor da operação será descontado.',
+  'ob1.1': 'Bem-vindo à sua primeira <b>rodada de treino</b>! Este é o gráfico do <b>Bitcoin</b>.',
+  'ob1.2': 'Velas <b>verdes</b>: o preço sobe. <b>Vermelhas</b>: cai. Veja como se move!',
+  'ob1.3': 'A queda acabou, o preço está rebatendo — aperte <b>Buy</b> agora!',
+  'ob1.4': 'Você está <b>em posição</b>! O lucro cresce enquanto o preço fica <b>acima da entrada</b>.',
+  'ob1.5': 'A alta está perdendo força — <b>feche a operação</b> e garanta seu lucro!',
+  'ob1.6': 'Seu primeiro <b>lucro</b> está garantido! Opere livre até o tempo acabar.',
+  'ob2.1': 'Você ganhou com a <b>alta</b>. Também dá para ganhar quando o preço <b>cai</b>.',
+  'ob2.2': 'Isso é um <b>Short</b> — abra quando esperar queda.',
+  'ob2.3': 'O preço está no topo — abra um <b>Short</b> agora!',
+  'ob2.4': 'Você está vendido: o lucro cresce enquanto o preço fica <b>abaixo da entrada</b>.',
+  'ob2.5': 'A queda está desacelerando — <b>feche a operação</b> e pegue seu lucro!',
+  'ob2.6': 'Agora você ganha em <b>qualquer mercado</b> — subindo ou caindo.',
+  'ob3.1': 'Confiante? Hora da <b>alavancagem</b> — ela multiplica sua posição.',
+  'ob3.2': 'Com <b>x3</b>, um movimento de 1% muda sua aposta em 3%. Já deixamos no <b>x3</b>.',
+  'ob3.3': 'Cuidado: em <b>−50%</b> a posição é <b>liquidada</b>. Fique de olho no risco!',
+  'ob3.4': 'A queda acabou — abra um <b>Long</b> com alavancagem x3!',
+  'ob3.5': 'Veja a barra de <b>liquidação</b> abaixo — não deixe encher.',
+  'ob3.6': 'Boa corrida — <b>feche a operação</b> antes do mercado virar!',
+  'ob3.7': 'Treino completo! Agora vêm rodadas reais — a entrada custa <b>100 fichas</b>. Boa sorte!',
+  'obp.1': 'Escolha o <b>tamanho da sua posição</b> em porcentagem e controle seu trading com mais precisão.',
+  'obp.2': 'Escolha uma parte — por exemplo <b>25%</b>. O resto fica seguro <b>em caixa</b>.',
+  'obp.3': 'A queda acabou — aperte <b>Buy</b>: só entra a <b>parte</b> escolhida!',
+  'obp.4': 'Olhe para cima: <b>Balance</b> é seu dinheiro livre, <b>Trade</b> — as moedas na posição.',
+  'obp.5': 'Mesmo movimento, menos <b>risco</b>: <b>feche a operação</b> e garanta o lucro!',
+  'obp.6': 'As <b>posições parciais</b> são suas! Mesma porcentagem — risco absoluto menor.',
   'rc.next': 'Próxima rodada', 'rc.repeat': 'Repetir rodada', 'rc.unlock': 'Nova mecânica desbloqueada!', 'rc.fwbonus': 'Bônus da primeira vitória',
   'mech.short': 'Venda Short', 'mech.short.d': 'Agora você pode abrir posições Short e apostar na queda do preço',
   'mech.lev': 'Alavancagem', 'mech.lev.d': 'Agora você pode multiplicar sua entrada com alavancagem ×2–×5',
@@ -1234,15 +1347,31 @@ ar: {
   'ach.shorts.t': 'بائع على المكشوف', 'ach.shorts.d': 'افتح الشورت (المرحلة 2)', 'ach.shorts.done': 'فتحت الشورت',
   'ach.ladder.t': 'الترسانة الكاملة', 'ach.ladder.d': 'افتح الآليات الأربع كلها', 'ach.ladder.done': 'فتحت الآليات الأربع كلها',
   'welcome.title': 'مرحبًا بك في Reptiloid Capital!', 'welcome.sub': 'أنت متداولنا المتدرب الجديد. يبدأ التدريب الآن – الجولة التدريبية الأولى على حسابنا.', 'welcome.start': 'ابدأ اللعبة →', 'welcome.skip': 'تخطّي',
-  'ob1.1': 'حلّل مخطط البيتكوين واتخذ قرارًا.',
-  'ob1.2': 'افتح صفقة Long بناءً على المخطط والمستويات. أغلقها عندما ترى ذلك مناسبًا — لجني الربح أو تقبّل الخسارة.',
-  'ob1.3': 'تكون الصفقة رابحة عندما تكون فوق نقطة الدخول؛ حاول إغلاقها عند أقصى ربح.',
-  'ob2.1': 'في السوق يمكنك الربح ليس فقط من ارتفاع قيمة الصفقة بل ومن انخفاضها أيضًا — إذا كنت تعرف الطريقة.',
-  'ob2.2': 'عند فتح صفقة Long يزداد الربح إذا كانت قيمة الأصل فوق نقطة الدخول.',
-  'ob2.3': 'عند فتح صفقة Short يزداد الربح إذا كان سعر الأصل تحت نقطة الدخول.',
-  'ob3.1': 'مع نمو ثقتك بمهاراتك يمكنك التصرف بجرأة أكبر — وهنا يأتي دور الرافعة المالية؛ فهي تضاعف الأرباح لكنها تزيد المخاطر أيضًا.',
-  'ob3.2': 'تتيح لك الرافعة المالية زيادة مبلغ الدخول.',
-  'ob3.3': 'راقب مستويات التصفية. إذا تمت تصفيتك فسيُخصم 50% من مبلغ الصفقة.',
+  'ob1.1': 'مرحباً بك في أول <b>جولة تدريب</b>! هذا مخطط <b>البيتكوين</b>.',
+  'ob1.2': 'الشموع <b>الخضراء</b>: السعر يصعد. <b>الحمراء</b>: يهبط. راقب حركته!',
+  'ob1.3': 'انتهى الهبوط والسعر يرتد — اضغط <b>Buy</b> الآن!',
+  'ob1.4': 'أنت <b>في صفقة</b>! يزداد الربح ما دام السعر <b>فوق نقطة الدخول</b>.',
+  'ob1.5': 'الصعود يتباطأ — <b>أغلق الصفقة</b> وثبّت ربحك!',
+  'ob1.6': 'أول <b>ربح</b> لك في الجيب! تداول بحرية حتى نهاية الوقت.',
+  'ob2.1': 'ربحت من <b>صعود</b> السعر. يمكنك الربح أيضاً عندما <b>يهبط</b>.',
+  'ob2.2': 'هذا هو <b>Short</b> — افتحه عندما تتوقع هبوطاً.',
+  'ob2.3': 'السعر عند القمة — افتح <b>Short</b> الآن!',
+  'ob2.4': 'أنت في شورت: يزداد الربح ما دام السعر <b>تحت نقطة الدخول</b>.',
+  'ob2.5': 'الهبوط يتباطأ — <b>أغلق الصفقة</b> وخذ ربحك!',
+  'ob2.6': 'الآن تربح في <b>أي سوق</b> — صاعداً كان أم هابطاً.',
+  'ob3.1': 'واثق من نفسك؟ حان وقت <b>الرافعة المالية</b> — إنها تضاعف صفقتك.',
+  'ob3.2': 'مع <b>x3</b> تحرك السعر 1% يغيّر رهانك 3%. ضبطنا لك <b>x3</b>.',
+  'ob3.3': 'انتبه: عند <b>−50%</b> تتم <b>تصفية</b> الصفقة. راقب المخاطر!',
+  'ob3.4': 'انتهى الهبوط — افتح <b>Long</b> برافعة x3!',
+  'ob3.5': 'انظر إلى شريط <b>التصفية</b> بالأسفل — لا تدعه يمتلئ.',
+  'ob3.6': 'انطلاقة رائعة — <b>أغلق الصفقة</b> قبل أن ينقلب السوق!',
+  'ob3.7': 'اكتمل التدريب! الجولات القادمة حقيقية — الدخول يكلف <b>100 رقاقة</b>. حظاً موفقاً!',
+  'obp.1': 'اختر <b>حجم صفقتك</b> كنسبة مئوية وتحكم في تداولك بدقة أكبر.',
+  'obp.2': 'اختر جزءاً — مثلاً <b>25%</b>. يبقى الباقي بأمان <b>نقداً</b>.',
+  'obp.3': 'انتهى الهبوط — اضغط <b>Buy</b>: يدخل فقط <b>الجزء</b> الذي اخترته!',
+  'obp.4': 'انظر للأعلى: <b>Balance</b> نقدك الحر، و<b>Trade</b> العملات في الصفقة.',
+  'obp.5': 'نفس الحركة وخطر <b>أقل</b>: <b>أغلق الصفقة</b> وثبّت الربح!',
+  'obp.6': 'أتقنت <b>الصفقات الجزئية</b>! نفس النسبة — خطر مطلق أصغر.',
   'rc.next': 'الجولة التالية', 'rc.repeat': 'إعادة الجولة', 'rc.unlock': 'فُتحت آلية جديدة!', 'rc.fwbonus': 'مكافأة الفوز الأول',
   'mech.short': 'بيع Short', 'mech.short.d': 'يمكنك الآن فتح صفقات Short والمراهنة على هبوط السعر',
   'mech.lev': 'الرافعة المالية', 'mech.lev.d': 'يمكنك الآن مضاعفة دخولك برافعة ×2–×5',
@@ -1833,7 +1962,7 @@ function scheduleOutOfChips() {
 }
 
 /* ---------- game layer ---------- */
-let gameOpen = false, curGame = null, tutMode = false, tutStep = 0, tutPaused = false;
+let gameOpen = false, curGame = null, tutMode = false, tutStep = 0;
 let lastRound = null;
 let roundSettled = false; // раунд текущего iframe уже зачтён кошельком
 let roundStartBal = 0;    // кошелёк на старте раунда (после fee) — для peak-сигнала ×2
@@ -1853,11 +1982,13 @@ function logIntent(source, pack) {
 function intentLog() {
   try { return JSON.parse(localStorage.getItem('hub.intents') || '[]') || []; } catch (e) { return []; }
 }
-// «Purchase intents» в профиле = покупательные клики (peak- и skin-записи — служебные,
-// в счётчик не входят: peak считается отдельно, skin-* = экспозиция/выбор стиля)
+// «Purchase intents» в профиле = покупательные клики (peak-/skin-/tut-записи — служебные,
+// в счётчик не входят: peak считается отдельно, skin-* = экспозиция стиля,
+// tut-* = телеметрия шагов туториала п.36)
 function purchaseIntentCount() {
   return intentLog().filter(x => x && typeof x.source === 'string' &&
-    !x.source.startsWith('peak-') && !x.source.startsWith('skin-')).length;
+    !x.source.startsWith('peak-') && !x.source.startsWith('skin-') &&
+    !x.source.startsWith('tut-')).length;
 }
 
 /* ---------- заглушки платежей (вердикт владельца 27.07: в веб-прототипе только заглушки) ----------
@@ -1947,13 +2078,15 @@ function openGame(g, opts = {}) {
   $('#gamelayer').hidden = false;
 }
 function closeGame() {
-  // staged-бабл, не показанный/не закрытый к концу раунда, НЕ блокирует Round Complete:
-  // раунд закрылся с живым туториалом → зачесть раунд туториала и погасить poll
+  // раунд закрылся с живым туториалом (событийный шаг так и не случился) — зачесть
+  // раунд туториала; ждущие шаги гаснут вместе с оверлеем ниже
   if (tutMode) {
-    clearInterval(tutStagedPoll);
-    tutStagedPoll = 0;
     if (tutRound >= OB_ROUNDS) { S.tutorialDone = true; save(); }
   }
+  tutSeq = null;
+  tutAwait = null;
+  tutWaiting = false;
+  $('#tutorial').classList.remove('wait');
   gameOpen = false;
   curGame = null;
   tutMode = false;
@@ -1993,6 +2126,14 @@ window.addEventListener('message', e => {
     feeRefunded = true;
     setBalance(balance + roundFee, { silent: true });
     toast(t('t.feeback', fmt(roundFee)));
+    return;
+  }
+  if (d.type === 'hub:tutEvent') {
+    // событие интерактивного туториала (п.36): фазы сценария цены и реальные тапы
+    // игрока; полезная нагрузка — строка ev ('phase:*'/'enter:±1'/'exit'/'liq'/
+    // 'frac:*'/'partial-start'). Содержимое — ДАННЫЕ: матчится по белому списку шагов
+    if (d.game !== curGame) return;
+    onTutEvent(String(d.ev || ''));
     return;
   }
   if (d.type === 'hub:flappyRound') {
@@ -2145,41 +2286,79 @@ function showRoundComplete() {
   }, 1100);
 }
 
-/* ---------- onboarding tutorial (вердикт 30.07 п.23; mockups onb1..3) ----------
-   3 сим-раунда × 3 бабла: р1 лонг (анализ / открой лонг / профит выше входа),
-   р2 шорт (профит на падении / Long / Short), р3 плечо (смелость / больше вход / ликвидация).
-   Механика запуска прежняя: шелл стартует раунд в iframe и морозит его (G.paused)
-   за баблами; endTutorial размораживает — раунд идёт дальше. «Skip the tutorial»
-   гасит ТОЛЬКО баблы ТЕКУЩЕГО раунда (слово Павла): раунды 2/3 получают свои
-   последовательности, т.к. каждый сим-раунд = свой iframe-запуск через openGame.
-   Якоря/подсветка — по ЖИВОЙ геометрии игры (same-origin); упавший якорь → фолбэк
-   (полное затемнение, бабл на CSS-позиции, без стрелки). */
-/* Стейджинг (QA 30.07, по макетам): 3-й бабл раундов 1 и 3 — «в середине позиции»
-   (onb1-3: профит/Close position; onb3-3: уровни ликвидации) — показывается ПОСЛЕ
-   открытия позиции поверх ЖИВОЙ игры (без заморозки); раунд 2 весь до сделки (onb2-1..3).
-   win: строка = одно окно в затемнении (запятая внутри строки = фолбэк-селектор),
-   массив = несколько окон; dim = сосед в светлой полосе, которого макет держит тёмным
-   (onb2-2: Long светлый, Short тёмный — вертикальная полоса не разделит, кладём патч). */
+/* ---------- onboarding tutorial v3 — интерактивный (вердикт 31.07 п.36) ----------
+   Вместо «некст-некст-некст»: шагов больше и они короче, первые секунды каждого
+   обучающего раунда — на живой динамике. Игра ведёт сценированную симуляцию цены
+   (TUT_SCRIPT в game.js) и шлёт события {type:'hub:tutEvent', ev} — подсказка
+   приходит В МОМЕНТ события («пошла свечка вверх — нажимай Buy») и ждёт РЕАЛЬНОГО
+   тапа по кнопке игры. Архитектура прежняя: оболочка владеет оверлеем, игра шлёт
+   события; каждый сим-раунд = свой iframe-запуск через openGame.
+   Формат шага:
+     key   — строка словаря (жирные акценты — <b> в самой строке);
+     win   — окна в затемнении (строка/массив), dim — патч-затемнение соседа,
+             arrow — белая стрелка [селектор, UL|DL|DR], top — CSS-позиция бабла;
+     on    — шаг ЖДЁТ события: баблы прячутся, игра живёт (таймер идёт), бабл
+             выстреливает при событии (или сразу, если событие уже случилось);
+     wait  — шаг закрывается НЕ Некстом, а реальным тапом: 'enter'/'enter:1'/
+             'enter:-1'/'exit'/'frac' — оверлей пропускает тапы в игру
+             (pointer-events:none), таймер раунда придержан, график живёт.
+   «Skip the tutorial» гасит ТОЛЬКО баблы текущего раунда (слово Павла) и
+   отпускает сценарий в свободный режим (tutFree).
+   ★draft: число шагов (6/6/7 + 6 у частичных), тексты подсказок и формы
+   сценариев — моё предложение по рамке «6–9 шагов» из ТЗ. */
 const OB_TUT = [
-  [ // round 1 — long (onb1-1..3)
-    { key: 'ob1.1', win: '#chartWrap', arrow: ['#tickerBox', 'UL'] },
-    { key: 'ob1.2', win: '#btnLong', arrow: ['#btnLong', 'DL'] },
-    // ★draft: зелёную зону профита в staged-бабле рисует САМА живая игра (PnL≥0),
-    // фейковый tutBand из макета не кладём — он врал бы против живого графика
-    { key: 'ob1.3', staged: true, win: ['#chartWrap', '#btnExit'], arrow: ['#btnExit', 'DL'] },
+  [ // round 1 — long: интро → падение → отскок (Buy!) → рост → затухание (Close!)
+    { key: 'ob1.1' },
+    { key: 'ob1.2', win: '#chartWrap', arrow: ['#tickerBox', 'UL'] },
+    { key: 'ob1.3', on: 'phase:rebound', wait: 'enter', win: ['#chartWrap', '#btnLong'], arrow: ['#btnLong', 'DL'] },
+    { key: 'ob1.4', win: ['#chartWrap', '#infoCard'] },
+    { key: 'ob1.5', on: 'phase:stall', wait: 'exit', win: ['#chartWrap', '#btnExit'], arrow: ['#btnExit', 'DL'] },
+    { key: 'ob1.6' },
   ],
-  [ // round 2 — short (onb2-1..3, все до сделки)
+  [ // round 2 — short: интро → рост → разворот (Short!) → падение → дно (Close!)
     { key: 'ob2.1' },
-    { key: 'ob2.2', win: ['#chartWrap', '#btnLong'], dim: '#btnShort', band: .42, arrow: ['#btnLong', 'DL'] },
-    { key: 'ob2.3', win: ['#chartWrap', '#btnShort'], dim: '#btnLong', band: .72, arrow: ['#btnShort', 'DR'] },
+    { key: 'ob2.2', win: ['#chartWrap', '#btnShort'], dim: '#btnLong' },
+    { key: 'ob2.3', on: 'phase:turn', wait: 'enter:-1', win: ['#chartWrap', '#btnShort'], dim: '#btnLong', arrow: ['#btnShort', 'DR'] },
+    { key: 'ob2.4', win: ['#chartWrap', '#infoCard'] },
+    { key: 'ob2.5', on: 'phase:bottom', wait: 'exit', win: ['#chartWrap', '#btnExit'], arrow: ['#btnExit', 'DL'] },
+    { key: 'ob2.6' },
   ],
-  [ // round 3 — leverage (onb3-1..3)
-    { key: 'ob3.1', top: 372, win: '#levCtl' },
+  [ // round 3 — leverage x3: интро → провал → отскок (Long ×3!) → ликвидация-бар → Close!
+    { key: 'ob3.1' },
     { key: 'ob3.2', win: '#levCtl', arrow: ['#levCtl', 'DL'] },
-    { key: 'ob3.3', staged: true, win: '#liqBlock', arrow: ['#liqBlock', 'DL'] },
+    { key: 'ob3.3' },
+    { key: 'ob3.4', on: 'phase:rebound', wait: 'enter:1', win: ['#chartWrap', '#ctlBar', '#btnLong'], dim: '#btnShort', arrow: ['#btnLong', 'DL'] },
+    { key: 'ob3.5', win: ['#chartWrap', '#liqBlock'], arrow: ['#liqBlock', 'DL'] },
+    { key: 'ob3.6', on: 'phase:stall', wait: 'exit', win: ['#chartWrap', '#btnExit'], arrow: ['#btnExit', 'DL'] },
+    { key: 'ob3.7' },
   ],
 ];
-let tutRound = 1; // 1..3, выставляется в openGame по trade.progress.rounds
+/* 4-й туториал — частичные позиции (клик-триггер по замку, флоу pendingPartial/рефанд
+   НЕ тронут): тот же интерактивный стиль «действие → комментарий» (слово Павла 31.07),
+   запускается событием 'partial-start' из игры. Мокап бабла — 558:10599. */
+const PARTIAL_TUT = [
+  { key: 'obp.1', win: ['#chartWrap', '#fracCtl'], arrow: ['#fracCtl', 'DL'] },
+  { key: 'obp.2', wait: 'frac', win: ['#chartWrap', '#fracCtl'], arrow: ['#fracCtl', 'DL'] },
+  { key: 'obp.3', on: 'phase:rebound', wait: 'enter', win: ['#chartWrap', '#fracCtl', '#btnLong'], dim: '#btnShort', arrow: ['#btnLong', 'DL'] },
+  { key: 'obp.4', win: ['#balanceBand', '#infoCard'], arrow: ['#balanceBand', 'UL'] },
+  { key: 'obp.5', on: 'phase:stall', wait: 'exit', win: ['#chartWrap', '#btnExit'], arrow: ['#btnExit', 'DL'] },
+  { key: 'obp.6' },
+];
+let tutRound = 1;       // 1..3, выставляется в openGame по trade.progress.rounds
+let tutSeq = null;      // активная последовательность баблов (OB_TUT[N] | PARTIAL_TUT)
+let tutKind = 'ob';     // 'ob' — онбординг-раунд, 'partial' — обучение частичных
+let tutAwait = null;    // событие, которого ждёт скрытый шаг (cfg.on)
+let tutWaiting = false; // видимый шаг ждёт реального тапа (cfg.wait) — Next скрыт
+const tutFired = new Set(); // события, уже случившиеся в этом раунде (буфер для on)
+function gameTrade() {
+  try { return $('#gameframe').contentWindow.__trade || null; } catch (err) { return null; }
+}
+/* таймер-холд: за любым видимым баблом таймер раунда придержан, но график живёт
+   (слово Павла: «игрок должен видеть, что график живёт») */
+function setTutHold(v) {
+  const tr = gameTrade();
+  try { if (tr && tr.setTimeHold) tr.setTimeHold(v); } catch (err) {}
+}
 function tutBoot() {
   if (!tutMode || !gameOpen) return;
   const t0 = performance.now();
@@ -2188,24 +2367,25 @@ function tutBoot() {
     let started = false;
     try {
       const tr = $('#gameframe').contentWindow.__trade;
-      // ждём фид (или 4с — оффлайн-генератор), чтобы обучение шло по «живому» рынку
+      // ждём фид (или 4с — оффлайн-генератор); сам раунд идёт по сценарию урока
       if (tr && ((tr.Feed.ready && tr.Feed.fresh()) || performance.now() - t0 > 4000)) {
         tr.startRound();
-        tr.G.paused = true;
-        tutPaused = true;
         started = true;
       }
-    } catch (err) { started = true; tutPaused = false; } // фолбэк: баблы без заморозки
+    } catch (err) { started = true; } // фолбэк: баблы без холда/сценария
     if (started) {
       clearInterval(iv);
+      tutSeq = OB_TUT[tutRound - 1] || null;
+      tutKind = 'ob';
+      tutFired.clear();
       tutStep = 0;
-      showTutStep();
+      runTutStep();
     }
   }, 150);
 }
 function tutLayout() {
   const t = $('#tutorial'), card = $('#tutCard'), band = $('#tutBand');
-  const cfg = (OB_TUT[tutRound - 1] || [])[tutStep] || {};
+  const cfg = (tutSeq || [])[tutStep] || {};
   const arrows = { UL: $('#tutArrowUL'), DL: $('#tutArrowDL'), DR: $('#tutArrowDR') };
   for (const k in arrows) arrows[k].style.display = 'none';
   card.removeAttribute('style');
@@ -2288,64 +2468,111 @@ function tutLayout() {
   }
   // фолбэк без якоря: CSS-позиция бабла (bottom:176px), полное затемнение
 }
+/* прогон текущего шага: обычный шаг показывается сразу; шаг с cfg.on прячет баблы
+   и ждёт события игры (или показывается сразу, если событие уже в буфере) */
+function runTutStep() {
+  if (!tutSeq) return;
+  if (tutStep >= tutSeq.length) { endTutorial(); return; }
+  const cfg = tutSeq[tutStep];
+  if (cfg.on && !tutFired.has(cfg.on)) {
+    tutAwait = cfg.on;
+    tutWaiting = false;
+    const t = $('#tutorial');
+    t.hidden = true;
+    t.classList.remove('wait');
+    setTutHold(false); // игра живёт: игрок смотрит на динамику, не на текст
+    const tr = gameTrade();
+    try { if (tr && tr.tutGo) tr.tutGo(); } catch (err) {} // отпустить стартовый hold сценария
+    return;
+  }
+  activateTutStep(cfg);
+}
+/* wait-шаг мог быть уже выполнен игроком заранее (тап до подсказки) — не ждём повтора */
+function tutSatisfied(wait) {
+  const tr = gameTrade();
+  if (!tr) return false;
+  try {
+    if (wait.indexOf('enter') === 0) {
+      if (!tr.G.pos) return false;
+      const dir = wait === 'enter:-1' ? -1 : wait === 'enter:1' ? 1 : 0;
+      return !dir || tr.G.pos.dir === dir;
+    }
+    if (wait === 'exit') return !tr.G.pos && tr.G.trades.length > 0;
+    if (wait === 'frac') return tr.G.frac !== 1 || !!tr.G.pos;
+  } catch (err) {}
+  return false;
+}
+function activateTutStep(cfg) {
+  tutAwait = null;
+  if (cfg.wait && tutSatisfied(cfg.wait)) { tutStep++; runTutStep(); return; }
+  tutWaiting = !!cfg.wait;
+  showTutStep();
+}
 function showTutStep() {
   const t = $('#tutorial');
+  const cfg = (tutSeq || [])[tutStep] || {};
   t.hidden = false;
-  $('#tutText').textContent = window.t(OB_TUT[tutRound - 1][tutStep].key);
+  // wait-шаг: Next скрыт, оверлей пропускает тапы в игру (закрывается реальным тапом)
+  t.classList.toggle('wait', !!cfg.wait);
+  // строки — из НАШЕГО словаря (не пользовательский ввод), <b> = акценты фраз (п.36)
+  $('#tutText').innerHTML = window.t(cfg.key);
+  // телеметрия шагов (приёмка ТЗ): intent-лог, из счётчика покупок исключено
+  logIntent('tut-step', (tutKind === 'ob' ? 'r' + tutRound : 'partial') + 's' + (tutStep + 1));
+  setTutHold(true); // таймер придержан, график живёт
   tutLayout();
 }
 function tutNext() {
+  if (!tutSeq || $('#tutorial').hidden) return;
+  if (tutWaiting) return; // событийный шаг закрывает только реальный тап (или Skip)
   tutStep++;
-  const seq = OB_TUT[tutRound - 1] || [];
-  if (tutStep >= seq.length) { endTutorial(); return; }
-  if (seq[tutStep].staged) { stageTutStep(); return; }
-  showTutStep();
+  runTutStep();
 }
-function unfreezeTut() {
-  if (tutPaused) {
-    try { $('#gameframe').contentWindow.__trade.G.paused = false; } catch (err) {}
-    tutPaused = false;
+/* событие из игры (hub:tutEvent) — буферизуем и будим ждущие шаги */
+function onTutEvent(ev) {
+  if (ev === 'partial-start') {
+    // 4-й туториал (частичные позиции): старт обучающего раунда внутри уже открытого
+    // iframe или через openGame — оболочке всё равно, событие приходит из игры
+    if (tutMode) return; // страховка: во время онбординга тренировка не заказывается
+    tutSeq = PARTIAL_TUT;
+    tutKind = 'partial';
+    tutFired.clear();
+    tutAwait = null;
+    tutStep = 0;
+    runTutStep();
+    return;
+  }
+  if (!tutSeq) return;
+  tutFired.add(ev);
+  if (tutAwait === ev) { activateTutStep(tutSeq[tutStep]); return; }
+  if (tutWaiting && !$('#tutorial').hidden) {
+    const w = tutSeq[tutStep].wait;
+    // расширенные совпадения — страховка от дедлока на придержанном таймере:
+    // ждали выбор доли, а игрок сразу вошёл → шаг зачтён (следующий сам скипнется
+    // по tutSatisfied); ждали выход, а позицию ликвидировало → тоже зачтён
+    const hit = w === ev ||
+      (w === 'enter' && ev.indexOf('enter:') === 0) ||
+      (w === 'exit' && ev === 'liq') ||
+      (w === 'frac' && ((ev.indexOf('frac:') === 0 && ev !== 'frac:1') || ev.indexOf('enter:') === 0));
+    if (hit) { tutStep++; runTutStep(); }
   }
 }
 function finishTutRound() {
   if (tutRound >= OB_ROUNDS) { S.tutorialDone = true; save(); }
   tutMode = false;
 }
-/* staged-бабл (QA 30.07, макеты onb1-3/onb3-3): баблы 1–2 отработали над замороженной
-   игрой → разморозка → ждём ОТКРЫТИЯ ПОЗИЦИИ (poll по __trade.G.pos, фолбэк — видимость
-   #pnlBox в DOM игры) → бабл 3 поверх ЖИВОЙ игры, без заморозки, Next гасит.
-   Позиции за раунд не случилось → бабл 3 молча пропадает (★draft: показывать его на
-   конце раунда было бы враньё — контекст «ты в позиции» уже ушёл). */
-let tutStagedPoll = 0;
-function stageTutStep() {
-  $('#tutorial').hidden = true;
-  unfreezeTut();
-  clearInterval(tutStagedPoll);
-  tutStagedPoll = setInterval(() => {
-    if (!tutMode || !gameOpen) { clearInterval(tutStagedPoll); tutStagedPoll = 0; return; }
-    let pos = false, over = false;
-    try {
-      const tr = $('#gameframe').contentWindow.__trade;
-      pos = !!(tr && tr.G.pos);
-      over = !!(tr && tr.G.over);
-    } catch (err) {
-      try { // фолбэк: судим по карточке позиции в DOM игры (same-origin)
-        pos = !$('#gameframe').contentWindow.document
-          .querySelector('#pnlBox').classList.contains('hidden');
-      } catch (e2) {}
-    }
-    if (over) { clearInterval(tutStagedPoll); tutStagedPoll = 0; finishTutRound(); return; }
-    if (pos) { clearInterval(tutStagedPoll); tutStagedPoll = 0; showTutStep(); }
-  }, 200);
-}
 /* закрыть баблы ТЕКУЩЕГО раунда (Next до конца или Skip) — раунд продолжается.
-   Skip гасит и отложенный staged-бабл (poll), не только видимые */
+   Skip отпускает и сценарий цены (tutFree): холды урока не держат график */
 function endTutorial() {
-  $('#tutorial').hidden = true;
-  clearInterval(tutStagedPoll);
-  tutStagedPoll = 0;
-  unfreezeTut();
-  finishTutRound();
+  const t = $('#tutorial');
+  t.hidden = true;
+  t.classList.remove('wait');
+  tutAwait = null;
+  tutWaiting = false;
+  setTutHold(false);
+  const tr = gameTrade();
+  try { if (tr && tr.tutFree) tr.tutFree(); } catch (err) {}
+  if (tutKind === 'ob') finishTutRound();
+  tutSeq = null;
 }
 
 /* ---------- daily challenge: реальная ставка на дневную свечу BTC (UTC-день) ----------

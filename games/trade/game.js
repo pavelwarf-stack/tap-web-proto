@@ -27,6 +27,7 @@ const CFG = {
   OB_VOL: 2,            // stages 1–2: множитель хода фейк-цены — график видимо скачет сильнее (вердикт 26.07)
   LEVS: [1, 2, 3, 4, 5], // stage 3+: выбор игрока ×1–×5, дефолт ×2 (слово владельца 25.07)
   LEV_DEF: 2,
+  TUT_LEV_DEF: 3,       // дефолт плеча в ОБУЧАЮЩИХ раундах — x3 (решение Павла 31.07, п.36б)
   FRACS: [0.25, 0.5, 0.75, 1], // stage 4+: доли котлеты на вход/выход
   LIQ_PNL: -50,         // ликвидация: PnL позиции −50% (расстояние цены = 50%/lev)
   MELT_MIN_PEAK: 12,
@@ -40,6 +41,59 @@ const CFG = {
   VIS_EASE: 0.13,       // тау глайда визуальной цены, сек
   TXT_EVERY: 0.2,       // цифры обновляются 5 раз/сек
 };
+
+/* ── Онбординг v3 — интерактив (вердикт 31.07 п.36): обучающие раунды идут на
+   СЦЕНИРОВАННОЙ симуляции цены — заранее заданная последовательность сегментов
+   (падение → отскок → рост → откат) под сценарий урока. Одобрено Павлом 31.07
+   («в онбординге можно симуляцию хотя бы на старте»); п.33 «реальный live-стрим»
+   относится к РЕАЛЬНЫМ раундам — их движок не тронут.
+   Сегмент: dur (сек), drift (лог-дрифт/сек), sigma (шум), emit (событие фазы для
+   подсказки хаба в МОМЕНТ события), hold (сегмент тянется после dur, пока не
+   выполнится условие: 'go' — хаб отпустил вступительные баблы; 'frac' — игрок
+   выбрал долю <100%; 'enter' — открыта позиция; 'exit' — позиция закрыта).
+   ★draft: формы сценариев и длительности — моё предложение, не вердикт. */
+const TUT_SCRIPT = {
+  1: [ // раунд 1 — лонг: флэт → падение → отскок (Buy!) → рост → затухание (Close!)
+    { dur: 2.0, drift: 0,      sigma: 0.006, hold: 'go' },
+    { dur: 3.0, drift: -0.032, sigma: 0.004 },
+    { dur: 1.4, drift: 0.010,  sigma: 0.003, emit: 'rebound', hold: 'enter' },
+    { dur: 4.0, drift: 0.032,  sigma: 0.005 },
+    { dur: 1.6, drift: -0.004, sigma: 0.004, emit: 'stall', hold: 'exit' },
+    { dur: 9e9, drift: 0.003,  sigma: 0.010 }, // свободная игра до конца раунда
+  ],
+  2: [ // раунд 2 — шорт: флэт → рост → разворот (Short!) → падение → дно (Close!)
+    { dur: 2.0, drift: 0,      sigma: 0.006, hold: 'go' },
+    { dur: 3.0, drift: 0.030,  sigma: 0.004 },
+    { dur: 1.4, drift: -0.008, sigma: 0.003, emit: 'turn', hold: 'enter' },
+    { dur: 4.0, drift: -0.032, sigma: 0.005 },
+    { dur: 1.6, drift: 0.005,  sigma: 0.004, emit: 'bottom', hold: 'exit' },
+    { dur: 9e9, drift: -0.002, sigma: 0.010 },
+  ],
+  3: [ // раунд 3 — плечо x3: флэт → провал → отскок (Long!) → рост → затухание (Close!)
+    { dur: 2.0, drift: 0,      sigma: 0.006, hold: 'go' },
+    { dur: 2.6, drift: -0.026, sigma: 0.004 },
+    { dur: 1.4, drift: 0.010,  sigma: 0.003, emit: 'rebound', hold: 'enter' },
+    { dur: 4.0, drift: 0.028,  sigma: 0.006 },
+    { dur: 1.6, drift: -0.005, sigma: 0.004, emit: 'stall', hold: 'exit' },
+    { dur: 9e9, drift: 0.003,  sigma: 0.012 },
+  ],
+  p: [ // обучающий раунд частичных позиций (п.18/п.35): флэт, пока игрок выбирает
+       // долю → провал → отскок (Buy частью котлеты!) → рост → затухание (Close!)
+    { dur: 2.0, drift: 0,      sigma: 0.006, hold: 'frac' },
+    { dur: 2.6, drift: -0.024, sigma: 0.004 },
+    { dur: 1.4, drift: 0.010,  sigma: 0.003, emit: 'rebound', hold: 'enter' },
+    { dur: 4.0, drift: 0.028,  sigma: 0.005 },
+    { dur: 1.6, drift: -0.005, sigma: 0.004, emit: 'stall', hold: 'exit' },
+    { dur: 9e9, drift: 0.003,  sigma: 0.010 },
+  ],
+};
+/* событие туториала game→shell: контракт {type:'hub:tutEvent', game:'trade', ev}
+   ev: 'phase:<имя>' (сегмент сценария начался) | 'enter:1'/'enter:-1' | 'exit' |
+   'liq' | 'frac:<доля>' | 'partial-start'. Существующие типы сообщений не тронуты. */
+function postTutEvent(ev) {
+  if (window.parent === window) return;
+  try { window.parent.postMessage({ type: 'hub:tutEvent', game: 'trade', ev }, '*'); } catch (e) {}
+}
 
 /* ── Анлоки (вердикт владельца 25.07): стадии 2–3 открываются РАУНДАМИ онбординга
    (раунд 1 пройден → шорты; раунд 2 → плечо), НЕ порогами. Stage 4 (частичные позиции,
@@ -171,6 +225,7 @@ en: {
   'howto.liq': '−50% is liquidation — you lose a heart',
   /* игровой хром по онбординг-макетам (30.07); Buy/Long/Short — English во всех языках */
   'ui.balance': 'Balance',
+  'ui.trade': 'Trade',
   'ui.leverage': 'Leverage',
   'ui.size': 'Trade size',
   'ui.upnl': 'Unrealized P&L',
@@ -218,6 +273,7 @@ es: {
   'howto.chart': 'El gráfico es el precio real de Bitcoin',
   'howto.liq': '−50% es liquidación — pierdes un corazón',
   'ui.balance': 'Saldo',
+  'ui.trade': 'Operación',
   'ui.leverage': 'Apalancamiento',
   'ui.size': 'Tamaño de operación',
   'ui.upnl': 'P&L no realizado',
@@ -264,6 +320,7 @@ fr: {
   'howto.chart': 'Le graphique est le prix réel du Bitcoin',
   'howto.liq': '−50% = liquidation — tu perds un cœur',
   'ui.balance': 'Solde',
+  'ui.trade': 'Trade',
   'ui.leverage': 'Levier',
   'ui.size': 'Taille du trade',
   'ui.upnl': 'P&L latent',
@@ -310,6 +367,7 @@ de: {
   'howto.chart': 'Der Chart ist der echte Bitcoin-Preis',
   'howto.liq': '−50% = Liquidation — du verlierst ein Herz',
   'ui.balance': 'Guthaben',
+  'ui.trade': 'Trade',
   'ui.leverage': 'Hebel',
   'ui.size': 'Positionsgröße',
   'ui.upnl': 'Unrealisierter P&L',
@@ -356,6 +414,7 @@ ja: {
   'howto.chart': 'チャートはビットコインのライブ価格',
   'howto.liq': '−50%で清算 — ハートを1つ失う',
   'ui.balance': '残高',
+  'ui.trade': '取引',
   'ui.leverage': 'レバレッジ',
   'ui.size': '取引サイズ',
   'ui.upnl': '含み損益',
@@ -402,6 +461,7 @@ zh: {
   'howto.chart': '图表是比特币实时价格',
   'howto.liq': '−50% 即爆仓 — 失去一颗心',
   'ui.balance': '余额',
+  'ui.trade': '交易',
   'ui.leverage': '杠杆',
   'ui.size': '交易规模',
   'ui.upnl': '未实现盈亏',
@@ -448,6 +508,7 @@ pt: {
   'howto.chart': 'O gráfico é o preço real do Bitcoin',
   'howto.liq': '−50% é liquidação — você perde um coração',
   'ui.balance': 'Saldo',
+  'ui.trade': 'Operação',
   'ui.leverage': 'Alavancagem',
   'ui.size': 'Tamanho da operação',
   'ui.upnl': 'P&L não realizado',
@@ -494,6 +555,7 @@ ar: {
   'howto.chart': 'الرسم البياني هو سعر بيتكوين الحقيقي',
   'howto.liq': '−50% تعني التصفية — تخسر قلباً',
   'ui.balance': 'الرصيد',
+  'ui.trade': 'الصفقة',
   'ui.leverage': 'الرافعة المالية',
   'ui.size': 'حجم الصفقة',
   'ui.upnl': 'الأرباح والخسائر غير المحققة',
@@ -659,6 +721,7 @@ class PriceEngine {
     this.lastReal = null;
     this.candles = [];
     this.hist = [];
+    this.script = null; // сценарий обучающего раунда (п.36) — ставится ПОСЛЕ prefill
     this.nextRegime();
   }
   nextRegime() {
@@ -686,6 +749,22 @@ class PriceEngine {
     this.regime = { drift, sigma, until: this.simTime + dur };
   }
   marketTick(dt) {
+    /* сценированный режим обучающих раундов (п.36): сегменты TUT_SCRIPT вместо
+       генератора режимов; живой фид и OB_VOL-буст отключены — форма урока
+       детерминирована ДАННЫМИ сценария, а не хардкодом рендера */
+    if (this.script) {
+      const sc = this.script;
+      let seg = sc.segs[sc.idx];
+      if (this.simTime - sc.segT0 >= seg.dur && sc.idx < sc.segs.length - 1 &&
+          (!seg.hold || sc.released(seg.hold))) {
+        sc.idx++; sc.segT0 = this.simTime; seg = sc.segs[sc.idx];
+        if (seg.emit) postTutEvent('phase:' + seg.emit); // подсказка приходит В МОМЕНТ события
+      }
+      Feed.pendingReal = null; // реальные тики не подмешиваем в урок
+      const dp = seg.drift * dt + seg.sigma * Math.sqrt(dt) * gauss();
+      this.price = Math.max(1, this.price * Math.exp(dp));
+      return;
+    }
     if (this.simTime >= this.regime.until) this.nextRegime();
     let realDp = 0;
     const live = this.live && Feed.fresh();
@@ -1044,28 +1123,52 @@ function startRound() {
   G.txtAcc = 9; G.axisTxt = '';
   // гейты раунда — по типу раунда (онбординг-сим N / реальный), фиксируются на старте
   G.caps = roundCaps();
-  // дефолт плеча ×2 (вердикт 25.07): в каждой новой сессии игры, пока игрок сам не
-  // выбрал сегмент (G.levUserSet живёт в рамках iframe) — LEV_BASE входит в LEVS,
-  // поэтому проверка принадлежности дефолт не чинила (находка QA 25.07)
-  if (G.caps.lev) { if (!G.levUserSet || !CFG.LEVS.includes(G.lev)) G.lev = CFG.LEV_DEF; }
-  else G.lev = CFG.LEV_BASE;
+  // дефолт плеча (вердикт 25.07 ×2; в ОБУЧАЮЩИХ раундах ×3 — решение Павла 31.07 п.36б):
+  // пока игрок сам не выбрал сегмент (G.levUserSet живёт в рамках iframe) — LEV_BASE
+  // входит в LEVS, поэтому проверка принадлежности дефолт не чинила (находка QA 25.07)
+  if (G.caps.lev) {
+    if (!G.levUserSet || !CFG.LEVS.includes(G.lev))
+      G.lev = G.simRound ? CFG.TUT_LEV_DEF : CFG.LEV_DEF;
+  } else G.lev = CFG.LEV_BASE;
   G.frac = 1;
 
-  // онбординг-симы: сердца скрыты, справа кебаб (макеты onb1–onb3; ★draft: данные
+  // сценарий обучающего раунда (п.36): онбординг-симы 1–3 и тренировка частичных —
+  // на сценированной последовательности сегментов; реальные раунды живут прежним движком
+  G.timeHold = false;
+  G.tutGo = false;
+  const scriptKey = G.partialTraining ? 'p' : (G.caps.ob > 0 ? G.caps.ob : null);
+  if (scriptKey && TUT_SCRIPT[scriptKey]) {
+    G.engine.script = {
+      segs: TUT_SCRIPT[scriptKey], idx: 0, segT0: G.engine.simTime,
+      released: h => h === 'go' ? G.tutGo
+        : h === 'frac' ? G.frac !== 1 || !!G.pos
+        : h === 'enter' ? !!G.pos
+        : !G.pos,
+    };
+  }
+
+  // сим-раунды (онбординг + тренировка частичных): сердца скрыты, справа кебаб
+  // (макеты onb1–onb3 и 558:10599 — у тренировки частичных тоже кебаб; данные
   // сердец живут, кебаб открывает существующее пауза-меню; в реальных раундах — сердца)
-  const obSim = G.caps.ob > 0;
+  const obSim = G.caps.ob > 0 || G.partialTraining;
   $('hearts').classList.toggle('hidden', obSim);
   $('btnKebab').classList.toggle('hidden', !obSim);
   document.querySelectorAll('#hearts .heart').forEach(h => h.classList.remove('lost', 'pop'));
   $('pnlBox').classList.add('hidden');
   $('tickerBox').classList.remove('hidden');
+  $('tradeCell').classList.add('hidden');
   $('liqOverlay').classList.add('hidden');
   $('meltWarn').classList.add('hidden');
   renderControls();
   show('game');
 
-  // обучающий раунд частичных позиций — плашка-подсказка, чем он отличается
-  if (G.partialTraining) hintFloat(gt('hint.partial'));
+  // обучающий раунд частичных позиций: в хабе туториал ведёт оболочка (интерактивные
+  // баблы по событию 'partial-start', п.36 — 4-й туториал в том же стиле);
+  // standalone-запуск остаётся на старой плашке-подсказке
+  if (G.partialTraining) {
+    if (window.parent !== window) postTutEvent('partial-start');
+    else hintFloat(gt('hint.partial'));
+  }
 }
 
 /* тап по залоченным Size (вердикт 25.07): интро про хеджирование → обучающий сим-раунд.
@@ -1123,6 +1226,11 @@ function renderControls() {
   fracCtl.querySelectorAll('button[data-frac]').forEach(b =>
     b.classList.toggle('on', +b.dataset.frac === (fracLocked ? 1 : G.frac)));
   $('fracUnlock').classList.toggle('hidden', !fracUnlockable);
+  // разлоченный ряд: фактическая сумма входа рядом с лейблом — «Trade size ◑ 1 000»
+  // (п.35, мокап 558:10455); сумма = доля × свободный кэш
+  const showAmt = !fracLocked && !inPos;
+  $('fracAmt').classList.toggle('hidden', !showAmt);
+  if (showAmt) $('fracAmtV').textContent = fmtCoins(Math.round(G.cash * G.frac));
   // в позиции ряды скрыты — карточка PnL раскрывается на их место (макеты onb1-5/onb3-5)
   $('ctlBar').classList.toggle('hidden', inPos);
   $('infoCard').classList.toggle('inpos', inPos);
@@ -1175,8 +1283,13 @@ function enterPos(dir) {
   $('pnlBox').classList.remove('hidden');
   $('tickerBox').classList.add('hidden');
   $('entryPriceEl').textContent = fmtCoins(G.pos.entryPrice);
+  // полоса сверху при открытой позиции (п.35, мокап 558:10599): Balance = свободный
+  // кэш (updateHUD), Trade = монеты в позиции — статично на всю жизнь позиции
+  $('tradeCell').classList.remove('hidden');
+  $('tradeTop').textContent = fmtCoins(Math.round(G.pos.stake));
   renderPosMeta();
   renderControls();
+  if (G.simRound) postTutEvent('enter:' + dir); // интерактивный туториал (п.36)
   if (dir === 1) Sound.enter(); else Sound.short();
 }
 
@@ -1216,6 +1329,7 @@ function exitPos(auto = false) {
     renderPosMeta();
     renderControls();
   }
+  if (G.simRound && !auto) postTutEvent('exit'); // интерактивный туториал (п.36)
   if (pnl >= 0) Sound.exitWin(); else Sound.exitLoss();
   if (pnl >= 30) FX.burst(188, 370, 36);
   flash(false);
@@ -1246,6 +1360,7 @@ function closePosUI() {
   G.pos = null; G.melting = false;
   $('pnlBox').classList.add('hidden');
   $('tickerBox').classList.remove('hidden');
+  $('tradeCell').classList.add('hidden');
   $('meltWarn').classList.add('hidden');
   G.frac = 1;
   renderControls();
@@ -1265,6 +1380,7 @@ function liquidate() {
   G.pos.stake = 0;
   recordTrade(CFG.LIQ_PNL, realized - part, true, false);
   closePosUI();
+  if (G.simRound) postTutEvent('liq'); // интерактивный туториал (п.36)
   G.liqsThisRound++;
   G.hearts--;
   const hearts = document.querySelectorAll('#hearts .heart');
@@ -1558,7 +1674,9 @@ function drawChart() {
 
 // ============================== HUD ==============================
 function updateHUD(dt) {
-  const bt = balTotal();
+  // при открытой позиции Balance = СВОБОДНЫЙ кэш (вложенное показывает ячейка Trade —
+  // п.35, мокап 558:10599); вне позиции — весь баланс по себестоимости
+  const bt = G.pos ? G.cash : balTotal();
   G.dispBal += (bt - G.dispBal) * Math.min(1, dt * 9);
   $('balTop').textContent = fmtCoins(Math.abs(G.dispBal - Math.round(G.dispBal)) < 0.005 ? Math.round(G.dispBal) : G.dispBal);
 
@@ -1668,7 +1786,10 @@ function frame(ts) {
     return;
   }
 
-  G.gameT += dt * 1000;
+  // timeHold (туториал п.36): таймер раунда придержан за баблом/подсказкой, но график
+  // ЖИВЁТ («игрок должен видеть, что график живёт» — слово Павла) — в отличие от
+  // G.paused, который морозит всё (пауза-меню)
+  if (!G.timeHold) G.gameT += dt * 1000;
   G.engine.step(dt);
   G.dispPrice = G.engine.vis;
 
@@ -1740,6 +1861,7 @@ function bind() {
     const b = e.target.closest('button[data-frac]');
     if (!b) return;
     G.frac = +b.dataset.frac;
+    if (G.simRound && !G.pos) postTutEvent('frac:' + G.frac); // интерактивный туториал (п.36)
     renderControls();
   });
   $('btnPause').addEventListener('click', () => {
@@ -1795,7 +1917,13 @@ function applyGT() {
   document.querySelectorAll('[data-gt]').forEach(el => { el.textContent = gt(el.dataset.gt); });
 }
 window.__trade = { G, CFG, Feed, P, saveP, targetStage, roundCaps, startRound, enterPos, exitPos, Tasks, OB_ROUNDS,
-  get skin() { return SKIN; }, setSkin }; // QA hook
+  get skin() { return SKIN; }, setSkin,
+  /* API туториала для оболочки (same-origin, как tutBoot): таймер-холд за баблами,
+     отпуск стартового hold-сегмента сценария, полный сброс сценария на Skip */
+  setTimeHold(v) { G.timeHold = !!v; },
+  tutGo() { G.tutGo = true; },
+  tutFree() { G.tutGo = true; G.timeHold = false; if (G.engine) G.engine.script = null; },
+}; // QA hook
 applyGT();
 readTheme();
 

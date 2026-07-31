@@ -1988,6 +1988,14 @@ body[data-skin="corporate"] .rc-home { background:var(--panel); box-shadow:none;
    вариантов нет, цвета выведены из ДС варианта. */
 #tutorial { position:absolute; inset:0; z-index:60; background:rgba(70,70,70,.5); }
 #tutorial[hidden] { display:none; }
+/* wait-шаг интерактивного туториала (п.36): подсказка ждёт РЕАЛЬНОГО тапа по кнопке
+   игры — оверлей пропускает тапы насквозь (затемнение остаётся визуальным), карточка
+   с Skip остаётся кликабельной, Next скрыт; патч-затемнение соседа ГЛОТАЕТ тапы
+   (неправильная кнопка не работает, пока идёт урок) */
+#tutorial.wait { pointer-events:none; }
+#tutorial.wait .tut-card { pointer-events:auto; }
+#tutorial.wait .tut-next { display:none; }
+#tutorial.wait #tutDim { pointer-events:auto; }
 /* зелёная полоса профит-зоны над графиком (mockup Rectangle 7271) */
 #tutBand {
   position:absolute; left:0; right:0; height:66px;
@@ -2013,9 +2021,12 @@ body[data-skin="corporate"] .rc-home { background:var(--panel); box-shadow:none;
 }
 @keyframes bubbleIn { from { transform:translateY(14px) scale(.86); opacity:0; } }
 .tut-card p {
-  font-size:14.4px; line-height:21.6px; font-weight:500;
-  padding-right:128px; min-height:44px; margin-bottom:54px;
+  /* кегль поднят с 14.4 (вердикт 31.07 п.36 «фразы крупнее»; ★draft: точное значение
+     моё — макета типографики v3 нет); 1–2 главных слова фразы — жирным через <b> */
+  font-size:17px; line-height:24px; font-weight:500;
+  padding-right:128px; min-height:48px; margin-bottom:54px;
 }
+.tut-card p b { font-weight:800; }
 .tut-mascot {
   position:absolute; right:24px; bottom:-4px; height:196px; z-index:2;
   pointer-events:none;

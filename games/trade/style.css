@@ -657,6 +657,10 @@ html[data-skin="corporate"] .du-ico { width:32px; height:32px; }
   background:var(--balrow-bg); border:var(--balrow-lw) solid var(--balrow-line);
   border-radius:var(--balrow-r); padding:var(--balrow-pad);
 }
+/* два значения в полосе при открытой позиции (п.35, мокап 558:10599):
+   Balance = свободный кэш, Trade = монеты в позиции; зазор между группами 20px по ноде */
+.bal-cell { display:flex; align-items:center; gap:var(--balrow-gap); }
+.bal-cell + .bal-cell { margin-left:20px; }
 .bal-lbl {
   font-size:var(--ballbl-fs); font-weight:var(--ballbl-fw); color:var(--ballbl-tx);
   text-transform:var(--ballbl-case); line-height:1.21;
@@ -666,7 +670,7 @@ html[data-skin="corporate"] .du-ico { width:32px; height:32px; }
   background:var(--balpill-bg); border:1px solid var(--balpill-line);
   border-radius:var(--r-pill); padding:var(--balpill-pad);
 }
-#balTop, #dealBal {
+#balTop, #dealBal, #tradeTop {
   font-family:var(--font-bal); font-size:var(--balval-fs); font-weight:var(--balval-fw);
   color:var(--balval-tx); font-variant-numeric:tabular-nums; line-height:1.28;
 }
@@ -789,6 +793,14 @@ html[data-skin="corporate"] .du-ico { width:32px; height:32px; }
 .ctl-lbl {
   font-size:var(--lbl-fs); font-weight:var(--lbl-fw); color:var(--lbl-tx);
   text-transform:var(--lbl-case); line-height:1.21;
+}
+/* фактическая сумма входа у разлоченного ряда (п.35, мокап 558:10455:
+   «Trade size ◑ 1 000» — монета 16px через 8px после лейбла, число 14/700 чернилами) */
+.ctl-amt { display:flex; align-items:center; gap:2px; margin-left:8px; }
+.ctl-amt .coin-dot { width:16px; height:16px; margin-right:2px; }
+#fracAmtV {
+  font-family:var(--font-bal); font-size:var(--lbl-fs); font-weight:700;
+  color:var(--tx); font-variant-numeric:tabular-nums; line-height:1.4;
 }
 .pills { display:flex; gap:var(--chip-gap); margin-top:var(--chip-mt); }
 .pills button {

@@ -92,8 +92,11 @@
 
       <div id="balanceBand">
         <div class="bal-row">
-          <span class="bal-lbl" data-gt="ui.balance">Balance</span>
-          <span class="bal-pill"><span class="coin-dot"></span><span id="balTop">1 000</span></span>
+          <span class="bal-cell"><span class="bal-lbl" data-gt="ui.balance">Balance</span>
+            <span class="bal-pill"><span class="coin-dot"></span><span id="balTop">1 000</span></span></span>
+          <!-- in position (п.35, mockup 558:10599): Balance = free cash, Trade = coins in the position -->
+          <span class="bal-cell hidden" id="tradeCell"><span class="bal-lbl" data-gt="ui.trade">Trade</span>
+            <span class="bal-pill"><span class="coin-dot"></span><span id="tradeTop">0</span></span></span>
         </div>
       </div>
 
@@ -143,7 +146,8 @@
             </div>
           </div>
           <div class="ctl-row" id="fracCtl">
-            <div class="ctl-head"><span class="lock-ico hidden"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 9V6.2a3.6 3.6 0 0 1 7.2 0V9"/><rect x="3.8" y="9" width="12.4" height="8.4" rx="2"/></svg></span><span class="ctl-lbl" data-gt="ui.size">Trade size</span></div>
+            <!-- unlocked row (п.35, mockup 558:10455): actual coin amount next to the label — «Trade size ◑ 1 000» -->
+            <div class="ctl-head"><span class="lock-ico hidden"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 9V6.2a3.6 3.6 0 0 1 7.2 0V9"/><rect x="3.8" y="9" width="12.4" height="8.4" rx="2"/></svg></span><span class="ctl-lbl" data-gt="ui.size">Trade size</span><span class="ctl-amt hidden" id="fracAmt"><span class="coin-dot"></span><span id="fracAmtV">1 000</span></span></div>
             <div class="pills">
               <button data-frac="0.25">25%</button><button data-frac="0.5">50%</button><button data-frac="0.75">75%</button><button data-frac="1" class="on">100%</button>
               <button id="fracUnlock" class="unlock hidden">🔒 Open</button>
