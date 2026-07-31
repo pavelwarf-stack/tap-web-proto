@@ -2056,8 +2056,12 @@ body[data-skin="editorial"] .po-ico { background:#fff; }
 .tier-price { font-size:13.3px; line-height:18px; font-weight:600; color:var(--tx); white-space:nowrap; }
 .ref-course {
   display:flex; align-items:center; gap:11px; width:100%;
-  background:var(--accent2); border-radius:var(--r-card); padding:14px 15px; margin-top:14px;
+  background:var(--card); border:2px solid var(--card-line); border-radius:var(--r-card);
+  padding:10.4px 12.5px; margin-top:12.5px;
   text-align:left; color:var(--tx);
+}
+body[data-skin="terminal"] .ref-course, body[data-skin="editorial"] .ref-course {
+  background:var(--accent2); border:none; padding:14px 15px; margin-top:14px;
 }
 .ref-course:active { transform:scale(.98); }
 .refc-ico {
@@ -2094,7 +2098,9 @@ body[data-skin="editorial"] .po-ico { background:#fff; }
 /* shop: заголовок «Chip packages» есть только у A; баланс-капсула в шапке — только у C */
 body[data-skin="editorial"] .packs-title, body[data-skin="terminal"] .packs-title { display:none; }
 body[data-skin="editorial"] .packs, body[data-skin="terminal"] .packs { margin-top:16.6px; }
-.shop-balance { display:none; position:absolute; top:9px; right:14.6px; }
+/* 622: пилюля баланса стоит в шапке ВСЕХ табов (Shop/Referrals/Achievements/Settings) */
+.shop-balance { display:flex; position:absolute; top:11.4px; right:14.6px; z-index:5; }
+body[data-skin="editorial"] .shop-balance { display:none; } /* B: заголовок живёт в navy-топбаре */
 body[data-skin="terminal"] .shop-balance {
   display:flex; height:33.3px; padding:6px 12.5px; font-size:15.6px;
 }

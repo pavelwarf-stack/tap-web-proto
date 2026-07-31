@@ -110,7 +110,7 @@
     <!-- SHOP (полный рескин, вердикт 30.07 п.24: mockups A/B/C-shop) -->
     <section class="screen has-tabbar" id="scr-shop">
       <h1 class="pg-title" data-i18n="shop.title">Shop</h1>
-      <div class="balance-pill shop-balance draft" data-draft="Shop-header balance capsule: only mockup C has it; hidden in A/B per their mockups"><span class="coin-dot"></span><span data-balance>8 253</span></div>
+      <div class="balance-pill shop-balance" data-draft=""><span class="coin-dot"></span><span data-balance>8 253</span><span class="bal-plus" aria-hidden="true">+</span></div>
       <div class="offer-card" data-act="open-offer">
         <div class="offer-left">
           <div class="offer-amount"><span class="coin-dot"></span><span>150 000</span><span class="chips-word" data-i18n="chips">chips</span></div>
@@ -185,7 +185,7 @@
     <!-- REFERRALS (reskin W2: mockups A/B/C-referrals) -->
     <section class="screen has-tabbar" id="scr-referrals">
       <h1 class="pg-title" data-i18n="ref.title">Referrals</h1>
-      <div class="balance-pill shop-balance"><span class="coin-dot"></span><span data-balance>8 253</span></div>
+      <div class="balance-pill shop-balance"><span class="coin-dot"></span><span data-balance>8 253</span><span class="bal-plus" aria-hidden="true">+</span></div>
       <div class="ref-hero">
         <div class="ref-hero-card">
           <h2 data-i18n="ref.h2">Invite friends</h2>
@@ -206,9 +206,9 @@
       </div>
       <h3 class="sub-title ref-sec"><span data-i18n="ref.your">Your referrals</span><span class="ref-count">&nbsp;(3)</span></h3>
       <div class="ref-list">
-        <div class="ref-row"><span class="ref-ava">JC</span><span class="ref-name">John Carter</span><span class="ref-amt">+500<span class="ref-chipword">&nbsp;<span data-i18n="chips">chips</span></span></span></div>
-        <div class="ref-row"><span class="ref-ava">JC</span><span class="ref-name">John Carter</span><span class="ref-amt">+500<span class="ref-chipword">&nbsp;<span data-i18n="chips">chips</span></span></span></div>
-        <div class="ref-row"><span class="ref-ava">JC</span><span class="ref-name">John Carter</span><span class="ref-amt">+500<span class="ref-chipword">&nbsp;<span data-i18n="chips">chips</span></span></span></div>
+        <div class="ref-row"><span class="ref-ava">JC</span><span class="ref-name">John Carter</span><span class="ref-amt"><span class="coin-dot"></span>+500<span class="ref-chipword">&nbsp;<span data-i18n="chips">chips</span></span></span></div>
+        <div class="ref-row"><span class="ref-ava">JC</span><span class="ref-name">John Carter</span><span class="ref-amt"><span class="coin-dot"></span>+500<span class="ref-chipword">&nbsp;<span data-i18n="chips">chips</span></span></span></div>
+        <div class="ref-row"><span class="ref-ava">JC</span><span class="ref-name">John Carter</span><span class="ref-amt"><span class="coin-dot"></span>+500<span class="ref-chipword">&nbsp;<span data-i18n="chips">chips</span></span></span></div>
       </div>
       <button class="copy-id-row" data-act="copy-id">
         <span data-i18n="ref.copy" data-i18n-arg="2545265426">Copy your ID: 2545265426</span>
@@ -220,7 +220,7 @@
     <!-- ACHIEVEMENTS (reskin W2: mockups A/B/C-achievements) -->
     <section class="screen has-tabbar" id="scr-achievements">
       <h1 class="pg-title" data-i18n="ach.title">Achievements</h1>
-      <div class="balance-pill shop-balance"><span class="coin-dot"></span><span data-balance>8 253</span></div>
+      <div class="balance-pill shop-balance"><span class="coin-dot"></span><span data-balance>8 253</span><span class="bal-plus" aria-hidden="true">+</span></div>
       <div id="achList"></div>
     </section>
 
@@ -228,7 +228,7 @@
     <section class="screen has-tabbar" id="scr-settings">
       <h1 class="pg-title" data-i18n="set.title">Settings</h1>
       <!-- terminal-only header balance capsule (mockup C: settings/referrals/achievements headers carry it) -->
-      <div class="balance-pill shop-balance"><span class="coin-dot"></span><span data-balance>8 253</span></div>
+      <div class="balance-pill shop-balance"><span class="coin-dot"></span><span data-balance>8 253</span><span class="bal-plus" aria-hidden="true">+</span></div>
       <div class="set-group">
         <button class="set-row" data-act="set-sub" data-sub="Notifications"><span class="set-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 16v-5a6 6 0 1 0-12 0v5l-1.7 2.4a.6.6 0 0 0 .5 1h14.4a.6.6 0 0 0 .5-1L18 16z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></span><span data-i18n="sub.notifications">Notifications</span><label class="switch set-sw draft" data-draft="Editorial row toggle (mockup B): flips a prototype-only master flag; row tap still opens the subscreen. A/C keep chevron rows per their mockups"><input type="checkbox" id="swNotif" checked><span class="knob"></span></label><span class="chev">&rsaquo;</span></button>
         <button class="set-row" data-act="set-sub" data-sub="Language"><span class="set-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/></svg></span><span data-i18n="sub.language">Language</span><span class="set-val" id="langVal">English</span><span class="chev">&rsaquo;</span></button>

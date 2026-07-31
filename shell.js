@@ -2660,8 +2660,9 @@ function renderAch() {
     let cta = '';
     if (!claimed && done) {
       cta = `<button class="ach-claim" data-ach="${a.id}">${t('claim')}<span class="ach-claim-amt">&nbsp;${fmt(a.reward)}</span></button>`;
-    } else if (!claimed && a.play) {
-      cta = `<button class="ach-play" data-act="play" data-game="${a.play}">${t('play')}</button>`;
+    } else if (!claimed) {
+      // 622-мокап: у каждой незакрытой ачивки кнопка Play; webv1 = одна игра, поэтому дефолт 'trade'
+      cta = `<button class="ach-play" data-act="play" data-game="${a.play || 'trade'}">${t('play')}</button>`;
     }
     const foot = claimed ? '' :
       `<div class="ach-foot">${cta}
