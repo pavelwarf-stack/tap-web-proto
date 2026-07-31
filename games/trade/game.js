@@ -1812,7 +1812,8 @@ function onAction(dir) {
 function bind() {
   $('btnPlay').addEventListener('click', () => { Sound.ensure(); startRound(); });
   $('btnAgain').addEventListener('click', () => { Sound.ensure(); startRound(); });
-  $('btnHome').addEventListener('click', () => show('start'));
+  // Deal-экрана больше нет во флоу: ⌂ со standalone-результата сразу запускает новый раунд
+  $('btnHome').addEventListener('click', () => { Sound.ensure(); startRound(); });
   // Deal-экран: селектор актива (f2055)
   $('assetChips').addEventListener('click', e => {
     const b = e.target.closest('.asset-chip');
@@ -1941,7 +1942,21 @@ window.addEventListener('message', ev => {
 if (_qs.has('tut') && window.parent !== window) $('stage').classList.add('tutboot');
 FX.init();
 bind();
-show('start');
+/* Deal-экран убран из флоу (слово Павла 31.07 «выбор актива пока нахуй; убрать»):
+   вход сразу в раунд, актив всегда BTC (ETH/SOL спят до отдельного решения по пп.33-34).
+   DOM экрана оставлен спящим — макет 635:15427 отложен, не удалён. В ?tut шелл
+   сам зовёт startRound() (онбординг), там автостарта нет. */
+if (_qs.has('tut') && window.parent !== window) {
+  show('start');
+} else {
+  show('start'); // renderStart держит хром консистентным, экран тут же сменится раундом
+  (function autoStart() {
+    let n = 0;
+    const iv = setInterval(() => {
+      if (Feed.ready || ++n > 12) { clearInterval(iv); if (G.screen === 'start') startRound(); }
+    }, 100);
+  })();
+}
 resizeAll();
 // второй проход после первой раскладки: к этому моменту шрифты/иконки применены,
 // геометрия плота финальная (страховка к ResizeObserver выше)
