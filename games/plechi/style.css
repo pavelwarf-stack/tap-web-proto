@@ -1,0 +1,292 @@
+/* Плечи — тёплая «бумажная» аркада по макетам plechi-mech4 (1927–1931).
+   Вертикаль 390×844, размеры в cqw (контейнерные единицы). */
+
+:root{
+  /* палитра — из макета 90:1541 (plechi-mech4): фон/карты #F0DFC2, зелёный #13A86D,
+     красный #F54040, синий #4068F5; карточки отличаются белой обводкой, не заливкой */
+  --bg:#f0dfc2;
+  --card:#f0dfc2;
+  --card2:rgba(255,255,255,.3);
+  --ink:#4b3f5e;
+  --ink-soft:#6d5f50;
+  --axis:#5c5148;
+  --green:#13a86d;
+  --green-hi:#17b878;
+  --green-lip:#0d7a4e;
+  --red:#f54040;
+  --red-lip:#c22f2f;
+  --blue:#4068f5;
+  --blue-lip:#2d4bd8;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{height:100%;overflow:hidden;background:#d8c9a8}
+body{display:flex;align-items:center;justify-content:center;
+  font-family:ui-rounded,"SF Pro Rounded","Arial Rounded MT Bold","Nunito",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  color:var(--ink)}
+
+#phone{position:relative;height:min(100dvh,calc(100vw*844/390));aspect-ratio:390/844;
+  container-type:size;overflow:hidden;border-radius:0;
+  /* бумажная фактура — точки чистым CSS (как в prognoz после краш-фикса):
+     1px repeating-градиенты полосами по всему слою валили GPU-растеризацию
+     вкладки на Retina (белый слой с sad-face → краш) */
+  background:
+    radial-gradient(rgba(140,115,70,.07) 1px, transparent 1.3px),
+    linear-gradient(180deg,var(--bg) 0%,var(--bg) 100%);
+  background-size:7px 7px, 100% 100%}
+@media (min-width:500px) and (min-height:600px){
+  #phone{border-radius:24px;box-shadow:0 20px 80px rgba(60,40,20,.45)}
+}
+
+#game{position:absolute;inset:0;display:flex;flex-direction:column;touch-action:none;
+  /* поля кадра — по макету: верх 24px (6.4cqw), низ 34px (9cqw, зона home-индикатора) */
+  padding-top:max(6.4cqw,env(safe-area-inset-top));
+  padding-bottom:max(9cqw,env(safe-area-inset-bottom))}
+#game.shake{animation:shake .6s}
+@keyframes shake{
+  8%,88%{transform:translate(-1.4cqw,.4cqw)}
+  16%,80%{transform:translate(2.2cqw,-1.2cqw)}
+  28%,52%,72%{transform:translate(-2.8cqw,1.4cqw)}
+  40%,64%{transform:translate(2.4cqw,.8cqw)}
+}
+
+/* ---------- HUD ---------- */
+#hud{display:flex;align-items:center;justify-content:space-between;
+  padding:0 4.3cqw;height:21.3cqw}
+#pauseBtn{width:10.7cqw;height:10.7cqw;border-radius:3.2cqw;border:none;cursor:pointer;
+  background:var(--card);box-shadow:0 .9cqw 0 rgba(120,95,60,.28),0 1.6cqw 3cqw rgba(90,60,30,.14),inset 0 0 0 .6cqw #fffdf3;
+  display:flex;align-items:center;justify-content:center;gap:1.4cqw;
+  align-self:flex-start}
+#pauseBtn span{width:1.4cqw;height:5cqw;border-radius:.8cqw;background:var(--ink)}
+#pauseBtn:active{transform:translateY(.5cqw)}
+#timerWrap{position:relative;width:20cqw;height:20cqw;align-self:flex-start;margin-top:-1.1cqw}
+#timerWrap svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:#fbf5e6;stroke-width:8}
+.ring-arc{fill:none;stroke:var(--blue);stroke-width:8;stroke-linecap:round;
+  stroke-dasharray:276.46;stroke-dashoffset:276.46}
+#timerVal{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:5.6cqw;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums}
+#timerVal.urgent{color:var(--red);animation:urgPulse .4s infinite alternate}
+@keyframes urgPulse{from{transform:scale(1)}to{transform:scale(1.12)}}
+#bestPill{display:flex;align-items:center;gap:1.3cqw;background:var(--card);
+  border-radius:99cqw;padding:1.6cqw 3.1cqw;font-weight:900;font-size:3.9cqw;color:var(--ink);
+  box-shadow:0 .7cqw 0 rgba(120,95,60,.22),inset 0 0 0 .5cqw #fffdf3;
+  align-self:flex-start;margin-top:1.6cqw;font-variant-numeric:tabular-nums}
+#bestPill .ico{font-size:4.1cqw}
+
+/* ---------- balance strip ---------- */
+#balStrip{display:flex;align-items:baseline;justify-content:center;gap:1.9cqw;
+  background:var(--card);padding:1cqw 0 1.2cqw;
+  border-top:1px solid #fffdf3;border-bottom:1px solid #fffdf3;
+  box-shadow:0 .6cqw 0 rgba(110,85,55,.30)}
+#balStrip .coin{font-size:4.5cqw;align-self:center}
+#balVal{font-size:5.9cqw;font-weight:900;color:var(--ink);line-height:1;font-variant-numeric:tabular-nums}
+#runMult{font-size:3.7cqw;font-weight:800;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+#runMult.up{color:var(--green)}
+#runMult.down{color:var(--red)}
+
+/* ---------- chart ---------- */
+#chartWrap{position:relative;flex:1;min-height:0;overflow:hidden}
+#chart{position:absolute;inset:0;width:100%;height:100%}
+#offlineBadge{position:absolute;top:2cqw;left:3.6cqw;z-index:6;
+  background:rgba(75,63,94,.75);color:#fff;font-size:2.9cqw;font-weight:800;
+  border-radius:99cqw;padding:.9cqw 2.6cqw;letter-spacing:.04em}
+#vignette{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(239,60,70,.5) 100%)}
+
+#msg{position:absolute;top:34%;left:0;right:0;text-align:center;z-index:7;
+  font-size:9.7cqw;font-weight:900;opacity:0;pointer-events:none;
+  text-shadow:0 2px 0 rgba(255,253,243,.8)}
+#msg.show{animation:msgPop .85s forwards}
+#msg.good{color:var(--green)}
+#msg.bad{color:var(--red)}
+@keyframes msgPop{
+  0%{opacity:0;transform:scale(.3)}
+  18%{opacity:1;transform:scale(1.15)}
+  30%{transform:scale(1)}
+  75%{opacity:1}
+  100%{opacity:0;transform:scale(1.04) translateY(-3cqw)}
+}
+
+#floatLayer{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+.float{position:absolute;font-weight:900;font-size:6.4cqw;color:var(--green);
+  text-shadow:0 2px 0 rgba(255,253,243,.85);animation:floatUp 1.15s forwards;white-space:nowrap}
+.float.neg{color:var(--red)}
+.float.big{font-size:8.5cqw}
+@keyframes floatUp{
+  0%{opacity:0;transform:translateY(3cqw) scale(.5)}
+  20%{opacity:1;transform:translateY(0) scale(1.12)}
+  100%{opacity:0;transform:translateY(-17cqw) scale(1)}
+}
+
+#stamp{position:absolute;top:44%;left:50%;z-index:45;
+  transform:translate(-50%,-50%) rotate(-12deg);
+  font-size:10.3cqw;font-weight:900;letter-spacing:.1em;color:#d63b3c;
+  border:1.3cqw solid #d63b3c;border-radius:3cqw;padding:2cqw 4.6cqw;
+  background:rgba(255,248,236,.88);
+  box-shadow:0 0 10cqw rgba(214,59,60,.55),inset 0 0 3cqw rgba(214,59,60,.25)}
+#stamp.pop{animation:stampIn .5s cubic-bezier(.2,2.4,.5,1) both}
+@keyframes stampIn{
+  0%{opacity:0;transform:translate(-50%,-50%) rotate(-4deg) scale(3.2)}
+  60%{opacity:1;transform:translate(-50%,-50%) rotate(-13deg) scale(.92)}
+  100%{opacity:1;transform:translate(-50%,-50%) rotate(-12deg) scale(1)}
+}
+
+/* ---------- info card ---------- */
+/* высота карточки — по контенту: макет 90:1541 (пустая ~97px≈26cqw),
+   в позиции (90:1693) ~176px≈47cqw; фикс-высота 47cqw душила пустое состояние */
+#infoCard{margin:2.3cqw 4.3cqw 0;border-radius:4cqw;background:var(--card);
+  border:.5cqw solid #fffdf3;
+  box-shadow:0 1.2cqw 0 rgba(110,85,55,.22),0 2.6cqw 4cqw rgba(90,60,30,.10);
+  padding:2.9cqw 3.6cqw 3.2cqw;display:flex;flex-direction:column;justify-content:center}
+#flatInfo{display:flex;flex-direction:column;align-items:center;gap:1.2cqw}
+#flatInfo .sym{font-size:3.6cqw;font-weight:800;color:var(--ink-soft);letter-spacing:.05em}
+#flatInfo .priceRow{display:flex;align-items:baseline;gap:2.1cqw}
+#flatPrice{font-size:8cqw;font-weight:900;color:var(--ink);line-height:1.05;font-variant-numeric:tabular-nums}
+#flatPct{font-size:4cqw;font-weight:800;font-variant-numeric:tabular-nums}
+#flatPct.up{color:var(--green)} #flatPct.down{color:var(--red)}
+#flatInfo .hintText{font-size:3.2cqw;font-weight:700;color:rgba(109,95,80,.75);margin-top:.4cqw}
+
+#posInfo{display:flex;flex-direction:column;gap:1.6cqw}
+#posInfo.hidden,#flatInfo.hidden{display:none}
+.chipRow{display:flex;align-items:center;justify-content:space-between}
+.plTitle{font-size:4.1cqw;font-weight:800;color:var(--ink-soft)}
+#levChip{background:var(--blue);color:#fff;font-weight:900;font-size:3.7cqw;
+  border-radius:2.7cqw;padding:.8cqw 2.3cqw;border:.5cqw solid #fffdf3;
+  box-shadow:0 .6cqw 0 var(--blue-lip)}
+#dirChip{color:#fff;font-weight:900;font-size:3.5cqw;border-radius:2.4cqw;
+  padding:.7cqw 2.7cqw;border:.5cqw solid #fffdf3}
+#dirChip.long{background:var(--green);box-shadow:0 .6cqw 0 var(--green-lip)}
+#dirChip.short{background:var(--red);box-shadow:0 .6cqw 0 var(--red-lip)}
+.plRow{display:flex;align-items:baseline;justify-content:center;gap:2.1cqw}
+#plCoins{font-size:7.9cqw;font-weight:900;line-height:1.05;font-variant-numeric:tabular-nums}
+#plPct{font-size:4.3cqw;font-weight:800;font-variant-numeric:tabular-nums}
+#plCoins.pos,#plPct.pos{color:var(--green)}
+#plCoins.neg,#plPct.neg{color:var(--red)}
+.subRow{display:flex;justify-content:center;gap:2.1cqw}
+.subCard{flex:0 1 27cqw;background:var(--card2);border-radius:3.2cqw;padding:1cqw 2cqw;text-align:center}
+.subCard .lbl{font-size:3.6cqw;font-weight:800;color:var(--ink-soft)}
+.subCard .val{font-size:4.7cqw;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums}
+.liqBlock{display:flex;flex-direction:column;align-items:center;gap:1.1cqw;margin-top:.5cqw}
+#liqLabel{font-size:3.9cqw;font-weight:800;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+#liqLabel.hot{color:var(--red);animation:urgPulse .3s infinite alternate}
+#liqBar{width:78.7%;height:1.4cqw;border-radius:99cqw;background:#fff;overflow:hidden}
+#liqFill{height:100%;width:0%;border-radius:99cqw;transition:width .2s linear;
+  background:linear-gradient(90deg,#ff9a8b,var(--red))}
+
+/* ---------- bottom zone ---------- */
+/* низ — по макету: карточка→«Плечо»→трек(653)→метки→кнопки(703..778);
+   высота по контенту (фикс 47cqw оставлял мёртвую зону в состоянии позиции) */
+#bottomZone{padding:2.1cqw 4.3cqw 0;display:flex;flex-direction:column}
+#tradeUI{display:flex;flex-direction:column}
+#tradeUI.hidden,#rowExit.hidden{display:none}
+#levTitle{font-size:5cqw;font-weight:900;color:var(--ink);margin:1.2cqw 0 2.4cqw}
+#slider{padding:0}
+#sliderTrack{position:relative;height:2.7cqw;border-radius:99cqw;background:#f4ecd6;
+  box-shadow:0 0 0 .5cqw #fffdf3,0 .5cqw 1.2cqw rgba(110,85,55,.22)}
+#sliderFill{position:absolute;left:0;top:0;bottom:0;width:50%;border-radius:99cqw;background:var(--blue);z-index:1}
+.stopDot{position:absolute;top:50%;width:1.9cqw;height:1.9cqw;border-radius:50%;
+  background:#cdbfa2;transform:translate(-50%,-50%)} /* точки под заливкой, как в макете */
+.stopDot[data-i="0"]{left:2%}.stopDot[data-i="1"]{left:26%}.stopDot[data-i="2"]{left:50%}.stopDot[data-i="3"]{left:74%}.stopDot[data-i="4"]{left:98%}
+#knob{position:absolute;top:50%;left:50%;width:5.4cqw;height:5.4cqw;border-radius:50%;
+  background:var(--blue);border:.8cqw solid #fffdf3;transform:translate(-50%,-50%);z-index:2;
+  box-shadow:0 .8cqw 1.6cqw rgba(45,75,216,.45);transition:left .18s cubic-bezier(.3,1.6,.5,1)}
+#levLabels{display:flex;justify-content:space-between;padding:1.9cqw .2cqw 0}
+#levLabels span{width:10cqw;text-align:center;font-size:4.6cqw;font-weight:900;color:rgba(75,63,94,.45);
+  transition:color .15s,transform .15s}
+#levLabels span:first-child{text-align:left}
+#levLabels span:last-child{text-align:right}
+#levLabels span.active{color:var(--ink);transform:scale(1.12)}
+#tradeUI.locked #slider{opacity:.55;pointer-events:none}
+
+/* кнопки — геометрия макета: высота 75px=20cqw, радиус 16px=4.3cqw, зазор 9px=2.4cqw */
+#rowEnter{display:flex;gap:2.4cqw;margin-top:3.2cqw}
+#rowEnter button{flex:1;height:20cqw;border:none;border-radius:4.3cqw;cursor:pointer;
+  color:#fff;font-family:inherit;font-weight:900;font-size:5.9cqw;
+  text-shadow:0 1px 0 rgba(0,0,0,.18);transition:transform .08s,box-shadow .08s}
+#btnLong{background:var(--green);box-shadow:0 1.8cqw 0 var(--green-lip),0 3cqw 4cqw rgba(90,60,30,.18)}
+#btnShort{background:var(--red);box-shadow:0 1.8cqw 0 var(--red-lip),0 3cqw 4cqw rgba(90,60,30,.18)}
+#rowEnter button:active{transform:translateY(1.2cqw);box-shadow:0 .6cqw 0 rgba(0,0,0,.25)}
+#rowEnter.locked button{pointer-events:none;opacity:.6}
+
+/* «Закрыть позицию» — РОВНО та же геометрия, что у Лонг/Шорт (20cqw/4.3cqw/губа),
+   на всю ширину; превью баланса — текстом в строке, без эмодзи */
+#rowExit{display:flex;margin-top:3.2cqw}
+#btnExit{flex:1;height:20cqw;border:none;border-radius:4.3cqw;cursor:pointer;
+  background:var(--blue);color:#fff;font-family:inherit;
+  font-weight:900;font-size:5.9cqw;text-shadow:0 1px 0 rgba(0,0,0,.18);
+  box-shadow:0 1.8cqw 0 var(--blue-lip),0 3cqw 4cqw rgba(90,60,30,.18);
+  transition:transform .08s,box-shadow .08s}
+#btnExit .cap{font-weight:900}
+#btnExit .sub{font-weight:800;font-size:4.3cqw;opacity:.95;margin-left:2.2cqw;
+  font-variant-numeric:tabular-nums}
+#btnExit:active{transform:translateY(1.2cqw);box-shadow:0 .6cqw 0 rgba(0,0,0,.25)}
+
+/* ---------- fx ---------- */
+#fx{position:absolute;inset:0;z-index:50;pointer-events:none}
+
+/* ---------- screens ---------- */
+/* без backdrop-filter и полупрозрачных оверлеев поверх 60fps-канвасов:
+   непрозрачная «бумага», как игровой фон. Скрытый экран = display:none —
+   невидимые слои не должны висеть в GPU-композиции (крашило вкладку
+   на Retina; тот же фикс в prognoz). */
+.screen{position:absolute;inset:0;z-index:60;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2.8cqw;padding:6cqw;text-align:center;
+  overflow-y:auto;
+  background:
+    radial-gradient(rgba(140,115,70,.07) 1px, transparent 1.3px),
+    linear-gradient(180deg,var(--bg) 0%,var(--bg) 100%);
+  background-size:7px 7px, 100% 100%}
+.hidden{display:none}
+.screen.hidden{display:none}
+
+.logo{font-size:15.4cqw;font-weight:900;letter-spacing:.05em;color:var(--ink);
+  text-shadow:0 .8cqw 0 #fffdf3,0 1.6cqw 0 rgba(110,85,55,.25)}
+.tagline{font-size:4.4cqw;font-weight:800;color:var(--ink-soft);margin-top:-1.8cqw}
+.rules{display:flex;flex-direction:column;gap:2.3cqw;font-size:3.9cqw;font-weight:700;color:var(--ink);
+  background:var(--card);border:.6cqw solid #fffdf3;
+  border-radius:5.1cqw;padding:4.4cqw 5.1cqw;text-align:left;
+  box-shadow:0 1.2cqw 0 rgba(110,85,55,.2)}
+#startBest{font-size:4.1cqw;font-weight:900;color:var(--ink)}
+
+.h2{font-size:8.7cqw;font-weight:900;color:var(--ink)}
+.sub{font-size:4.4cqw;font-weight:800;color:var(--ink-soft);margin-top:-2cqw}
+#finalBal{font-size:14.9cqw;font-weight:900;color:var(--ink);line-height:1;
+  text-shadow:0 .8cqw 0 #fffdf3}
+#recordNote{font-size:4.6cqw;font-weight:900;color:var(--green);animation:recPulse .6s infinite alternate}
+@keyframes recPulse{from{transform:scale(1)}to{transform:scale(1.08)}}
+
+.bigBtn{border:none;border-radius:99cqw;cursor:pointer;font-family:inherit;
+  background:linear-gradient(180deg,#5f88ff,var(--blue));color:#fff;
+  font-size:5.9cqw;font-weight:900;padding:3.6cqw 14.4cqw;
+  box-shadow:0 1.8cqw 0 var(--blue-lip),0 4cqw 6cqw rgba(90,60,30,.25);
+  transition:transform .08s}
+.bigBtn:active{transform:translateY(1.2cqw);box-shadow:0 .6cqw 0 var(--blue-lip)}
+.ghostBtn{border:.5cqw solid rgba(75,63,94,.35);border-radius:99cqw;cursor:pointer;
+  background:rgba(255,253,243,.6);color:var(--ink);font-family:inherit;
+  font-size:4.4cqw;font-weight:800;padding:2.6cqw 10.3cqw}
+
+/* ---------- trades list ---------- */
+#tradesList{display:flex;flex-direction:column;gap:1.3cqw;width:100%;max-width:82cqw;
+  max-height:32cqw;overflow-y:auto}
+.trow{display:flex;align-items:center;gap:2.3cqw;background:var(--card);
+  border-radius:99cqw;padding:1.5cqw 3.6cqw;font-size:3.9cqw;font-weight:900;
+  box-shadow:0 .6cqw 0 rgba(110,85,55,.18)}
+.trow .dir{color:#fff;border-radius:99cqw;padding:.4cqw 2.6cqw;font-size:3.3cqw}
+.trow .dir.long{background:var(--green)}
+.trow .dir.short{background:var(--red)}
+.trow .lev{color:var(--blue);font-size:3.6cqw}
+.trow .tpnl{margin-left:auto}
+.trow .tpnl.pos{color:var(--green)}
+.trow .tpnl.neg{color:var(--red)}
+
+/* ---------- leaderboard ---------- */
+#board{display:flex;flex-direction:column;gap:1.3cqw;width:100%;max-width:82cqw}
+#board .row{display:flex;align-items:center;gap:2.3cqw;background:var(--card);
+  border-radius:99cqw;padding:1.6cqw 3.6cqw;font-size:3.9cqw;font-weight:800;color:var(--ink);
+  box-shadow:0 .6cqw 0 rgba(110,85,55,.18)}
+#board .row .rank{width:6.7cqw;text-align:center;font-size:4.4cqw}
+#board .row .name{flex:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#board .row .pts{font-weight:900}
+#board .row.me{background:linear-gradient(180deg,#5f88ff,var(--blue));color:#fff;
+  box-shadow:0 .8cqw 0 var(--blue-lip)}

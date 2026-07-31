@@ -1,0 +1,1959 @@
+/* ============================================================
+   Tap Trading Hub — shell styles.
+   Rebuilt to match Figma wireframes (file MwL2GyFM68cbkVYy4XueTY, page V1).
+   Design frame is 440×956; all values here are ×(390/440) ≈ 0.886.
+   Fonts: Inter (shell), Nunito (round-complete + tutorial, game theme).
+   ============================================================ */
+
+/* Local fonts (self-contained prototype — no CDN). Variable woff2, latin subset. */
+@font-face {
+  font-family:'Inter'; font-style:normal; font-weight:100 900; font-display:swap;
+  src:url('fonts/inter-var.woff2') format('woff2');
+}
+@font-face {
+  font-family:'Nunito'; font-style:normal; font-weight:600 900; font-display:swap;
+  src:url('fonts/nunito-var.woff2') format('woff2');
+}
+/* new skins (вердикт 30.07 п.24): editorial = Crimson Pro headings, terminal = JetBrains Mono digits */
+@font-face {
+  font-family:'Crimson Pro'; font-style:normal; font-weight:200 900; font-display:swap;
+  src:url('fonts/crimson-pro-var.woff2') format('woff2');
+}
+@font-face {
+  font-family:'JetBrains Mono'; font-style:normal; font-weight:100 800; font-display:swap;
+  src:url('fonts/jetbrains-mono-var.woff2') format('woff2');
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+[hidden] { display:none !important; }
+html, body { height:100%; }
+body {
+  font-family:var(--font);
+  background:#22262f; /* letterbox around the phone frame on desktop */
+  display:grid; place-items:center;
+  color:var(--tx);
+  overflow:hidden;
+}
+button { font-family:inherit; border:none; background:none; cursor:pointer; color:inherit; }
+input { font-family:inherit; }
+
+:root {
+  /* ============ SKIN TOKEN CONTRACT v2 ============
+     Полный рескин (вердикт 30.07, DESIGN-ADDITIONS п.24): три мини-дизайн-системы Миши
+     (нода 602:10514). Defaults = skin «narodny» (вариант A, тёплый крем + зелёный);
+     body[data-skin="terminal"|"editorial"] переопределяют те же переменные ниже.
+     Every surface reads ONLY these tokens.
+     Values from node dumps (_рабочее/misha-3variants/nodes-*.json), scale ×(390/375)≈1.04. */
+  --bg:#FDF8F0;          /* screen background (nodes: screen-home fill) */
+  --card:#FFFDF6;        /* elevated cards, sheets, tab bar */
+  --panel:#FFFDF6;       /* groups, pills */
+  --panel2:#FFFDF6;      /* second surface (editorial rows #F6F8FC) */
+  --accent2:#F0E7D2;     /* art placeholders (legacy screens) */
+  --line:#E5E7EB;        /* card borders, dividers */
+  --tx:#2B1D0C;          /* primary ink */
+  --tx-soft:#6B5C4C;     /* secondary ink */
+  --sb:#8C7E6E;          /* tertiary: placeholders, dim labels */
+  --green:#13A86D;
+  --green-deep:#1B5E20;  /* avatar bg, active tab, «Buy» link (variant A deep green) */
+  --red:#CC0000;
+  --hot:#CC0000;
+  --blue:#4A7BD5;
+  --gold:#E8A013;        /* coin */
+  --danger:var(--red);
+  --danger-bg:#FEE2E2;   /* danger icon circle */
+  --r-sheet:20.8px;      /* sheets/modals (★draft, шитов в макетах нет: ДС A «крупные блоки» 20) */
+  --toast-bg:#2B1D0C; --toast-tx:#FFFDF6;
+  --btn-bg:linear-gradient(180deg,#1E9E4A,#0F6B2E);   /* primary CTA */
+  --btn-tx:#ffffff;
+  --btn2-bg:linear-gradient(180deg,#4A7BD5,#224192);  /* secondary (free-row actions) */
+  --btn2-tx:#ffffff;
+  --ghost:rgba(43,29,12,.08);
+  --r-card:12.5px;       /* cards, small CTA */
+  --r-card-lg:16.6px;    /* promo card, big panels */
+  --r-pack:12.5px;       /* shop pack cards */
+  --r-btn:12.5px;
+  --r-btn-sm:8.3px;
+  --badge-bg:#FEF3C7; --badge-tx:#E8A013; --badge-line:transparent; /* PERSONAL OFFER */
+  --save-bg:#FEE2E2; --save-tx:#CC0000;                             /* SAVE 90% */
+  --offer-badge-bg:#FEE2E2; --offer-badge-tx:#CC0000;               /* home SPECIAL OFFER */
+  --expire-tx:#E8A013;   /* «Ends in 2h» on home offer */
+  --timer-tx:#CC0000;    /* shop countdown */
+  --reward-tx:#E8A013;   /* «+500 chips» reward line */
+  --icirc-bg:transparent;/* free-row icon circle (terminal #242F41) */
+  --card-shadow:0 1px 2px #E6E1CD;
+  --cta-shadow:0 8px 18px rgba(0,0,0,.15);
+  --statusbar-tx:#2B1D0C; --statusbar-bg:transparent;
+  --topbar-bg:#1B2838; --topbar-tx:#FFFFFF;  /* editorial-only navy app bar */
+  --tab-bg:#FFFDF6; --tab-line:#E5E7EB;
+  --tab-active:#1B5E20; --tab-inactive:#6B5C4C; --tab-active-bg:#F3E8D5;
+  --avatar-bg:#1B5E20; --avatar-tx:#FFFFFF;
+  --homeind:#C9BCA6;
+  --font:'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-head:var(--font);
+  --font-num:var(--font);
+  /* typography voice per skin (casing = CSS only, verdict 29.07) */
+  --head-tx:#2B1D0C;
+  --w-head:800; --w-btn:800;
+  --hero-size:25px; --hero-lh:30px;            /* home hero title (A: Inter 800 24→25) */
+  --sec-tx:#8C7E6E; --sec-size:13.5px; --sec-w:600; --sec-case:uppercase; /* shop section titles */
+  --case-head:none; --case-hero:none; --case-btn:uppercase; --case-cta:none; --case-tab:none;
+  /* comic speech bubble (mascot onboarding) */
+  --font-bubble:var(--nunito);
+  --bubble-bg:#FFFDF6; --bubble-line:#2B1D0C;
+  /* round-complete / game overlay theme */
+  --rc-bg:#f0dfc2;
+  --rc-ink:#4c334a;
+  --rc-soft:rgba(76,51,74,.7);
+  --rc-pill:rgba(255,255,255,.3);
+  --rc-line:#ffffff;
+  --rc-cta:#4068F5;          /* Round Complete CTA (mockup onb1-6 blue) */
+  --rc-cta-tx:#ffffff;
+  --rc-cta-link:#4068F5;
+  --rc-unlock-tx:#19213D;    /* unlock-card ink (mockup) */
+  --rc-unlock-soft:#7D676F;
+  --nunito:'Nunito', 'Arial Rounded MT Bold', -apple-system, sans-serif;
+}
+
+/* ============ skin «terminal» (вариант C, тёмный неон; DS = A-ds/nodes-A) ============ */
+body[data-skin="terminal"] {
+  --bg:#0B0E14;
+  --card:#141A26;
+  --panel:#141A26;
+  --panel2:#141A26;
+  --accent2:#1B2432;
+  --line:rgba(255,255,255,.10);
+  --tx:#FFFFFF;
+  --tx-soft:#8F9CAE;
+  --sb:#8F9CAE;
+  --green:#16C784;
+  --green-deep:#16C784;
+  --red:#EA3943;
+  --hot:#FFFFFF;
+  --blue:#22D3EE;
+  --gold:#F3BA2F;
+  --danger-bg:rgba(234,57,67,.15);
+  --r-sheet:16.6px;      /* ДС C: main panels 16 */
+  --toast-bg:#242F41; --toast-tx:#FFFFFF;
+  --btn-bg:#16C784;
+  --btn-tx:#0B0E14;
+  --btn2-bg:#22D3EE;
+  --btn2-tx:#0B0E14;
+  --ghost:rgba(255,255,255,.08);
+  --r-card:12.5px;
+  --r-card-lg:16.6px;
+  --r-pack:12.5px;
+  --r-btn:12.5px;
+  --r-btn-sm:8.3px;
+  --badge-bg:rgba(34,211,238,.13); --badge-tx:#22D3EE; --badge-line:transparent;
+  --save-bg:#EA3943; --save-tx:#FFFFFF;
+  --offer-badge-bg:rgba(34,211,238,.13); --offer-badge-tx:#22D3EE;
+  --expire-tx:#EA3943;
+  --timer-tx:#EA3943;
+  --reward-tx:#F3BA2F;
+  --icirc-bg:#242F41;
+  --card-shadow:none;
+  --cta-shadow:0 8px 16px rgba(22,199,132,.2);
+  --statusbar-tx:#FFFFFF; --statusbar-bg:transparent;
+  --tab-bg:#141A26; --tab-line:rgba(255,255,255,.10);
+  --tab-active:#22D3EE; --tab-inactive:#8F9CAE; --tab-active-bg:transparent;
+  --avatar-bg:#22D3EE; --avatar-tx:#0B0E14;
+  --homeind:#3A4356;
+  --font-num:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --head-tx:#FFFFFF;
+  --w-head:900; --w-btn:800;
+  --hero-size:29px; --hero-lh:35px;            /* C: Inter 900 28→29 */
+  --sec-tx:#8F9CAE; --sec-size:14.6px; --sec-w:800; --sec-case:uppercase;
+  --case-head:none; --case-hero:none; --case-btn:none; --case-cta:uppercase; --case-tab:none;
+  /* welcome/баблы/RC/игра НЕ скинуются (поправка владельца 30.07 к п.24):
+     --font-bubble/--bubble-*/--rc-* здесь не переопределяются — корневые значения едины. */
+}
+
+/* ============ skin «editorial» (вариант B, светлый корпоративный, тёмно-синий топбар;
+   DS = C-ds/nodes-C: Crimson Pro headings + Inter UI) ============ */
+body[data-skin="editorial"] {
+  --bg:#FFFFFF;
+  --card:#F2F4F7;
+  --panel:#F2F4F7;
+  --panel2:#F6F8FC;
+  --accent2:#E4E7EC;
+  --line:#E4E7EC;
+  --tx:#1A2333;
+  --tx-soft:#868DA6;
+  --sb:#868DA6;
+  --green:#2D7D5A;
+  --green-deep:#2D7D5A;
+  --red:#B3453E;
+  --hot:#1F3A5F;
+  --blue:#1F3A5F;
+  --gold:#D49E2F;
+  --danger-bg:rgba(179,69,62,.12);
+  --r-sheet:16.6px;      /* ДС B: карточки/промо-блоки 16 */
+  --toast-bg:#1B2838; --toast-tx:#FFFFFF;
+  --btn-bg:#2D7D5A;
+  --btn-tx:#ffffff;
+  --btn2-bg:#1F3A5F;
+  --btn2-tx:#ffffff;
+  --ghost:rgba(31,58,95,.08);
+  --r-card:12.5px;
+  --r-card-lg:16.6px;
+  --r-pack:14.6px;
+  --r-btn:10.4px;
+  --r-btn-sm:10.4px;
+  --badge-bg:#E4E7EC; --badge-tx:#1F3A5F; --badge-line:transparent;
+  --save-bg:#FFFFFF; --save-tx:#2D7D5A;
+  --offer-badge-bg:#2D7D5A; --offer-badge-tx:#FFFFFF;
+  --expire-tx:#EA3943;
+  --timer-tx:#1A2333;
+  --reward-tx:#1A2333;
+  --icirc-bg:#E4E7EC;
+  --card-shadow:none;
+  --cta-shadow:0 4px 12px rgba(46,204,113,.2);
+  --statusbar-tx:#FFFFFF; --statusbar-bg:#1B2838;
+  --tab-bg:#FFFFFF; --tab-line:#F6F8FC;
+  --tab-active:#2D7D5A; --tab-inactive:#868DA6; --tab-active-bg:transparent;
+  --avatar-bg:#1F3A5F; --avatar-tx:#FFFFFF;
+  --homeind:#868DA6;
+  --font-head:'Crimson Pro', Georgia, 'Times New Roman', serif;
+  --head-tx:#1A2333;
+  --w-head:700; --w-btn:600;
+  --hero-size:28px; --hero-lh:31px;            /* B: Crimson Pro 700 26→27 (serif optical) */
+  --sec-tx:#1A2333; --sec-size:20.8px; --sec-w:700; --sec-case:none;
+  --case-head:none; --case-hero:none; --case-btn:none; --case-cta:none; --case-tab:none;
+  /* welcome/баблы/RC/игра НЕ скинуются (поправка владельца 30.07 к п.24). */
+}
+
+/* ---------- phone frame ----------
+   Desktop: always a vertical 390x844 iPhone frame, centered, letterboxed,
+   scaled down (never up) to fit short windows; island = hardware cue.
+   Mobile (<=430px wide): the app fills the real screen, no frame chrome. */
+#frame {
+  position:fixed; left:50%; top:50%;
+  width:390px; height:844px;
+  background:var(--bg);
+  overflow:hidden;
+  border-radius:34px;
+  box-shadow:0 0 0 10px #101319, 0 0 0 11px #2e333e, 0 30px 80px rgba(0,0,0,.55);
+  transform:translate(-50%,-50%) scale(var(--fit, 1));
+  transform-origin:center center;
+}
+#frame::before { /* hardware notch/island (desktop frame only) */
+  content:''; position:absolute; top:11px; left:50%; transform:translateX(-50%);
+  width:118px; height:30px; border-radius:16px; background:#101319;
+  z-index:100; pointer-events:none;
+}
+@media (max-width:430px) {
+  body { display:block; background:var(--bg); }
+  #frame { position:fixed; inset:0; left:0; top:0; width:100vw; height:100dvh; border-radius:0; box-shadow:none; margin:0; transform:none; }
+  #frame::before { display:none; }
+}
+
+/* ---------- status bar (h57; colors per skin: A ink on cream, B white on navy, C mono white) ---------- */
+#statusbar {
+  position:absolute; top:0; left:0; right:0; height:57px; z-index:20;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 32px 0 43px;
+  font-size:15px; font-weight:600; color:var(--statusbar-tx);
+  background:var(--statusbar-bg);
+  user-select:none; -webkit-user-select:none;
+  pointer-events:none;
+}
+#sbTime { pointer-events:auto; cursor:pointer; letter-spacing:.01em; position:relative; top:-3px; }
+.sb-icons { display:flex; align-items:center; gap:6px; position:relative; top:-3px; }
+/* terminal: JetBrains Mono time + «100%» battery text instead of icons (mockup C) */
+.sb-batt { display:none; position:relative; top:-3px; }
+body[data-skin="terminal"] #sbTime,
+body[data-skin="terminal"] .sb-batt { font-family:var(--font-num); font-weight:700; font-size:14.6px; display:inline; }
+body[data-skin="terminal"] .sb-icons { display:none; }
+
+/* ---------- top app bar (editorial navy bar; skeleton exists in all skins,
+   A/C hide it per their DS — у них на Home шапка-юзер, ★draft) ---------- */
+#topbar {
+  position:absolute; top:57px; left:0; right:0; height:48px; z-index:20;
+  display:none; align-items:center;
+  padding:0 16.6px;
+  background:var(--topbar-bg); color:var(--topbar-tx);
+  font-size:18.7px; line-height:22.9px; font-weight:700;
+}
+#topbar[hidden] { display:none !important; }
+body[data-skin="editorial"] #topbar { display:flex; }
+body[data-skin="editorial"] .screen.has-tabbar { padding-top:55px; }
+body[data-skin="editorial"] .screen.has-tabbar .pg-title { display:none; } /* title живёт в топбаре */
+/* B-mockups: первый контент-блок в 24px от навбара (statusbar 37 + bar 46 + 24 = y107) */
+body[data-skin="editorial"] #scr-settings .set-group:first-of-type,
+body[data-skin="editorial"] #scr-referrals .ref-hero,
+body[data-skin="editorial"] #scr-achievements #achList { margin-top:16.6px; }
+/* full-bleed screens (welcome, RC) — не красить статусбар в навью */
+#frame:has(#scr-welcome.active) #statusbar,
+#frame:has(.rc.active) #statusbar { background:transparent; }
+
+/* ---------- home indicator (all shell screens) ---------- */
+#homeind {
+  position:absolute; left:50%; bottom:8.3px; transform:translateX(-50%);
+  width:139.4px; height:5.2px; border-radius:3px; background:var(--homeind);
+  z-index:45; pointer-events:none;
+}
+#view:has(.rc.active) ~ #homeind { display:none; } /* round-complete has none in Figma */
+
+/* ---------- screens ---------- */
+#view { position:absolute; top:57px; left:0; right:0; bottom:0; }
+.screen {
+  position:absolute; inset:0; display:none;
+  overflow-y:auto; -webkit-overflow-scrolling:touch;
+  padding:7px 14px 28px;
+  scrollbar-width:none;
+}
+.screen::-webkit-scrollbar { display:none; }
+.screen.active { display:block; }
+.screen.has-tabbar { padding-bottom:120px; }
+body[data-skin="editorial"] .screen.has-tabbar, body[data-skin="terminal"] .screen.has-tabbar { padding-bottom:125px; }
+
+/* page title: A Inter 800 28→29, C Inter 900 28→29 white, B — скрыт (заголовок в топбаре) */
+.pg-title { font-size:29.1px; line-height:35.4px; font-weight:var(--w-head); color:var(--head-tx); margin:4px 0 8.3px; }
+#scr-settings .pg-title { margin-bottom:30px; }
+#scr-referrals .pg-title { margin-bottom:20px; }
+#scr-achievements .pg-title { margin-bottom:18px; }
+/* shop section titles: A «CHIP PACKAGES» caps grey, B «Free» 20 bold ink, C «FREE» caps grey */
+.sec-title {
+  font-size:var(--sec-size); line-height:1.25; font-weight:var(--sec-w);
+  color:var(--sec-tx); text-transform:var(--sec-case);
+  margin:20.8px 0 10.4px;
+}
+.sub-title { font-size:14.2px; line-height:21.3px; font-weight:500; color:var(--tx); margin:21px 0 14px; }
+
+/* ---------- buttons ---------- */
+.btn { border-radius:var(--r-btn); font-weight:var(--w-btn); text-transform:var(--case-btn); text-align:center; transition:transform .08s, opacity .15s; }
+.btn:active { transform:scale(.97); }
+.btn-primary { background:var(--btn-bg); color:var(--btn-tx); box-shadow:var(--cta-shadow); padding:14.5px 25px; font-size:14.2px; line-height:21.3px; }
+.btn-dark { background:var(--btn-bg); color:var(--btn-tx); border-radius:var(--r-btn-sm); padding:8.3px 14px; font-size:13.5px; line-height:16.6px; }
+.btn-ghost { background:var(--ghost); color:var(--tx); padding:14.5px 25px; font-size:14.2px; line-height:21.3px; }
+.btn-outline { background:var(--card); color:var(--tx); padding:13.5px 25px; font-size:13.3px; font-weight:600; box-shadow:inset 0 0 0 1.5px var(--line); border-radius:14px; }
+.btn-play { background:var(--btn-bg); color:var(--btn-tx); border-radius:var(--r-btn-sm); padding:8.3px 14px; font-size:13.5px; line-height:16.6px; box-shadow:var(--cta-shadow); }
+.btn-play.sm { padding:8.3px 14px; font-size:13.5px; }
+.btn-dark.sm { padding:8.3px 26px; }
+/* secondary free-row action (A blue gradient, B navy, C cyan) */
+.btn-free {
+  background:var(--btn2-bg); color:var(--btn2-tx);
+  border-radius:var(--r-btn-sm); font-weight:var(--w-btn); text-transform:var(--case-btn);
+  min-width:83px; padding:8.3px 14px; font-size:13.5px; line-height:16.6px; text-align:center;
+  transition:transform .08s;
+}
+.btn-free:active { transform:scale(.97); }
+.btn-free[disabled] { opacity:.45; pointer-events:none; }
+body[data-skin="editorial"] .btn-free { min-width:114px; padding:10.4px 14px; font-size:13.5px; }
+body[data-skin="terminal"] .btn-free { min-width:104px; padding:8.3px 12px; font-size:12.5px; }
+.btn.wide { display:block; width:100%; margin-top:11px; }
+.btn[disabled] { opacity:.45; pointer-events:none; }
+.text-link { display:block; margin:21px auto 0; color:var(--tx); font-size:14.2px; line-height:21.3px; font-weight:400; }
+
+.xbtn {
+  position:absolute; top:14px; right:14px; z-index:5;
+  width:25px; height:25px; border-radius:50%;
+  background:var(--ghost); color:var(--tx);
+  font-size:15px; line-height:24px; text-align:center; font-weight:500;
+}
+.back-circle {
+  width:43px; height:43px; border-radius:50%; background:var(--card);
+  box-shadow:inset 0 0 0 1px var(--line);
+  color:var(--tx); font-size:19px; flex:0 0 43px; font-weight:500;
+}
+body[data-skin="terminal"] .back-circle { box-shadow:none; }
+/* subscreen header (reskin W3 ★draft — субэкранов в макетах нет):
+   A/C — крупный заголовок в потоке; B — navy-бар как topbar/auth-bar (язык макетов B) */
+.sub-head {
+  display:flex; align-items:center; gap:12.5px;
+  padding:0 0 14px; font-size:20.8px; line-height:25px; font-weight:var(--w-head); color:var(--head-tx);
+}
+body[data-skin="editorial"] .sub-head {
+  position:sticky; top:-7px; z-index:15; flex:none;
+  margin:-7px -14px 16.6px; padding:0 16.6px; height:48px;
+  background:var(--topbar-bg); color:#fff;
+  font-family:var(--font); font-size:18.7px; line-height:22.9px; font-weight:700;
+}
+body[data-skin="editorial"] .sub-head .back-circle {
+  width:33.3px; height:33.3px; flex-basis:33.3px;
+  background:rgba(255,255,255,.10); box-shadow:none; color:#fff; font-size:16.6px;
+}
+
+/* ---------- coin icon (poker-chip glyph) ---------- */
+.coin-ico {
+  display:inline-block; width:21px; height:21px; vertical-align:-4px;
+  color:var(--gold);
+  border:1.5px solid currentColor; border-radius:50%; position:relative; flex:0 0 auto;
+}
+.coin-ico::after {
+  content:''; position:absolute; top:1.5px; bottom:1.5px; left:38%;
+  width:7px; transform:translateX(-50%);
+  border:1.4px solid currentColor; border-radius:50%;
+}
+.coin-ico.sm { width:18px; height:18px; flex-basis:18px; }
+.coin-ico.sm::after { width:6px; }
+.coin-ico.light { color:#fff; }
+.coin-ico.dark { color:var(--rc-ink); }
+
+/* ---------- home header: avatar+username слева, баланс+колокольчик справа
+   (mockups A/C-home; B-home шапки не имеет — рисуем по её ДС, ★draft) ---------- */
+.home2-head {
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  height:37.4px; margin:2px 0 0;
+}
+.user-id { display:flex; align-items:center; gap:8.3px; min-width:0; flex:1 1 auto; text-align:left; }
+.avatar-ini {
+  width:37.4px; height:37.4px; border-radius:50%; flex:0 0 37.4px;
+  background:var(--avatar-bg); color:var(--avatar-tx);
+  display:flex; align-items:center; justify-content:center;
+  font-size:13.5px; font-weight:800; letter-spacing:.01em;
+}
+body[data-skin="terminal"] .avatar-ini { width:33.3px; height:33.3px; flex-basis:33.3px; font-size:12.5px; }
+.user-name { font-size:14.6px; line-height:17.7px; font-weight:700; color:var(--tx); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.head-right { display:flex; align-items:center; gap:8.3px; flex:0 0 auto; }
+.balance-pill {
+  position:relative;
+  display:flex; align-items:center; gap:6.2px; height:29.1px;
+  background:var(--card); border-radius:100px; padding:6px 12.5px;
+  box-shadow:inset 0 0 0 1px var(--line);
+  font-size:13.5px; line-height:1; font-weight:700; color:var(--tx);
+  font-family:var(--font-num);
+  white-space:nowrap;
+}
+body[data-skin="terminal"] .balance-pill { box-shadow:none; color:var(--gold); height:30.2px; }
+.coin-dot { display:inline-block; width:12.5px; height:12.5px; border-radius:50%; background:var(--gold); flex:0 0 12.5px; vertical-align:-1px; }
+body[data-skin="terminal"] .balance-pill .coin-dot { width:14.6px; height:14.6px; flex-basis:14.6px; }
+.balance-pill.pop { animation:pillPop .45s; }
+@keyframes pillPop { 30% { transform:scale(1.09); } }
+#balDelta {
+  position:absolute; right:6px; top:100%; margin-top:4px; z-index:30;
+  font-size:12.5px; font-weight:700; pointer-events:none;
+  animation:deltaFloat 1.4s forwards;
+}
+#balDelta.plus { color:var(--green); }
+#balDelta.minus { color:var(--red); }
+@keyframes deltaFloat { 0%{opacity:0; transform:translateY(-4px);} 15%{opacity:1;} 75%{opacity:1;} 100%{opacity:0; transform:translateY(10px);} }
+/* круглые иконки-входы (bell по макету; gift = сохранённый вход дейлика, ★draft) */
+.icon-sq {
+  position:relative; width:29.1px; height:29.1px; border-radius:50%; flex:0 0 29.1px;
+  background:var(--card); box-shadow:inset 0 0 0 1px var(--line);
+  display:flex; align-items:center; justify-content:center; color:var(--tx-soft);
+}
+body[data-skin="terminal"] .icon-sq { box-shadow:none; color:#fff; }
+.icon-sq svg { width:16.6px; height:16.6px; }
+.icon-sq.gift { color:var(--green); }
+.icon-sq .dot {
+  position:absolute; top:2px; right:2px; width:7px; height:7px; border-radius:50%;
+  background:var(--red); border:1.5px solid var(--bg);
+}
+.chips-row { display:flex; gap:11px; margin-bottom:14px; }
+.chip { background:var(--panel); color:var(--sb); border-radius:999px; padding:5px 9px; font-size:12.4px; font-weight:500; }
+.chip.active { background:var(--tx); color:#fff; }
+
+.cards .gcard { margin-bottom:10px; }
+.gcard {
+  position:relative; overflow:hidden;
+  background:var(--panel); border-radius:var(--r-card); padding:18px 14px 18px 14px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  min-height:94px;
+}
+.gcard::before {
+  content:''; position:absolute; inset:0;
+  background:var(--accent2);
+  clip-path:polygon(56.2% 0, 100% 0, 100% 100%, 39.1% 100%);
+  pointer-events:none;
+}
+.gc-text { flex:1; position:relative; align-self:flex-start; padding-top:0; }
+.gc-text h3 { font-size:16px; line-height:19px; letter-spacing:-.44px; font-weight:500; color:var(--tx); margin-bottom:4px; }
+.gc-text p { font-size:10.6px; line-height:14.9px; font-weight:400; color:var(--tx); max-width:150px; }
+.gcard .btn-play { position:relative; z-index:1; min-width:94px; }
+.gc-event {
+  position:absolute; top:6px; right:15px; z-index:2;
+  display:flex; align-items:center; gap:9px;
+  background:var(--bg); border-radius:999px; padding:3.5px 7px;
+  font-size:12.4px; line-height:17.4px; font-weight:500; color:var(--tx);
+  font-variant-numeric:tabular-nums;
+}
+.gc-event .ev-sep { color:var(--tx); font-weight:400; opacity:.45; }
+.gcard.has-event { padding-top:18px; }
+.gc-dot {
+  position:absolute; right:0; bottom:-12px; z-index:2;
+  width:21px; height:21px; border-radius:50%; background:var(--accent2);
+  display:flex; align-items:center; justify-content:center; color:var(--tx);
+}
+
+/* ---------- home body: hero-текст + спецоффер + большой Play (mockups *-home) ----------
+   A: Play сразу под оффером; B/C: Play прижат к низу (margin-top:auto). */
+#scr-home.active { display:flex; flex-direction:column; }
+.home-hero {
+  position:relative;
+  margin-top:var(--hero-mt, 152px);
+  display:block; text-align:left;
+}
+body[data-skin="editorial"] .home-hero { --hero-mt:47px; }
+body[data-skin="terminal"]  .home-hero { --hero-mt:93px; }
+.hero-title {
+  font-size:var(--hero-size); line-height:var(--hero-lh);
+  font-family:var(--font-head); font-weight:var(--w-head);
+  color:var(--head-tx); text-transform:var(--case-hero);
+}
+.hero-desc {
+  font-size:13.5px; line-height:18.7px; font-weight:400;
+  color:var(--tx-soft); margin:4.2px 0 0;
+}
+body[data-skin="editorial"] .hero-desc { font-size:15.6px; line-height:21.8px; color:#8F9CAE; margin-top:8.3px; }
+body[data-skin="terminal"]  .hero-desc { font-size:14.6px; line-height:20.8px; margin-top:8.3px; }
+
+/* спецоффер на Home — витрина СУЩЕСТВУЮЩЕГО personal offer (без новых офферов) */
+.sp-offer {
+  display:block; width:100%; text-align:left; cursor:pointer;
+  margin-top:16.6px; padding:var(--spo-pad, 16.6px);
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card-lg);
+  box-shadow:0 4px 12px rgba(109,117,143,.06);
+}
+body[data-skin="editorial"] .sp-offer { background:var(--panel2); box-shadow:none; --spo-pad:14.6px; }
+body[data-skin="terminal"]  .sp-offer { box-shadow:none; }
+.spo-top { display:flex; width:100%; align-items:center; justify-content:space-between; gap:8px; }
+.spo-badge {
+  background:var(--offer-badge-bg); color:var(--offer-badge-tx);
+  border-radius:6.2px; padding:4.2px 8.3px;
+  font-size:10.4px; line-height:12.5px; font-weight:800; text-transform:uppercase;
+}
+.spo-ends { font-size:11.4px; line-height:13.5px; font-weight:600; color:var(--expire-tx); font-variant-numeric:tabular-nums; }
+body[data-skin="editorial"] .spo-ends, body[data-skin="terminal"] .spo-ends { font-size:12.5px; line-height:15.6px; font-weight:700; }
+.spo-title { display:block; font-size:16.6px; line-height:19.8px; font-weight:800; color:var(--tx); margin-top:12.5px; }
+body[data-skin="editorial"] .spo-title, body[data-skin="terminal"] .spo-title { font-size:18.7px; line-height:22.9px; }
+.spo-desc { display:block; font-size:12.5px; line-height:17.7px; font-weight:400; color:var(--tx-soft); margin-top:4.2px; }
+body[data-skin="editorial"] .spo-desc { font-size:15.6px; line-height:21.8px; color:#8F9CAE; }
+body[data-skin="terminal"]  .spo-desc { font-size:13.5px; line-height:18.7px; }
+.spo-foot { display:flex; width:100%; align-items:center; justify-content:space-between; margin-top:12.5px; }
+.spo-price { font-size:18.7px; line-height:22.9px; font-weight:800; color:var(--tx); font-variant-numeric:tabular-nums; }
+body[data-skin="editorial"] .spo-price, body[data-skin="terminal"] .spo-price { font-size:20.8px; line-height:25px; font-weight:900; }
+/* Buy: A — зелёная подчёркнутая ссылка; B — navy кнопка; C — cyan кнопка */
+.spo-buy {
+  color:var(--green-deep); font-size:13.5px; line-height:16.6px; font-weight:700;
+  text-decoration:underline; text-underline-offset:3px; padding:4px 0;
+}
+body[data-skin="editorial"] .spo-buy, body[data-skin="terminal"] .spo-buy {
+  background:var(--btn2-bg); color:var(--btn2-tx); text-decoration:none;
+  border-radius:8.3px; width:83.2px; padding:8.3px 0; text-align:center; font-weight:800;
+}
+
+.hero-play {
+  display:block; width:100%; margin-top:16.6px;
+  height:var(--play-h, 57.2px); padding:0 25px;
+  border-radius:12.5px;
+  font-size:16.6px; line-height:19.8px; text-transform:var(--case-cta);
+}
+body[data-skin="editorial"] .hero-play, body[data-skin="terminal"] .hero-play { --play-h:53px; margin-top:auto; }
+.hero-stage:empty { display:none; }
+.hero-stage { margin:12.5px 0 4px; display:flex; flex-direction:column; align-items:center; gap:7px; }
+.hs-dots { display:flex; gap:7px; }
+.hs-dot { width:9px; height:9px; border-radius:50%; background:var(--card); box-shadow:inset 0 0 0 1.5px var(--sb); }
+.hs-dot.on { background:var(--green); box-shadow:none; }
+.hs-line { font-size:10.6px; line-height:16px; font-weight:400; color:var(--tx-soft); }
+.hs-line b { font-weight:600; }
+
+/* ---------- tab bar: плавающая карточка со скруглённым верхом (mockups всех трёх) ---------- */
+#tabbar {
+  position:absolute; left:0; right:0; bottom:0; z-index:30; height:var(--tab-h, 104px);
+  display:flex; gap:4.2px; align-items:stretch;
+  background:var(--tab-bg);
+  border:1px solid var(--tab-line); border-bottom:none;
+  border-radius:25px 25px 0 0;
+  box-shadow:0 -8px 28px rgba(109,117,143,.16);
+  padding:12.5px 8.3px 25px;
+}
+body[data-skin="editorial"] #tabbar { --tab-h:108px; padding:12.5px 8.3px 29px; } /* 16.6px давал ~67.6px на таб — «Achieveme…» на 390 (QA-финал 30.07) */
+body[data-skin="terminal"]  #tabbar { --tab-h:100px; padding:12.5px 0 21px; }
+#tabbar[hidden] { display:none; }
+.tab {
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6.2px;
+  height:66.6px; margin-top:0; border-radius:16.6px;
+  padding:0; color:var(--tab-inactive); font-size:12.5px; line-height:18.7px; font-weight:500;
+  text-transform:var(--case-tab);
+  overflow:hidden;
+}
+.tab.active { color:var(--tab-active); background:var(--tab-active-bg); }
+.tab svg { width:25px; height:25px; flex:0 0 25px; }
+/* W2 fix: EN «Achievements» must not ellipsize at 390/360 — labels 11px + узкий трекинг,
+   на узких экранах ещё на шаг меньше (решение в рамках дизайна таббара; в макетах 12/500,
+   RU-лейблы заметно короче EN) */
+.tab span { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:10.6px; letter-spacing:-.03em; }
+@media (max-width:375px) {
+  .tab span { font-size:9.8px; }
+  body[data-skin="editorial"] #tabbar { padding-left:8.3px; padding-right:8.3px; gap:2px; }
+}
+
+/* ---------- welcome: hiring at Reptiloid Capital (mockup step1, Figma 558:10224) ----------
+   Design frame 424×920 → ×(390/424) ≈ 0.92. Own light palette per mockup (GAME-adjacent
+   theme like RC); terminal skin gets a dark override so the screen stays legible. */
+#scr-welcome {
+  --wl-bg:#FFFFFF; --wl-card:#F6F8FC; --wl-h1:#19213D; --wl-soft:#868DA6;
+  --wl-btn:#868DA6; --wl-btn-tx:#FFFFFF;
+  background:var(--wl-bg); padding:0 22px 30px;
+}
+/* welcome — единый светлый дизайн во всех скинах (поправка владельца 30.07):
+   skin-оверрайды --wl-* удалены сознательно. */
+#frame:has(#scr-welcome.active) { background:#FFFFFF; }
+#frame:has(#scr-welcome.active) #statusbar { color:#B7C0D2; } /* mockup: pale status icons */
+#scr-welcome.active { display:flex; flex-direction:column; overflow-y:hidden; }
+/* min-height:0 — карточка маскота ОБЯЗАНА сжиматься на низких экранах (QA 30.07:
+   на 360×740 Start/Skip уезжали за фолд и экран скроллился; действия всегда во вьюпорте) */
+.wl-body { flex:1; min-height:0; display:flex; flex-direction:column; align-items:stretch; text-align:center; }
+.wl-card {
+  margin-top:35px; height:464px; flex:0 1 464px; min-height:250px;
+  background:var(--wl-card); border-radius:22px;
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+.wl-mascot { display:block; height:430px; max-height:92%; width:auto; }
+.wl-text { margin-top:36px; flex:0 1 auto; }
+.wl-text h1 {
+  font-size:22px; line-height:35px; font-weight:700; color:var(--wl-h1);
+  font-family:var(--font); text-transform:none;
+}
+.wl-text p { font-size:14.7px; line-height:22px; font-weight:400; color:var(--wl-soft); margin:11px auto 0; max-width:334px; }
+.wl-actions { margin-top:auto; padding-top:31px; }
+.wl-start {
+  display:block; width:100%; height:52px; border-radius:80px;
+  background:var(--wl-btn); color:var(--wl-btn-tx);
+  font-size:14.7px; line-height:22px; font-weight:500; text-align:center;
+  transition:transform .08s;
+}
+.wl-start:active { transform:scale(.97); }
+.wl-skip {
+  display:block; margin:15px auto 0; color:var(--wl-soft);
+  font-size:14.7px; line-height:18px; font-weight:500; text-decoration:underline; text-underline-offset:3px;
+}
+
+/* ---------- shop (mockups *-shop; один скелет, три раскладки через CSS) ---------- */
+/* Составная карточка оффера: A — широкая карта с вложенной левой картой;
+   B — две отдельные карты; C — одна карта с cyan-обводкой. */
+.offer-card {
+  position:relative;
+  display:flex; align-items:stretch; gap:0; cursor:pointer; text-align:left;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card-lg);
+  box-shadow:var(--card-shadow);
+  padding:0; margin:4px 0 0; min-height:156px;
+}
+body[data-skin="editorial"] .offer-card {
+  background:none; border:none; box-shadow:none; gap:12.5px; min-height:141.4px;
+}
+body[data-skin="terminal"] .offer-card {
+  border:1.6px solid var(--blue); padding:16.6px; min-height:195.5px;
+}
+.offer-left {
+  display:flex; flex-direction:column; align-items:flex-start;
+  flex:0 0 172.6px; margin:-1px; padding:14.6px;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
+  box-shadow:var(--card-shadow);
+}
+body[data-skin="editorial"] .offer-left {
+  flex-basis:213.2px; margin:0; border-radius:var(--r-card-lg); padding:14.6px;
+  display:grid; grid-template-columns:auto auto 1fr; align-items:center;
+  grid-template-areas:'amt amt amt' 'price save gap' 'buy buy buy';
+  column-gap:8.3px;
+}
+body[data-skin="editorial"] .offer-left .offer-amount { grid-area:amt; align-self:start; }
+body[data-skin="editorial"] .offer-left .offer-price { grid-area:price; }
+body[data-skin="editorial"] .offer-left .save-tag { grid-area:save; justify-self:start; }
+body[data-skin="editorial"] .offer-left .btn-dark { grid-area:buy; align-self:end; }
+body[data-skin="terminal"] .offer-left {
+  flex-basis:139.4px; margin:0; padding:0; background:none; border:none; align-items:center;
+}
+.offer-amount {
+  display:flex; align-items:center; gap:6.2px; margin-top:10.4px;
+  font-size:18.7px; line-height:22.9px; font-weight:800; color:var(--tx);
+}
+.offer-amount .coin-dot { width:18.7px; height:18.7px; flex-basis:18.7px; }
+body[data-skin="editorial"] .offer-amount { margin-top:0; font-size:22.9px; line-height:28.1px; font-weight:700; }
+body[data-skin="editorial"] .offer-amount .coin-dot { width:29.1px; height:29.1px; flex-basis:29.1px; }
+body[data-skin="terminal"] .offer-amount {
+  display:grid; grid-template-columns:auto auto; justify-items:center; justify-content:center;
+  gap:8.3px 4px; margin-top:8.3px; font-size:16.6px; line-height:19.8px; font-weight:900; white-space:nowrap;
+}
+body[data-skin="terminal"] .offer-amount .coin-dot { grid-column:1 / -1; }
+body[data-skin="terminal"] .offer-amount .coin-dot { width:41.6px; height:41.6px; flex-basis:41.6px; }
+.chips-word { display:none; }
+body[data-skin="terminal"] .offer-amount .chips-word { display:inline; }
+body[data-skin="terminal"] .offer-amount > span:not(.coin-dot) { display:inline; }
+.offer-price { display:flex; align-items:baseline; gap:6.2px; margin-top:10.4px; font-weight:800; font-size:16.6px; line-height:19.8px; color:var(--tx); }
+.offer-price s { color:var(--sb); font-weight:400; font-size:12.5px; line-height:15.6px; }
+body[data-skin="editorial"] .offer-price { margin-top:10.4px; font-size:13.5px; }
+body[data-skin="editorial"] .offer-price s { font-size:13.5px; line-height:16.6px; }
+body[data-skin="terminal"] .offer-price { align-self:center; font-weight:900; font-size:15.6px; line-height:18.7px; color:var(--green); }
+.offer-price.big { font-size:19.1px; line-height:22.9px; text-align:center; margin-top:8px; display:block; }
+.offer-price.big s { font-size:19.1px; opacity:.5; }
+.save-tag {
+  background:var(--save-bg); color:var(--save-tx); border-radius:6.2px;
+  padding:4.2px 8.3px; font-size:9.4px; line-height:11.4px; font-weight:800;
+  text-transform:uppercase; letter-spacing:.01em;
+}
+body[data-skin="editorial"] .save-tag { text-transform:none; font-size:11.4px; line-height:13.5px; font-weight:600; }
+.offer-left .save-tag { flex:0 0 auto; }
+.save-tag.center { display:block; width:max-content; margin:11px auto 0; }
+.offer-left .btn-dark { margin-top:12.5px; align-self:stretch; }
+body[data-skin="terminal"] .offer-left .btn-dark { margin-top:8.3px; width:139.4px; }
+.offer-right { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12.5px; padding:8px; }
+.offer-lbl {
+  background:var(--badge-bg); color:var(--badge-tx); border-radius:6.2px;
+  padding:4.2px 8.3px; font-size:9.4px; line-height:11.4px; font-weight:800; text-transform:uppercase;
+}
+body[data-skin="editorial"] .offer-lbl { background:none; color:var(--tx); padding:0; font-size:14.6px; line-height:17.7px; font-weight:600; text-transform:none; }
+body[data-skin="terminal"] .offer-lbl { font-size:10.4px; line-height:12.5px; }
+.ends-card { background:none; text-align:center; }
+.ends-card span { display:block; font-size:11.4px; line-height:13.5px; font-weight:600; color:var(--sb); }
+.ends-card b {
+  display:block; margin-top:4.2px;
+  font-size:16.6px; line-height:19.8px; font-weight:800; color:var(--timer-tx);
+  font-variant-numeric:tabular-nums;
+}
+body[data-skin="editorial"] .ends-card span { font-weight:400; }
+body[data-skin="editorial"] .ends-card b {
+  background:#fff; border-radius:12.5px; padding:8.3px 12.5px;
+  font-size:20.8px; line-height:25px; font-weight:700;
+}
+body[data-skin="terminal"] .ends-card span { font-weight:400; font-size:12.5px; line-height:15.6px; }
+
+/* пакеты фишек */
+.packs { display:flex; gap:8.3px; align-items:stretch; margin:0; }
+.pack {
+  position:relative; flex:1; display:flex; flex-direction:column; align-items:flex-start;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-pack);
+  box-shadow:var(--card-shadow);
+  padding:37.4px 12.5px 12.5px; min-height:132.1px; overflow:visible;
+}
+body[data-skin="editorial"] .pack { padding:12.5px 10.4px 10.4px; min-height:202.8px; }
+body[data-skin="terminal"]  .pack { padding:35.4px 12.5px 12.5px; min-height:142.5px; align-items:center; }
+.pack-top {
+  position:absolute; top:12.5px; left:12.5px; right:12.5px;
+  display:flex; align-items:center; gap:6.2px;
+}
+body[data-skin="editorial"] .pack-top { position:static; display:contents; }
+/* арт-плейсхолдер пакета — только у editorial (B) */
+.pack-art { display:none; }
+body[data-skin="editorial"] .pack-art {
+  display:block; position:static; width:100%; height:62.4px;
+  border-radius:10.4px; background:var(--accent2); margin-bottom:8.3px;
+}
+body[data-skin="editorial"] .pack.hot .pack-art { background:#D6DFF5; }
+.hot-tag {
+  background:var(--blue); color:var(--btn2-tx); border-radius:4.2px;
+  padding:2.1px 6.2px; font-size:8.3px; line-height:10.4px; font-weight:900; text-transform:uppercase;
+}
+body[data-skin="narodny"] .hot-tag { display:none; } /* A: Hot-акцента нет в макете */
+body[data-skin="editorial"] .hot-tag {
+  position:absolute; top:8.3px; right:7.3px; z-index:2;
+  background:#fff; color:#1F3A5F; border-radius:6.2px;
+  padding:3.1px 6.2px; font-size:10.4px; line-height:12.5px; font-weight:600; text-transform:none;
+  box-shadow:0 2px 4px rgba(0,0,0,.08);
+}
+.pack-save { font-size:10.4px; line-height:12.5px; font-weight:800; color:var(--gold); white-space:nowrap; }
+body[data-skin="terminal"] .pack-top .pack-save { margin-left:auto; }
+.pack-amt { display:flex; align-items:center; gap:4.2px; font-size:13.5px; line-height:16.6px; font-weight:800; color:var(--tx); }
+.pack-amt .coin-dot { width:16.6px; height:16.6px; flex-basis:16.6px; }
+body[data-skin="editorial"] .pack-amt { font-weight:700; font-size:15.6px; line-height:18.7px; }
+body[data-skin="editorial"] .pack-amt .coin-dot { width:14.6px; height:14.6px; flex-basis:14.6px; }
+body[data-skin="terminal"] .pack-amt { flex-direction:column; gap:8.3px; font-weight:800; }
+body[data-skin="terminal"] .pack-amt .coin-dot { width:33.3px; height:33.3px; flex-basis:33.3px; }
+.pack-price { font-size:12.5px; line-height:15.6px; font-weight:600; color:var(--tx-soft); margin-top:8.3px; }
+body[data-skin="editorial"] .pack-price { font-weight:400; font-size:13.5px; line-height:16.6px; color:var(--tx); }
+body[data-skin="terminal"] .pack-price { display:none; } /* C: цена живёт в кнопке */
+/* editorial: save-строка между ценой и кнопкой */
+.pack-save2 { display:none; }
+body[data-skin="editorial"] .pack-save2 { display:block; font-size:11.4px; line-height:13.5px; font-weight:600; color:var(--green); margin-top:8.3px; }
+body[data-skin="editorial"] .pack-top .pack-save { display:none; }
+.pack .btn-play { position:static; transform:none; width:100%; margin-top:auto; z-index:auto; }
+.pack .btn-play:active { transform:scale(.97); }
+.pack .bp-price { display:none; }
+body[data-skin="terminal"] .pack .bp-price { display:inline; }
+body[data-skin="terminal"] .pack .bp-word { display:none; }
+body[data-skin="terminal"] .pack .btn-play { border-radius:6.2px; padding:6.2px 8px; font-size:11.4px; line-height:13.5px; }
+/* editorial hot-пакет: зелёная карта, белая кнопка */
+body[data-skin="editorial"] .pack .btn-play { margin-top:8.3px; }
+body[data-skin="editorial"] .pack.hot { background:var(--green); border:none; box-shadow:0 4px 12px rgba(31,58,95,.16); }
+body[data-skin="editorial"] .pack.hot .pack-amt, body[data-skin="editorial"] .pack.hot .pack-price,
+body[data-skin="editorial"] .pack.hot .pack-save2 { color:#fff; }
+body[data-skin="editorial"] .pack.hot .btn-play { background:#fff; color:var(--green); }
+
+/* бесплатные способы */
+.free-list { display:flex; flex-direction:column; gap:8.3px; }
+body[data-skin="editorial"] .free-list { gap:12.5px; }
+body[data-skin="terminal"] .free-list { gap:0; background:var(--card); border-radius:var(--r-card-lg); padding:4.2px 16.6px; }
+.free-row {
+  position:relative;
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
+  box-shadow:var(--card-shadow);
+  padding:12.5px; margin:0; min-height:75.9px;
+}
+body[data-skin="editorial"] .free-row { background:var(--panel2); border:none; padding:16.6px; min-height:92.6px; }
+body[data-skin="terminal"] .free-row {
+  background:none; border:none; border-radius:0; padding:12.5px 0;
+  border-bottom:1px solid var(--line); min-height:73.9px;
+}
+body[data-skin="terminal"] .free-row:last-child { border-bottom:none; }
+.fr-ico {
+  display:none; width:41.6px; height:41.6px; flex:0 0 41.6px; border-radius:50%;
+  background:var(--icirc-bg); color:var(--blue);
+  align-items:center; justify-content:center;
+}
+body[data-skin="terminal"] .fr-ico { display:flex; }
+.fr-ico svg { width:18.7px; height:18.7px; }
+.fr-text { display:flex; flex-direction:column; gap:0; flex:1 1 auto; min-width:0; }
+.fr-text b { font-size:14.6px; line-height:17.7px; color:var(--tx); font-weight:800; }
+body[data-skin="editorial"] .fr-text b { font-weight:600; font-size:15.6px; line-height:18.7px; }
+body[data-skin="terminal"] .fr-text b { font-weight:700; }
+.fr-text > span { font-size:12.5px; line-height:15.6px; font-weight:400; color:var(--tx-soft); margin-top:2.1px; }
+body[data-skin="terminal"] .fr-text > span { font-size:11.4px; line-height:13.5px; }
+/* строка награды: A «+500 chips» золотом, B тёмная, C золото без плюса */
+.chip-pill {
+  display:inline-flex; align-items:center; gap:0; width:max-content;
+  background:none; border-radius:0; padding:0; margin-top:6.2px;
+  font-size:11.4px; line-height:13.5px; font-weight:800; color:var(--reward-tx);
+  font-variant-numeric:tabular-nums;
+}
+.chip-pill .coin-dot { width:10.4px; height:10.4px; flex-basis:10.4px; margin-right:4.2px; }
+body[data-skin="editorial"] .chip-pill { font-weight:600; font-size:13.5px; line-height:16.6px; }
+body[data-skin="editorial"] .chip-pill .coin-dot { width:14.6px; height:14.6px; flex-basis:14.6px; }
+.cp-plus, .cp-word { display:none; }
+body[data-skin="narodny"] .cp-plus, body[data-skin="narodny"] .cp-word { display:inline; }
+.dev-link { display:block; margin:20px auto 0; font-size:12px; color:var(--sb); text-decoration:underline dashed; padding:6px 10px; }
+
+/* ---------- referrals (reskin W2, mockups A/B/C-referrals; nodes ×1.04) ----------
+   A: hero card + green banner tucked under it, rows = cards, reward pills.
+   B: one flat hero card (serif heading, plain green hook line), bare rows + hairlines.
+   C: centered intro + cyan outlined banner, rows inside one dark card, mono amounts. */
+#scr-referrals .pg-title { margin-bottom:8.3px; }
+.ref-hero { position:relative; margin-bottom:0; }
+.ref-hero-card {
+  position:relative; z-index:2; text-align:left;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
+  box-shadow:var(--card-shadow); padding:16.6px;
+}
+.ref-hero h2 { font-size:20.8px; line-height:25px; font-weight:800; color:var(--tx); }
+.ref-hero p { font-size:14.6px; line-height:17.7px; font-weight:500; color:var(--tx-soft); margin-top:4.2px; }
+.ref-banner {
+  position:relative; z-index:1;
+  background:#E8F5E9; border:1px solid var(--green-deep); border-radius:var(--r-card);
+  margin:-36.4px 0 0; padding:47.9px 12.5px 12.5px;
+  font-size:13.5px; line-height:18.7px; font-weight:600; color:var(--green-deep); text-align:center;
+}
+body[data-skin="editorial"] .ref-hero-card { background:var(--panel2); border-color:var(--line); border-radius:var(--r-card-lg); padding:20.8px; box-shadow:none; }
+body[data-skin="editorial"] .ref-hero h2 { font-family:var(--font-head); font-size:25px; line-height:28.1px; font-weight:700; }
+body[data-skin="editorial"] .ref-hero p { font-size:15.6px; line-height:21.8px; font-weight:400; color:var(--sb); margin-top:8.3px; }
+body[data-skin="editorial"] .ref-banner {
+  border:none; margin:0; padding:8.3px 20.8px 20.8px;
+  background:var(--panel2); border-radius:0 0 var(--r-card-lg) var(--r-card-lg);
+  text-align:left; color:#1B5E20; font-size:13.5px; line-height:18.7px; font-weight:600;
+}
+body[data-skin="editorial"] .ref-hero-card { border-bottom:none; border-radius:var(--r-card-lg) var(--r-card-lg) 0 0; padding-bottom:8.3px; }
+body[data-skin="terminal"] .ref-hero-card { background:none; border:none; box-shadow:none; padding:0 0 12.5px; text-align:center; }
+body[data-skin="terminal"] .ref-hero h2 { font-size:22.9px; line-height:28.1px; }
+body[data-skin="terminal"] .ref-hero p { font-size:14.6px; line-height:17.7px; font-weight:400; color:var(--tx-soft); }
+body[data-skin="terminal"] .ref-banner {
+  background:rgba(34,211,238,.10); border:1px solid var(--blue); border-radius:12.5px;
+  margin:0; padding:12.5px; color:var(--blue); font-weight:500;
+}
+.fld-lbl { display:block; font-size:13.5px; line-height:16.6px; color:var(--tx-soft); font-weight:600; margin:25px 0 8.3px; }
+body[data-skin="editorial"] .fld-lbl, body[data-skin="terminal"] .fld-lbl { text-transform:uppercase; color:var(--sb); }
+body[data-skin="terminal"] .fld-lbl { font-size:12.5px; line-height:15.6px; font-weight:700; }
+.fld {
+  display:flex; align-items:center; gap:8px; height:50px;
+  background:var(--card); border-radius:999px; padding:7px 21px;
+  box-shadow:inset 0 0 0 1px var(--line); color:var(--sb);
+}
+.fld input { flex:1; border:none; outline:none; background:none; padding:0; font-size:14.2px; line-height:21.3px; color:var(--tx); min-width:0; }
+.fld input::placeholder { color:var(--sb); font-weight:400; }
+/* referral paste field: A/B — button inside the field; C — separate box + cyan button */
+.paste-fld { height:58.2px; border-radius:var(--r-card); padding:7px 8.3px 7px 12.5px; }
+body[data-skin="editorial"] .paste-fld { height:62.4px; border-radius:10.4px; background:#FFFFFF; padding-right:14.6px; }
+.paste-btn {
+  flex:0 0 auto; background:var(--btn-bg); color:var(--btn-tx);
+  border-radius:8.3px; min-width:69.9px; height:33.3px; padding:0 12.5px;
+  font-size:13.5px; line-height:16.6px; font-weight:800; text-transform:uppercase;
+}
+body[data-skin="editorial"] .paste-btn { background:var(--btn2-bg); color:var(--btn2-tx); }
+body[data-skin="terminal"] .paste-fld { background:none; box-shadow:none; padding:0; gap:8.3px; height:42.6px; border-radius:0; }
+body[data-skin="terminal"] .paste-fld input { background:var(--card); box-shadow:inset 0 0 0 1px var(--line); border-radius:8.3px; height:42.6px; padding:0 16.6px; align-self:stretch; }
+body[data-skin="terminal"] .paste-btn { background:var(--btn2-bg); color:var(--btn2-tx); min-width:74.9px; height:42.6px; text-transform:none; font-size:14.6px; }
+/* section label */
+#scr-referrals .sub-title.ref-sec {
+  margin:25px 0 10.4px; text-transform:uppercase;
+  font-size:13.5px; line-height:16.6px; font-weight:600; color:var(--sb);
+}
+body[data-skin="terminal"] #scr-referrals .sub-title.ref-sec { font-size:14.6px; line-height:17.7px; font-weight:800; margin-bottom:12.5px; }
+.ref-count { display:none; }
+body[data-skin="editorial"] .ref-count { display:inline; }
+/* rows */
+.ref-list { background:none; border-radius:0; padding:0; margin-bottom:25px; display:flex; flex-direction:column; gap:8.3px; }
+.ref-row {
+  display:flex; align-items:center; gap:12.5px; padding:0 12.5px; height:58.2px; position:relative;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
+  box-shadow:var(--card-shadow);
+}
+.ref-ava {
+  width:33.3px; height:33.3px; border-radius:50%; flex:0 0 33.3px;
+  background:var(--avatar-bg); color:var(--avatar-tx);
+  display:flex; align-items:center; justify-content:center;
+  font-size:12.5px; font-weight:800;
+}
+.ref-name { flex:1; font-size:14.6px; line-height:17.7px; font-weight:700; color:var(--tx); }
+.ref-amt {
+  display:inline-flex; align-items:center; font-variant-numeric:tabular-nums;
+  background:#E8F5E9; border-radius:6.2px; padding:4.2px 8.3px;
+  font-size:12.5px; line-height:15.6px; font-weight:800; color:var(--green-deep);
+}
+.ref-chipword { display:none; }
+body[data-skin="editorial"] .ref-list { gap:0; margin-bottom:20.8px; }
+body[data-skin="editorial"] .ref-row { background:none; border:none; border-radius:0; box-shadow:none; height:66.6px; padding:0 4.2px; }
+body[data-skin="editorial"] .ref-row + .ref-row::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:var(--line); }
+body[data-skin="editorial"] .ref-ava { background:var(--panel2); color:var(--sb); font-size:13.5px; font-weight:600; }
+body[data-skin="editorial"] .ref-name { font-size:15.6px; line-height:18.7px; font-weight:600; }
+body[data-skin="editorial"] .ref-amt { background:none; padding:0; border-radius:0; color:var(--green); font-size:14.6px; line-height:17.7px; font-weight:700; }
+body[data-skin="editorial"] .ref-chipword { display:inline; font-weight:700; }
+body[data-skin="terminal"] .ref-list { gap:0; background:var(--card); border-radius:var(--r-card-lg); padding:6.2px 16.6px; }
+body[data-skin="terminal"] .ref-row { background:none; border:none; border-radius:0; box-shadow:none; height:58.2px; padding:0; }
+body[data-skin="terminal"] .ref-row + .ref-row::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:var(--line); }
+body[data-skin="terminal"] .ref-name { font-weight:600; }
+body[data-skin="terminal"] .ref-amt {
+  background:none; padding:0; border-radius:0; color:var(--green);
+  font-family:var(--font-num); font-size:14.6px; line-height:18.7px; font-weight:700;
+}
+/* copy id + invite */
+.copy-id-row {
+  display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%;
+  height:45.8px; padding:0 12.5px; text-align:left;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
+  box-shadow:var(--card-shadow);
+  font-size:14.6px; line-height:17.7px; font-weight:600; color:var(--tx-soft);
+}
+.copy-id-row svg { flex:0 0 20.8px; color:var(--green-deep); }
+body[data-skin="editorial"] .copy-id-row { background:var(--panel2); border-radius:10.4px; height:46.8px; padding:0 14.6px; font-weight:400; color:var(--tx); box-shadow:none; }
+body[data-skin="editorial"] .copy-id-row svg { color:var(--sb); }
+body[data-skin="terminal"] .copy-id-row { box-shadow:none; color:rgba(255,255,255,.6); }
+body[data-skin="terminal"] .copy-id-row svg { color:var(--blue); }
+.ref-invite.btn-primary { margin-top:16.6px; height:47.9px; padding:0 25px; border-radius:12.5px; font-size:15.6px; line-height:18.7px; }
+body[data-skin="narodny"] .ref-invite.btn-primary { text-transform:uppercase; font-weight:800; }
+body[data-skin="editorial"] .ref-invite.btn-primary { height:53px; margin-top:20.8px; font-size:16.6px; }
+body[data-skin="terminal"] .ref-invite.btn-primary { text-transform:uppercase; font-weight:800; margin-top:12.5px; }
+
+/* ---------- achievements (reskin W2, mockups A/B/C-achievements; nodes ×1.04) ----------
+   Grid: A/B — иконка | тексты+бар | кнопка справа; C — кнопка во всю ширину под баром. */
+#scr-achievements .pg-title { margin-bottom:8.3px; }
+.ach-row {
+  display:grid; grid-template-columns:auto 1fr auto; grid-template-areas:'ico main cta';
+  align-items:center; column-gap:12.5px;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
+  padding:16.6px; margin-bottom:12.5px;
+}
+body[data-skin="editorial"] .ach-row { border-radius:var(--r-card-lg); margin-bottom:14.6px; }
+body[data-skin="terminal"] .ach-row {
+  grid-template-columns:auto 1fr; grid-template-areas:'ico main' 'cta cta';
+  border:none; border-radius:var(--r-card-lg); align-items:start;
+}
+.ach-ico {
+  grid-area:ico; width:41.6px; height:41.6px; border-radius:50%; flex:0 0 41.6px;
+  background:#E8F5E9; color:var(--green-deep);
+  display:flex; align-items:center; justify-content:center;
+}
+body[data-skin="terminal"] .ach-ico { background:var(--icirc-bg); color:var(--blue); }
+.ach-main { grid-area:main; min-width:0; }
+.ach-top { display:flex; justify-content:space-between; align-items:flex-start; gap:8.3px; }
+.ach-texts { display:flex; flex-direction:column; min-width:0; }
+.ach-title { font-size:14.6px; line-height:17.7px; font-weight:800; color:var(--tx); }
+body[data-skin="editorial"] .ach-title { font-size:16.6px; line-height:19.8px; font-weight:700; }
+body[data-skin="terminal"] .ach-title { font-size:16.6px; line-height:19.8px; }
+.ach-desc { font-size:11.4px; line-height:14.6px; font-weight:400; color:var(--tx-soft); margin-top:2.1px; }
+body[data-skin="editorial"] .ach-desc { font-size:13.5px; line-height:16.6px; color:var(--sb); }
+body[data-skin="terminal"] .ach-desc { font-size:12.5px; line-height:15.6px; }
+.ach-reward-badge {
+  display:inline-flex; align-items:center; gap:4.2px; flex:0 0 auto; white-space:nowrap;
+  font-size:13.5px; line-height:16.6px; font-weight:700; color:var(--tx);
+  font-variant-numeric:tabular-nums; padding-top:1px;
+}
+.ach-reward-badge .coin-dot { width:12.5px; height:12.5px; flex-basis:12.5px; }
+body[data-skin="terminal"] .ach-reward-badge { color:var(--gold); font-size:12.5px; line-height:15.6px; font-weight:800; }
+.ach-bar { height:6.2px; border-radius:100px; background:var(--line); margin-top:11.4px; overflow:hidden; }
+.ach-bar i { display:block; height:100%; background:var(--green-deep); border-radius:100px; }
+body[data-skin="terminal"] .ach-bar { height:8.3px; border-radius:4.2px; background:var(--icirc-bg); }
+body[data-skin="terminal"] .ach-bar i { background:var(--blue); border-radius:4.2px; }
+.ach-count { display:block; font-size:10.4px; line-height:12.5px; font-weight:600; color:var(--sb); margin-top:4.2px; }
+body[data-skin="editorial"] .ach-count { font-size:11.4px; line-height:13.5px; }
+body[data-skin="terminal"] .ach-count { font-size:12.5px; line-height:15.6px; font-weight:700; }
+.ach-cta { grid-area:cta; display:flex; align-items:center; justify-content:flex-end; }
+.ach-cta:empty { display:none; }
+body[data-skin="terminal"] .ach-cta { margin-top:10.4px; }
+.ach-play, .ach-claim {
+  min-width:83.2px; height:33.3px; padding:0 14px; border-radius:8.3px;
+  background:var(--btn2-bg); color:var(--btn2-tx);
+  font-size:13.5px; line-height:16.6px; font-weight:800; text-transform:uppercase;
+  transition:transform .08s;
+}
+.ach-play:active, .ach-claim:active { transform:scale(.97); }
+body[data-skin="editorial"] .ach-play, body[data-skin="editorial"] .ach-claim {
+  background:var(--btn-bg); color:var(--btn-tx); border-radius:10.4px;
+}
+body[data-skin="terminal"] .ach-play, body[data-skin="terminal"] .ach-claim {
+  width:100%; height:47.9px; border-radius:12.5px; font-size:15.6px; line-height:18.7px;
+}
+body[data-skin="terminal"] .ach-play { background:var(--btn2-bg); color:var(--btn2-tx); }
+body[data-skin="terminal"] .ach-claim { background:var(--green); color:#0B0E14; }
+.ach-claim-amt { display:none; font-variant-numeric:tabular-nums; }
+body[data-skin="terminal"] .ach-claim-amt { display:inline; }
+/* claimed row: A/B — компакт без бара и бейджа, золотая иконка, пилюля Claimed; C — бар остаётся, текст CLAIMED */
+.ach-claimed {
+  background:#E8F5E9; color:var(--green-deep); border-radius:6.2px;
+  padding:4.2px 8.3px; font-size:10.4px; line-height:12.5px; font-weight:800;
+}
+.ach-row.claimed .ach-bar, .ach-row.claimed .ach-count, .ach-row.claimed .ach-reward-badge { display:none; }
+.ach-row.claimed .ach-ico { background:#FEF3C7; color:var(--gold); }
+body[data-skin="terminal"] .ach-row.claimed .ach-bar, body[data-skin="terminal"] .ach-row.claimed .ach-count,
+body[data-skin="terminal"] .ach-row.claimed .ach-reward-badge { display:block; }
+body[data-skin="terminal"] .ach-row.claimed .ach-reward-badge { display:inline-flex; }
+body[data-skin="terminal"] .ach-row.claimed .ach-ico { background:var(--icirc-bg); color:var(--blue); }
+body[data-skin="terminal"] .ach-claimed {
+  background:none; padding:0; border-radius:0;
+  color:var(--sb); font-size:13.5px; line-height:16.6px; font-weight:700; text-transform:uppercase;
+}
+
+/* ---------- settings (reskin W2, mockups A/B/C-settings; nodes ×390/375≈1.04) ----------
+   A: white cards, plain brown icons, chevrons. B: bare rows + hairlines, no icons,
+   row toggles + language value. C: dark cards, cyan icons, chevrons. One skeleton. */
+#scr-settings .pg-title { margin-bottom:8.3px; }
+body[data-skin="terminal"] #scr-settings .pg-title,
+body[data-skin="terminal"] #scr-referrals .pg-title,
+body[data-skin="terminal"] #scr-achievements .pg-title { margin-top:16.6px; } /* C headers sit lower (y66) */
+.set-group {
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r-card);
+  margin-bottom:16.6px; overflow:hidden; padding:0;
+}
+body[data-skin="terminal"] .set-group { border:none; padding:4.2px 0; }
+body[data-skin="editorial"] .set-group { background:none; border:none; border-radius:0; margin-bottom:0; }
+.set-row {
+  position:relative;
+  display:flex; align-items:center; gap:12.5px; width:100%; text-align:left;
+  padding:0 16.6px; height:54.1px; font-size:15.6px; line-height:18.7px; font-weight:600; color:var(--tx);
+}
+body[data-skin="terminal"] .set-row { height:49.9px; font-weight:500; }
+body[data-skin="editorial"] .set-row { height:58.2px; padding:0 6.2px; font-size:16.6px; font-weight:500; border-top:1px solid var(--line); }
+body[data-skin="editorial"] .set-group:first-of-type .set-row:first-child { border-top:none; }
+.set-group .set-row + .set-row::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px; background:var(--line);
+}
+body[data-skin="terminal"] .set-group .set-row + .set-row::before { left:16.6px; right:16.6px; }
+body[data-skin="editorial"] .set-group .set-row + .set-row::before { content:none; } /* border-top does the job */
+.set-ico {
+  width:20.8px; height:20.8px; border-radius:0; background:none; color:var(--set-ico, var(--tx-soft));
+  display:flex; align-items:center; justify-content:center; flex:0 0 20.8px;
+}
+body[data-skin="terminal"] .set-row .set-ico { color:var(--blue); }
+body[data-skin="editorial"] .set-row .set-ico { display:none; }
+.set-ico svg { width:100%; height:100%; }
+.chev { margin-left:auto; color:var(--sb); font-size:19.8px; line-height:1; font-weight:600; }
+/* editorial extras: language value + row toggles (mockup B); hidden in A/C */
+.set-val { display:none; }
+body[data-skin="editorial"] .set-val { display:inline; margin-left:auto; color:var(--sb); font-size:14.6px; line-height:17.7px; font-weight:400; }
+body[data-skin="editorial"] .set-row:has(.set-val) .chev { margin-left:0; }
+.switch.set-sw { display:none; } /* .switch.* beats the generic .switch display rule below */
+body[data-skin="editorial"] .switch.set-sw { display:inline-block; }
+body[data-skin="editorial"] .set-row:has(.set-sw) .chev { display:none; }
+/* divider between groups and the logout zone: line in A, plain gap in B/C */
+.set-divider { height:0; border-top:1px solid var(--line); margin:16.6px 0; }
+body[data-skin="terminal"] .set-divider { border-top:none; margin:0; }
+body[data-skin="editorial"] .set-divider { border-top:none; margin:12.5px 0; }
+/* log out: A red card row (no chevron), B centered underlined link, C red card row + chevron */
+.logout-row { background:var(--panel); border:1px solid var(--line); border-radius:var(--r-card); height:49.9px; padding:0 16.6px; }
+.logout-row, .logout-row .set-ico { color:var(--red); }
+body[data-skin="narodny"] .logout-row .chev { display:none; }
+body[data-skin="terminal"] .logout-row { border:none; height:66.6px; }
+body[data-skin="editorial"] .logout-row {
+  background:none; border:none; height:auto; padding:8.3px 0; justify-content:center;
+  color:var(--sb); font-size:16.6px; font-weight:600; text-decoration:underline; text-underline-offset:3px;
+}
+body[data-skin="editorial"] .logout-row .set-ico, body[data-skin="editorial"] .logout-row .chev { display:none; }
+.delete-link { display:block; margin:20.8px auto 0; font-size:13.5px; line-height:16.6px; font-weight:600; color:var(--sb); padding:0 12px; text-decoration:underline; text-underline-offset:3px; }
+body[data-skin="terminal"] .delete-link { color:var(--red); font-size:14.6px; }
+body[data-skin="editorial"] .delete-link { color:#E74C3C; font-size:15.6px; line-height:18.7px; text-decoration:none; margin-top:14.6px; }
+.switch { margin-left:auto; position:relative; display:inline-block; width:44px; height:26px; flex:0 0 44px; cursor:pointer; }
+.switch input { opacity:0; width:0; height:0; }
+.switch .knob {
+  position:absolute; inset:0; border-radius:999px; background:var(--line); transition:background .18s;
+}
+.switch .knob::after {
+  content:''; position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%;
+  background:#fff; box-shadow:0 1px 3px rgba(26,35,48,.25); transition:transform .18s;
+}
+.switch input:checked + .knob { background:var(--green); }
+.switch input:checked + .knob::after { transform:translateX(18px); }
+/* editorial switch per mockup B: 50×29, grey when off */
+body[data-skin="editorial"] .switch.set-sw { width:49.9px; height:29.1px; flex-basis:49.9px; }
+body[data-skin="editorial"] .switch.set-sw .knob { background:#868DA6; }
+body[data-skin="editorial"] .switch.set-sw input:checked + .knob { background:var(--green); }
+body[data-skin="editorial"] .switch.set-sw .knob::after { top:2.6px; left:2.6px; width:24px; height:24px; }
+body[data-skin="editorial"] .switch.set-sw input:checked + .knob::after { transform:translateX(20.7px); }
+
+.stub-body { padding-top:4px; }
+.stub-card { background:var(--card); border:1px solid var(--line); border-radius:var(--r-card); box-shadow:var(--card-shadow); padding:16.6px; }
+body[data-skin="editorial"] .stub-card { background:var(--panel2); border:none; box-shadow:none; }
+body[data-skin="terminal"] .stub-card { border:none; border-radius:var(--r-card-lg); }
+.stub-card p { font-size:13.5px; color:var(--tx); line-height:1.55; font-weight:400; }
+body[data-skin="editorial"] .stub-card p { font-size:14.6px; }
+.stub-list-row {
+  display:flex; align-items:center; gap:10px; width:100%;
+  padding:13px 16px; font-size:14.2px; font-weight:500; color:var(--tx); text-align:left;
+}
+.stub-list-row + .stub-list-row { border-top:1px solid var(--line); margin-top:0; }
+.stub-check { margin-left:auto; color:var(--tab-active); font-weight:800; }
+.set-group:has(.stub-list-row) { padding:0; }
+
+/* ---------- profile (reskin W3 ★draft: макета нет — язык по ДС вариантов) ----------
+   A: белая карта статистики с волосяными линиями; B: голые ряды + hairlines;
+   C: тёмная карта, mono-цифры (группа font-num ниже). Один скелет. */
+.prof-id { display:flex; align-items:center; gap:12.5px; padding:12.5px 0 0; }
+.avatar-ini.xl { width:66.6px; height:66.6px; flex-basis:66.6px; font-size:22.9px; }
+.prof-name { font-size:20.8px; line-height:25px; font-weight:700; color:var(--tx); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.edit-pill { background:var(--card); box-shadow:inset 0 0 0 1px var(--line); border-radius:999px; padding:6.2px 14.6px; margin-left:auto; font-size:13.5px; line-height:16.6px; font-weight:600; color:var(--tx); flex:0 0 auto; }
+#scr-profile .sub-title {
+  margin:25px 0 10.4px;
+  font-size:var(--sec-size); line-height:1.25; font-weight:var(--sec-w);
+  color:var(--sec-tx); text-transform:var(--sec-case);
+}
+.stat-rows {
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
+  box-shadow:var(--card-shadow); padding:2px 14.6px; margin:0;
+}
+.stat-row { position:relative; display:flex; justify-content:space-between; align-items:center; gap:8px; min-height:47.9px; padding:6px 0; font-size:14.6px; line-height:17.7px; }
+.stat-row + .stat-row::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:var(--line); }
+.stat-row span:first-child { color:var(--tx-soft); font-weight:400; }
+.stat-row b { color:var(--tx); font-weight:700; display:flex; align-items:center; gap:5.2px; }
+.stat-row .coin-dot { width:14.6px; height:14.6px; flex-basis:14.6px; }
+.stat-pct { color:var(--green); font-weight:700; margin-left:1px; }
+body[data-skin="editorial"] .stat-rows { background:none; border:none; box-shadow:none; padding:0; }
+body[data-skin="editorial"] .stat-row { min-height:53px; font-size:15.6px; }
+body[data-skin="editorial"] .stat-row span:first-child { color:var(--sb); }
+body[data-skin="editorial"] .stat-row b { font-weight:600; }
+body[data-skin="terminal"] .stat-rows { border:none; border-radius:var(--r-card-lg); padding:4.2px 16.6px; }
+#scr-profile .btn.wide { margin-top:25px; }
+#scr-profile .btn-ghost.wide { margin-top:25px; }
+
+/* ---------- guides (reskin W3 ★draft: макета нет — ряды в языке вариантов) ----------
+   A: карточные ряды с шевроном; B: голые ряды + hairlines; C: тёмные карты.
+   Секции — в голосе sec-title (A/C caps grey, B крупный ink). Буллеты/HR убраны. */
+.search-fld { margin-bottom:0; }
+.g-sec {
+  font-size:var(--sec-size); line-height:1.25; font-weight:var(--sec-w);
+  color:var(--sec-tx); text-transform:var(--sec-case);
+  margin:20.8px 0 10.4px;
+}
+.g-row {
+  position:relative; display:flex; align-items:center; gap:10.4px; width:100%; text-align:left;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
+  box-shadow:var(--card-shadow);
+  padding:14.6px; margin-bottom:8.3px;
+  font-size:14.6px; line-height:19.8px; font-weight:600; color:var(--tx);
+}
+.g-row > span { flex:1 1 auto; }
+.g-row::after { content:'\203A'; margin-left:auto; color:var(--sb); font-size:19.8px; line-height:1; font-weight:600; flex:0 0 auto; }
+body[data-skin="editorial"] .g-row {
+  background:none; border:none; border-radius:0; box-shadow:none;
+  padding:14.6px 4.2px; margin-bottom:0; font-weight:500; font-size:15.6px; line-height:21.8px;
+}
+body[data-skin="editorial"] .g-row + .g-row::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:var(--line); }
+body[data-skin="terminal"] .g-row { border:none; border-radius:var(--r-card-lg); padding:16.6px; font-weight:500; }
+.g-empty { padding:20px 4px; font-size:13px; color:var(--sb); text-align:center; }
+.g-hr { display:none; }
+#scr-notifications .search-fld { margin-bottom:0; }
+
+.article h1 { font-size:25px; line-height:31.2px; margin:14.6px 0 12.5px; }
+.article h2 { font-size:20.8px; line-height:26px; margin:29.1px 0 12.5px; }
+.article p { font-size:13.5px; line-height:19.8px; font-weight:400; color:var(--tx); margin-bottom:12.5px; }
+body[data-skin="editorial"] .article p { font-size:15.6px; line-height:22.9px; }
+body[data-skin="terminal"] .article p { font-size:14.6px; line-height:21.8px; }
+.article .art-lead { color:var(--tx); font-weight:600; margin-bottom:16.6px; }
+.art-img { height:174px; border-radius:var(--r-card-lg); background:var(--accent2); margin:14.6px 0; }
+/* блок «закрепи в игре» в статье: wireframe-gcard → карточный язык вариантов (★draft) */
+.article .gcard {
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card-lg);
+  box-shadow:var(--card-shadow); padding:16.6px 14.6px; min-height:0;
+}
+.article .gcard::before { content:none; }
+.article .gc-text h3 { font-size:16.6px; line-height:19.8px; font-weight:700; letter-spacing:0; }
+body[data-skin="editorial"] .article .gc-text p, body[data-skin="terminal"] .article .gc-text p,
+.article .gc-text p { font-size:12.5px; line-height:17.7px; color:var(--tx-soft); margin-bottom:0; max-width:none; }
+body[data-skin="editorial"] .article .gcard { background:var(--panel2); border:none; }
+body[data-skin="terminal"] .article .gcard { border:none; }
+/* ★ draft: мини-график паттерна (Chart patterns) — SVG красится скин-токенами:
+   нейтральные линии currentColor (здесь --tx-soft), акценты var(--green)/var(--red) в самом SVG */
+.art-img.art-chart {
+  height:auto; display:flex; align-items:center; justify-content:center;
+  padding:17px 14px; color:var(--tx-soft);
+}
+.art-chart svg { display:block; width:100%; max-width:340px; height:auto; }
+.article .gcard { margin-bottom:14px; }
+
+/* ---------- notifications (reskin W3 ★draft: макета нет — ряды в языке вариантов) ----------
+   A: карточные ряды, зелёный кружок-иконка (как achievements); B: голые ряды + hairlines;
+   C: тёмные карты, cyan-иконки. Непрочитанное — красная точка справа сверху. */
+.ntf-row {
+  position:relative; display:flex; gap:12.5px; align-items:flex-start;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
+  box-shadow:var(--card-shadow);
+  padding:14.6px; margin:0 0 8.3px;
+}
+.ntf-row:first-of-type { margin-top:16.6px; }
+.ntf-row.unread::before {
+  content:''; position:absolute; top:14.6px; right:14.6px; width:8.3px; height:8.3px; border-radius:50%;
+  background:var(--red);
+}
+.ntf-ico {
+  width:41.6px; height:41.6px; border-radius:50%; flex:0 0 41.6px;
+  background:#E8F5E9; color:var(--green-deep);
+  display:flex; align-items:center; justify-content:center;
+}
+body[data-skin="terminal"] .ntf-ico { background:var(--icirc-bg); color:var(--blue); }
+body[data-skin="editorial"] .ntf-row {
+  background:none; border:none; border-radius:0; box-shadow:none;
+  padding:16.6px 4.2px; margin-bottom:0;
+}
+body[data-skin="editorial"] .ntf-row + .ntf-row::after { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:var(--line); }
+body[data-skin="editorial"] .ntf-row.unread::before { right:4.2px; }
+body[data-skin="terminal"] .ntf-row { border:none; border-radius:var(--r-card-lg); padding:16.6px; margin-bottom:12.5px; }
+.ntf-text { display:flex; flex-direction:column; gap:0; padding-top:1px; flex:1 1 auto; min-width:0; }
+.ntf-text b { font-size:14.6px; line-height:19.8px; color:var(--tx); font-weight:700; padding-right:12.5px; }
+body[data-skin="editorial"] .ntf-text b { font-weight:600; font-size:15.6px; line-height:21.8px; }
+.ntf-text > span { font-size:12.5px; line-height:17.7px; font-weight:400; color:var(--tx-soft); margin-top:2.1px; }
+body[data-skin="editorial"] .ntf-text > span { font-size:13.5px; line-height:18.7px; color:var(--sb); }
+.ntf-text .btn-play { width:auto; align-self:flex-start; min-width:104px; margin-top:10.4px; }
+
+/* ---------- sign up / verify (reskin W2, mockups A/B/C signup + code input/error; ×1.04) ----------
+   Один скелет: контент прижат к низу; B добавляет navy-бар с назад и сабтайтл,
+   C — кружок «назад» над заголовком кода. Пароля нет (флоу «почта → код», вердикт 26.07). */
+#scr-signup.active, #scr-verify.active { display:flex; flex-direction:column; }
+#scr-signup, #scr-verify { padding-left:25px; padding-right:25px; }
+/* editorial navy auth bar (mockup B: back circle + title) */
+.auth-bar {
+  display:none; position:absolute; top:0; left:0; right:0; height:50px; z-index:6;
+  align-items:center; gap:12.5px; padding:0 16.6px;
+  background:var(--topbar-bg); color:#fff;
+  font-size:18.7px; line-height:22.9px; font-weight:700;
+}
+body[data-skin="editorial"] .auth-bar { display:flex; }
+body[data-skin="editorial"] #scr-signup .xbtn.wl-x, body[data-skin="editorial"] #scr-verify .xbtn.wl-x { display:none; }
+.auth-back {
+  width:33.3px; height:33.3px; border-radius:50%; flex:0 0 33.3px;
+  background:rgba(255,255,255,.10); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+}
+.signup-body { margin:auto 0 0; padding:0 0 41.6px; width:100%; display:flex; flex-direction:column; }
+body[data-skin="editorial"] .signup-body { padding-bottom:29.1px; }
+.signup-body h1 {
+  font-size:29.1px; line-height:35.4px; font-weight:var(--w-head); font-family:var(--font-head);
+  color:var(--head-tx); text-align:center; margin-bottom:25px;
+}
+body[data-skin="terminal"] #scr-signup h1 { font-size:33.3px; line-height:40.6px; margin-bottom:39.5px; }
+body[data-skin="editorial"] .signup-body h1 { font-size:27px; line-height:30.2px; margin-bottom:0; }
+/* B-only subtitle under «Sign up» */
+.su-sub { display:none; }
+body[data-skin="editorial"] .su-sub {
+  display:block; text-align:center; color:var(--sb);
+  font-size:14.6px; line-height:17.7px; font-weight:400; margin:8.3px 0 0;
+}
+.signup-body .fld-lbl { margin:25px 0 8.3px; }
+body[data-skin="editorial"] #scr-signup .fld-lbl { text-transform:none; color:var(--tx); font-size:14.6px; line-height:17.7px; }
+#scr-signup .fld {
+  height:53px; border-radius:var(--r-card); padding:7px 16.6px; margin-bottom:25px;
+  background:var(--card);
+}
+body[data-skin="editorial"] #scr-signup .fld { height:52px; border-radius:10.4px; background:var(--panel2); }
+body[data-skin="terminal"] #scr-signup .fld { height:47.9px; border-radius:8.3px; }
+.signup-body .fld input { font-size:14.6px; }
+body[data-skin="editorial"] .signup-body .fld input, body[data-skin="terminal"] .signup-body .fld input { font-size:15.6px; }
+.su-cta.btn-primary { height:53px; padding:0 25px; border-radius:12.5px; font-size:16.6px; line-height:19.8px; font-weight:800; text-transform:none; }
+body[data-skin="editorial"] .su-cta.btn-primary { font-weight:600; }
+body[data-skin="terminal"] .su-cta.btn-primary { text-transform:uppercase; }
+.or-divider {
+  display:flex; align-items:center; gap:12.5px; margin:25px 0 0;
+  color:var(--sb); font-size:12.5px; line-height:15.6px; font-weight:500;
+}
+body[data-skin="terminal"] .or-divider { text-transform:uppercase; font-size:13.5px; line-height:16.6px; font-weight:400; margin-top:35px; }
+.or-divider::before, .or-divider::after { content:''; flex:1; border-top:1px solid var(--line); }
+.social-row { display:flex; gap:12.5px; margin-top:25px; }
+body[data-skin="terminal"] .social-row { justify-content:center; gap:16.6px; margin-top:31px; }
+.social-btn {
+  flex:1; height:49.9px; background:var(--card); border-radius:var(--r-card);
+  display:flex; align-items:center; justify-content:center;
+  font-size:16.6px; line-height:19.8px; font-weight:700; color:var(--tx);
+  box-shadow:inset 0 0 0 1px var(--line);
+}
+body[data-skin="editorial"] .social-btn { height:42.6px; border-radius:10.4px; background:var(--panel2); font-size:14.6px; font-weight:600; }
+body[data-skin="terminal"] .social-btn { flex:0 0 56.2px; width:56.2px; height:56.2px; border-radius:50%; font-size:18.7px; font-weight:800; }
+.soc-mark-b, .soc-mark-c { display:none; }
+body[data-skin="editorial"] .soc-mark-b { display:inline; }
+body[data-skin="terminal"] .soc-mark-c { display:inline-flex; align-items:center; }
+body[data-skin="terminal"] .soc-lbl { display:none; }
+#scr-signup .text-link { margin:20.8px auto 0; color:var(--tx-soft); font-size:13.5px; line-height:16.6px; }
+.legal {
+  font-size:11.4px; line-height:15.6px; font-weight:400; color:var(--sb); text-align:center;
+  margin-top:145px; padding-top:0; border-top:none;
+}
+body[data-skin="editorial"] .legal { font-size:12.5px; line-height:18.7px; margin-top:25px; }
+body[data-skin="terminal"] .legal { font-size:12.5px; line-height:18.7px; margin-top:50px; }
+/* ----- verify ----- */
+#scr-verify .signup-body { padding-bottom:41.6px; }
+.vf-back { display:none; } /* terminal-only back circle (mockup C) */
+body[data-skin="terminal"] .vf-back {
+  display:flex; align-items:center; justify-content:center; align-self:flex-start;
+  width:37.4px; height:37.4px; border-radius:50%; margin-bottom:25px;
+  background:var(--card); box-shadow:inset 0 0 0 1px var(--line); color:#fff;
+}
+#scr-verify h1 { text-align:center; margin-bottom:0; }
+body[data-skin="editorial"] #scr-verify h1, body[data-skin="terminal"] #scr-verify h1 { text-align:left; }
+.verify-sub { text-align:center; font-size:14.6px; line-height:20.8px; font-weight:400; color:var(--tx-soft); margin:8.3px 0 0; }
+.verify-mail { text-align:center; font-size:14.6px; line-height:20.8px; font-weight:600; color:var(--tx); margin:0; }
+body[data-skin="editorial"] .verify-sub, body[data-skin="editorial"] .verify-mail,
+body[data-skin="terminal"] .verify-sub, body[data-skin="terminal"] .verify-mail { text-align:left; }
+body[data-skin="editorial"] .verify-sub { font-size:15.6px; line-height:21.8px; }
+body[data-skin="editorial"] .verify-mail { font-size:15.6px; line-height:21.8px; font-weight:700; }
+/* expires: A gold line above boxes, B grey pill below boxes (order), C mono cyan above */
+.verify-expires {
+  order:0; text-align:center; margin:8.3px 0 0;
+  font-size:13.5px; line-height:16.6px; font-weight:600; color:var(--expire-tx);
+}
+body[data-skin="editorial"] .verify-expires {
+  order:6; align-self:center; margin:16.6px 0 0;
+  background:var(--panel2); border-radius:100px; padding:6.2px 12.5px;
+  font-size:13.5px; line-height:16.6px; font-weight:500; color:var(--sb);
+}
+body[data-skin="terminal"] .verify-expires {
+  text-align:left; font-family:var(--font-num); font-weight:400; color:var(--blue); margin-top:11.4px;
+}
+#scr-verify.vf-error .verify-expires b, .verify-expires b { font-weight:inherit; }
+body[data-skin="terminal"] #scr-verify.vf-error .verify-expires { color:var(--red); }
+.code-row { display:flex; gap:8.3px; justify-content:center; margin:25px 0 0; }
+body[data-skin="terminal"] .code-row { justify-content:space-between; }
+.code-box {
+  width:45.8px; height:56.2px; border-radius:8.3px; border:none; outline:none;
+  background:var(--card); box-shadow:inset 0 0 0 1.5px var(--line);
+  font-size:25px; font-weight:700; color:var(--tx); text-align:center;
+  transition:box-shadow .12s;
+}
+.code-box:focus { box-shadow:inset 0 0 0 2px var(--tx); }
+body[data-skin="editorial"] .code-box { width:49.9px; border-radius:10.4px; background:#fff; box-shadow:inset 0 0 0 1px var(--line); font-size:20.8px; }
+body[data-skin="editorial"] .code-box.filled { background:var(--panel2); box-shadow:inset 0 0 0 1px #1B2838; }
+body[data-skin="editorial"] .code-box:focus { box-shadow:inset 0 0 0 2px #1B2838; }
+body[data-skin="terminal"] .code-box { width:49.9px; border-radius:12.5px; box-shadow:inset 0 0 0 1px var(--line); font-size:22.9px; font-weight:800; }
+body[data-skin="terminal"] .code-box.filled { box-shadow:inset 0 0 0 2px var(--blue); }
+body[data-skin="terminal"] .code-box:focus { box-shadow:inset 0 0 0 2px var(--blue); }
+/* error state (mockups *-code-error): red boxes + inline message; digits keep the red ink */
+.verify-error { text-align:center; margin:16.6px 0 0; font-size:13.5px; line-height:16.6px; font-weight:600; color:var(--red); }
+body[data-skin="editorial"] .verify-error, body[data-skin="terminal"] .verify-error { text-align:left; font-size:14.6px; line-height:17.7px; }
+#scr-verify.vf-error .code-box { box-shadow:inset 0 0 0 1.5px var(--red); color:var(--red); }
+body[data-skin="editorial"] #scr-verify.vf-error .code-box, body[data-skin="editorial"] #scr-verify.vf-error .code-box.filled { background:rgba(231,76,60,.06); box-shadow:inset 0 0 0 2px #E74C3C; color:#E74C3C; }
+body[data-skin="terminal"] #scr-verify.vf-error .code-box, body[data-skin="terminal"] #scr-verify.vf-error .code-box.filled { box-shadow:inset 0 0 0 2px var(--red); }
+#scr-verify.vf-error .code-box:focus { box-shadow:inset 0 0 0 2px var(--red); }
+.vf-cta.btn-primary { order:7; height:53px; padding:0 25px; border-radius:12.5px; font-size:16.6px; line-height:19.8px; font-weight:800; text-transform:none; margin-top:25px; }
+body[data-skin="editorial"] .vf-cta.btn-primary { font-weight:600; margin-top:29.1px; }
+body[data-skin="terminal"] .vf-cta.btn-primary { text-transform:uppercase; }
+#scr-verify .text-link.vf-resend {
+  order:8; margin:25px auto 0; color:var(--green-deep);
+  font-size:14.6px; line-height:17.7px; font-weight:600;
+  text-decoration:underline; text-underline-offset:3px;
+}
+body[data-skin="editorial"] #scr-verify .text-link.vf-resend { color:#1B2838; }
+body[data-skin="terminal"] #scr-verify .text-link.vf-resend { color:var(--blue); }
+#scr-verify .text-link.vf-alt {
+  order:9; margin:12.5px auto 0; color:var(--tx-soft);
+  font-size:14.6px; line-height:17.7px; font-weight:600;
+  text-decoration:underline; text-underline-offset:3px;
+}
+body[data-skin="editorial"] #scr-verify .text-link.vf-alt, body[data-skin="terminal"] #scr-verify .text-link.vf-alt { text-decoration:none; color:var(--sb); }
+/* skeleton order (flex): back 0 → h1 1 → sub 2 → mail 3 → expires (A/C above boxes) → boxes 5 → error 6 → cta 7 → links 8/9 */
+.vf-body { display:flex; flex-direction:column; }
+.vf-body .vf-back { order:0; }
+.vf-body h1 { order:1; }
+.vf-body .verify-sub { order:2; }
+.vf-body .verify-mail { order:3; }
+.vf-body .verify-expires { order:4; }
+body[data-skin="editorial"] .vf-body .verify-expires { order:6; }
+.vf-body .code-row { order:5; }
+.vf-body .verify-error { order:6; }
+
+/* ---------- round complete (beige Nunito theme) ---------- */
+.rc { background:var(--rc-bg); color:var(--rc-ink); padding:0 0 22px; font-family:var(--nunito); }
+/* RC не скинуется (поправка 30.07): пиним палитру внутри поддерева, чтобы skin-токены не протекали */
+.rc, #tutorial, #scr-welcome {
+  --green:#13A86D; --gold:#E8A013; --red:#CC0000; --line:#E5E7EB;
+  --font-num:var(--font); --w-head:800; --case-head:none;
+}
+/* статусбар над welcome/RC — единый вид во всех скинах (без mono-времени и «100%» терминала) */
+#frame:has(#scr-welcome.active) #sbTime, #frame:has(.rc.active) #sbTime {
+  font-family:var(--font); font-weight:600; font-size:15px;
+}
+#frame:has(#scr-welcome.active) .sb-batt, #frame:has(.rc.active) .sb-batt { display:none !important; }
+#frame:has(#scr-welcome.active) .sb-icons, #frame:has(.rc.active) .sb-icons { display:flex !important; }
+#frame:has(#scr-welcome.active) #homeind, #frame:has(.rc.active) #homeind { background:#C9BCA6; }
+/* Figma 440:30167: the beige field extends under the status bar; no island on this screen */
+#frame:has(.rc.active) { background:var(--rc-bg); }
+.rc-menu {
+  position:absolute; top:-1px; right:16px; z-index:4;
+  width:42px; height:42px; border-radius:12.5px; background:var(--rc-bg);
+  border:2.3px solid var(--rc-line);
+  font-size:19px; color:var(--rc-ink); font-weight:700;
+}
+.rc-top { text-align:center; padding:18px 0 0; }
+#frame:has(.rc.active) #statusbar { color:#B7C0D2; } /* mockup onb1-6: pale status icons */
+.rc-btc {
+  display:inline-flex; align-items:center; gap:2px;
+  background:var(--rc-pill); border-radius:999px; padding:6px 8px;
+  font-size:14.6px; line-height:21.8px; font-weight:600;
+}
+.btc-coin {
+  width:22px; height:22px; border-radius:50%; background:var(--gold); color:#fff;
+  display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:800;
+}
+.rc-top h1 { font-family:var(--nunito); font-size:33.3px; line-height:49.9px; font-weight:900; color:var(--rc-ink); margin-top:14px; text-transform:var(--case-head); }
+.rc-earn-band {
+  margin:17.7px 0 0; background:var(--rc-bg);
+  border-top:2.1px solid var(--rc-line); border-bottom:2.1px solid var(--rc-line);
+  box-shadow:0 4px 0 rgba(0,0,0,.06);
+  padding:21.3px 16.8px; min-height:131px;
+  display:flex; flex-direction:column; align-items:center; gap:10.6px;
+}
+.rc-earn-lbl { font-size:12.5px; line-height:18.7px; font-weight:600; color:var(--rc-soft); }
+.rc-earn-val { display:flex; align-items:center; gap:8px; font-size:33.3px; line-height:49.9px; margin:-10.6px 0; }
+.rc-earn-val b { font-weight:900; }
+.rc-earn-val .coin-ico { width:27px; height:27px; border-width:2px; }
+.rc-earn-val .coin-ico::after { width:9px; border-width:1.8px; }
+.rc-earn-val.neg b { color:var(--red); }
+/* first-win bonus card (+150 fires only on the first REAL round — economics unchanged) */
+.rc-fw {
+  width:100%; border-radius:17.7px; background:var(--green);
+  border:1.8px solid var(--rc-line); box-shadow:0 3.5px 0 rgba(0,0,0,.10);
+  padding:10.6px 14.2px; margin-top:4px;
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  color:#fff;
+}
+.rc-fw-lbl { font-size:14.2px; line-height:18.4px; font-weight:600; color:rgba(255,255,255,.75); }
+.rc-fw-amt { display:inline-flex; align-items:center; gap:5px; font-size:14.8px; line-height:22.2px; font-weight:600; }
+.rc-bal-pill {
+  display:inline-flex; align-items:center; gap:4px;
+  background:var(--rc-pill); border-radius:999px; padding:6.3px 8.5px;
+  font-size:14.8px; line-height:22.2px; font-weight:600; margin-top:2px;
+}
+.rc-tiles { display:flex; gap:8px; margin:17.7px 16.8px 0; }
+.rc-tile {
+  flex:1; background:var(--rc-bg); border:2.1px solid var(--rc-line); border-radius:16.6px;
+  padding:8.3px 6px 8.3px; text-align:center; min-height:76px;
+  box-shadow:0 4px 0 rgba(0,0,0,.06);
+}
+.rc-tile span { display:block; font-size:12.5px; line-height:18.7px; font-weight:600; color:var(--rc-soft); margin-bottom:2px; }
+.rc-tile b { font-size:20.8px; line-height:31.2px; font-weight:900; }
+/* unlock card «New mechanic unlocked!» (mockup onb1-6; celebrating mascot on the right edge) */
+.rc-unlock {
+  position:relative; margin:24px 14.2px 0; padding:14.2px 16px 15px;
+  background:var(--rc-bg); border:1px solid var(--rc-line); border-radius:17.7px;
+  text-align:left; min-height:104px;
+}
+.rc-unlock-head { display:flex; align-items:center; gap:7px; }
+.rc-unlock-head b { font-size:13.3px; line-height:18.1px; font-weight:700; color:var(--rc-unlock-tx); }
+.rc-unlock-name { font-size:16px; line-height:21.8px; font-weight:700; color:var(--rc-unlock-tx); margin-top:9px; }
+/* max-width 186: длинный EN-текст заезжал под ликующего маскота (QA 30.07, cmp-rc);
+   маскот-контейнер 175px от правого края — текст живёт строго левее него */
+.rc-unlock-desc { font-size:10.6px; line-height:14.2px; font-weight:500; color:var(--rc-unlock-soft); margin-top:3.5px; max-width:186px; }
+.rc-unlock-mascot {
+  position:absolute; top:-30px; bottom:0; right:2px; width:175px;
+  overflow:hidden; border-radius:0 0 17.7px 0; pointer-events:none;
+}
+.rc-unlock-mascot img { display:block; height:250px; width:auto; margin:0 auto; }
+.rc-actions { display:block; margin:43px 14.2px 0; }
+.rc-next {
+  display:block; width:100%; height:62px; background:var(--rc-cta); color:var(--rc-cta-tx);
+  border-radius:16.6px; padding:0 0 6px; font-family:var(--nunito); font-size:18.7px; font-weight:900;
+  box-shadow:inset 0 -6px 0 rgba(0,0,0,.20), 0 3px 2px rgba(0,0,0,.2);
+  text-shadow:0 2px 0 rgba(0,0,0,.15);
+}
+.rc-next:active { transform:translateY(2px); box-shadow:inset 0 -3px 0 rgba(0,0,0,.20); }
+.rc-repeat {
+  display:block; margin:15px auto 0; color:var(--rc-cta-link);
+  font-family:var(--nunito); font-size:17.7px; line-height:26.6px; font-weight:900;
+}
+.rc-home {
+  position:absolute; top:-1px; left:16px; z-index:4;
+  width:42px; height:42px; border-radius:12.5px; background:var(--rc-bg);
+  border:2.3px solid var(--rc-line);
+  display:flex; align-items:center; justify-content:center; color:var(--rc-ink);
+}
+
+/* ---------- game layer ---------- */
+/* подложка под iframe = бумага игры: игра одинакова во всех скинах (вердикт 29.07, п.21) */
+#gamelayer { position:absolute; inset:0; z-index:50; background:#f0e4cb; }
+#gamelayer[hidden] { display:none; }
+#gameframe { width:100%; height:100%; border:0; display:block; }
+#gameBack {
+  position:absolute; top:64px; left:10px; z-index:55;
+  width:38px; height:38px; border-radius:13px;
+  background:rgba(76,51,74,.55); color:#fff; font-size:24px; line-height:34px;
+  backdrop-filter:blur(2px);
+}
+
+/* tutorial overlay: cream mascot bubbles per round (mockups onb1..3, Figma 558:12514 etc.)
+   Design frame 375×812 → ×(390/375) = 1.04. Own mockup palette, NOT skinned
+   (bubbles ride over the game which is identical in all skins, вердикт 29.07 п.21). */
+#tutorial { position:absolute; inset:0; z-index:60; background:rgba(70,70,70,.5); }
+#tutorial[hidden] { display:none; }
+/* green profit-zone band over the chart (mockup Rectangle 7271 #22C55E 30% + 1px white) */
+#tutBand {
+  position:absolute; left:0; right:0; height:66px;
+  background:rgba(34,197,94,.30);
+  border-top:1px solid #fff; border-bottom:1px solid #fff;
+}
+/* патч-затемнение соседа внутри светлой полосы (onb2-2/3: вторая кнопка пары тёмная) */
+#tutDim {
+  position:absolute; background:rgba(70,70,70,.5); border-radius:18px; pointer-events:none;
+}
+#tutDim[hidden] { display:none; }
+@keyframes mascotIn { from { transform:translateY(60px) scale(.7); opacity:0; } }
+@media (prefers-reduced-motion: reduce) {
+  .tut-mascot, .tut-card { animation:none; }
+}
+.tut-card {
+  position:absolute; left:16.6px; right:16.6px; bottom:176px;
+  background:#F0DFC2; border:2px solid #fff; border-radius:12.4px;
+  padding:10.8px 12.4px 10.4px;
+  box-shadow:0 4px 0 rgba(0,0,0,.10);
+  color:#4C334A; font-family:var(--nunito);
+  animation:bubbleIn .38s .1s cubic-bezier(.2,1.5,.4,1) both;
+}
+@keyframes bubbleIn { from { transform:translateY(14px) scale(.86); opacity:0; } }
+.tut-card p {
+  font-size:14.4px; line-height:21.6px; font-weight:600;
+  padding-right:128px; min-height:44px; margin-bottom:54px;
+}
+.tut-mascot {
+  position:absolute; right:24px; bottom:-4px; height:196px; z-index:2;
+  pointer-events:none;
+  animation:mascotIn .45s cubic-bezier(.2,1.4,.4,1) both; transform-origin:bottom center;
+}
+.tut-mascot img { display:block; height:100%; width:auto; }
+.tut-skip {
+  position:absolute; left:12.4px; bottom:10.4px;
+  font-family:var(--nunito); color:#4068F5; font-size:12.4px; line-height:18.6px; font-weight:600;
+  padding:2px 0;
+}
+.tut-next {
+  position:absolute; right:12.4px; bottom:9.4px; z-index:3;
+  font-family:var(--nunito); background:#4068F5; color:#fff;
+  border-radius:10.3px; width:146.6px; height:43.7px; padding:0 0 5px;
+  font-size:14.4px; font-weight:900;
+  box-shadow:inset 0 -6px 0 rgba(0,0,0,.20), 0 2px 2px rgba(0,0,0,.25);
+  text-shadow:0 1.5px 0 rgba(0,0,0,.15);
+}
+.tut-next:active { transform:translateY(2px); box-shadow:inset 0 -3px 0 rgba(0,0,0,.20); }
+.tut-arrow { position:absolute; display:none; filter:drop-shadow(0 2px 4px rgba(43,36,22,.35)); }
+#tutArrowDL, #tutArrowDR { width:56px; height:66px; }
+#tutArrowUL { width:67px; height:60px; }
+
+/* ---------- sheets ---------- */
+#sheetlayer, #modallayer { position:absolute; inset:0; }
+#sheetlayer { z-index:80; }
+#modallayer { z-index:90; }
+#sheetlayer[hidden], #modallayer[hidden] { display:none; }
+.backdrop { position:absolute; inset:0; background:rgba(70,70,70,.5); animation:fadeIn .22s; }
+#modallayer .backdrop { background:rgba(0,0,0,.4); }
+@keyframes fadeIn { from { opacity:0; } }
+/* база шитов — язык вариантов (reskin W3 ★draft: шитов в макетах нет):
+   радиус var(--r-sheet), заголовки в голосе скина (группа typography внизу),
+   B — белая поверхность (карты внутри читаются на ней). */
+.sheet {
+  position:absolute; left:0; right:0; bottom:0; z-index:2;
+  background:var(--card); border-radius:var(--r-sheet) var(--r-sheet) 0 0;
+  padding:26px 28px 28px;
+  max-height:92%; overflow-y:auto; scrollbar-width:none;
+  animation:sheetUp .3s cubic-bezier(.2,.8,.3,1);
+  text-align:center;
+}
+body[data-skin="editorial"] .sheet { background:#FFFFFF; }
+.sheet::-webkit-scrollbar { display:none; }
+@keyframes sheetUp { from { transform:translateY(60px); opacity:0; } }
+.sheet h2 { font-size:21.3px; line-height:26.6px; font-weight:500; color:var(--tx); }
+.sheet-sub { font-size:13.5px; line-height:19.8px; font-weight:400; color:var(--tx-soft); margin-top:7px; }
+body[data-skin="editorial"] .sheet-sub { font-size:14.6px; line-height:20.8px; color:var(--sb); }
+.sheet-kicker {
+  font-size:11.4px; line-height:13.5px; font-weight:700; color:var(--sb);
+  letter-spacing:.06em; text-transform:uppercase; margin-bottom:8.3px;
+}
+.sheet-kicker.pill {
+  display:inline-block; background:var(--badge-bg); border:1px solid var(--badge-line); border-radius:6.2px;
+  padding:4.2px 8.3px; font-size:10.4px; line-height:12.5px; font-weight:800; color:var(--badge-tx); margin-bottom:21px;
+  letter-spacing:.02em;
+}
+.sheet .free-row { text-align:left; margin-top:14px; margin-bottom:0; }
+
+/* daily challenge sheet (W3: скин-токены вместо бежевой rc-палитры; график = accent2) */
+#sh-daily { padding-bottom:25px; }
+.daily-chart {
+  position:relative; margin:28px 0 27px; border-radius:var(--r-card-lg); overflow:hidden;
+  background:var(--accent2); height:169px;
+}
+.daily-chart svg { position:absolute; inset:0; width:100%; height:100%; }
+.dc-grid { stroke:var(--line); }
+.daily-prices {
+  position:absolute; top:2px; bottom:2px; right:11px; width:44px;
+  display:flex; flex-direction:column; justify-content:space-around; align-items:flex-end;
+  font-family:var(--font-num); font-size:11px; font-weight:600; color:var(--tx-soft);
+  font-variant-numeric:tabular-nums;
+}
+/* результат вчерашней ставки (классы вместо инлайновых hex — скинуются токенами) */
+.dc-res {
+  display:flex; align-items:center; gap:8px; padding:9px 12.5px;
+  border-radius:var(--r-card); font-size:13px; line-height:18px; text-align:left;
+}
+.dc-res.win { background:color-mix(in srgb, var(--green) 13%, transparent); color:var(--green); }
+.dc-res.lose { background:var(--ghost); color:var(--tx-soft); }
+.dc-res .dc-res-ico { font-size:16px; }
+.daily-q {
+  position:absolute; top:3px; bottom:35px; right:57px; width:36px;
+  background:transparent; border:2px solid #fff; border-radius:7px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-around;
+  color:#fff; font-weight:900; font-size:16px; font-family:var(--nunito);
+}
+.daily-q::before {
+  content:''; position:absolute; top:-20px; bottom:-40px; left:50%; width:2px; background:#fff; z-index:-1;
+}
+.daily-q .q-big { font-size:30px; }
+.daily-q span:first-child:not(.q-big) { opacity:.65; }
+.daily-q span:last-child { opacity:.5; }
+.daily-q.done { background:var(--green); border-color:#fff; color:#fff; font-size:18px; justify-content:center; }
+.daily-days { display:flex; gap:7px; align-items:center; margin:0 -28px 27px 0; overflow:hidden; }
+.dd {
+  flex:0 0 60px; border-radius:var(--r-card-lg); background:var(--accent2); padding:10px 2px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:0;
+  font-size:10.6px; line-height:14.2px; color:var(--tx-soft); font-weight:500; height:89px;
+  position:relative;
+}
+.dd .coin-dot { width:27px; height:27px; flex-basis:27px; }
+.dd .amt { font-size:10.6px; line-height:14.2px; font-weight:600; }
+.dd.today {
+  flex:0 0 83px; background:var(--btn2-bg); color:var(--btn2-tx); height:122px; border-radius:var(--r-sheet);
+  font-size:14.7px; line-height:19.6px; padding:14px 2px;
+}
+.dd.today .coin-dot { width:39px; height:39px; flex-basis:39px; }
+.dd.today .amt { font-size:14.7px; line-height:19.6px; font-weight:600; }
+.dd.done { opacity:.5; }
+.dd.done .amt { text-decoration:none; opacity:1; }
+.dd-check {
+  width:21px; height:21px; border-radius:50%; background:var(--green); color:#fff;
+  display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;
+  margin:3.5px 0;
+}
+.daily-btns { display:flex; gap:11px; margin:0; }
+.btn-long, .btn-short {
+  flex:1; height:50px; border-radius:999px; color:#fff; font-size:14.6px; line-height:21.3px; font-weight:700;
+}
+/* кнопки Long/Short: A — пилюли (игровой тон), B/C — радиус кнопок ДС */
+body[data-skin="editorial"] .btn-long, body[data-skin="editorial"] .btn-short,
+body[data-skin="terminal"] .btn-long, body[data-skin="terminal"] .btn-short { border-radius:var(--r-btn); }
+.btn-long { background:var(--green); }
+body[data-skin="terminal"] .btn-long { color:var(--btn-tx); }
+.btn-short { background:var(--red); }
+.btn-long:active, .btn-short:active { transform:scale(.97); }
+.daily-victory { display:flex; flex-direction:column; align-items:center; gap:8px; padding-top:4px; }
+.daily-victory[hidden] { display:none; }
+.dv-badge {
+  width:52px; height:52px; border-radius:50%; background:var(--green); color:#fff;
+  display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700;
+  margin-bottom:2px;
+}
+.daily-victory b { font-size:17.7px; font-weight:700; color:var(--tx); }
+.daily-victory p { font-size:12.5px; line-height:18.7px; font-weight:400; color:var(--tx-soft); }
+body[data-skin="terminal"] .dv-badge { color:var(--btn-tx); }
+
+/* notification permission sheet */
+#sh-notifperm { padding:32px 55px 28px; }
+#sh-notifperm .np-title { font-size:17.7px; line-height:22.2px; font-weight:500; padding:0; }
+#sh-notifperm .sheet-sub { margin-top:22px; }
+#sh-notifperm .btn-primary.wide { margin-top:21px; }
+#sh-notifperm .btn-ghost { margin-top:11px; background:var(--ghost); color:var(--tx); }
+
+/* save progress sheet */
+#sh-saveprogress { padding:29px 0 28px; }
+#sh-saveprogress h2 { padding:0 28px; }
+#sh-saveprogress .sheet-sub { font-size:17.7px; line-height:22.2px; font-weight:500; color:var(--tx); margin:0; padding:0 55px; }
+.sp-band { background:var(--ghost); margin:21px 0 31px; padding:14px 28px 11px; }
+.sp-band p { font-size:17.7px; line-height:22.2px; color:var(--tx); font-weight:600; }
+.sp-band p + p { margin-top:11px; }
+.sp-band .coin-dot { width:18.7px; height:18.7px; vertical-align:-2px; }
+#sh-saveprogress .btn-primary.wide { width:280px; margin:21px auto 0; display:block; }
+
+/* out of chips (W3: пакеты/фри-ряд = скелет и язык магазина, свой скин из его CSS) */
+#sh-outofchips { padding:26px 14px 25px; }
+#sh-outofchips .packs { margin-top:20.8px; }
+/* terminal: шит и карты одного цвета — пакеты/фри-блок поднимаем на accent2 */
+body[data-skin="terminal"] #sh-outofchips .pack,
+body[data-skin="terminal"] #sh-outofchips .free-list { background:var(--accent2); }
+#sh-outofchips .free-list { margin-top:12.5px; text-align:left; }
+#sh-outofchips .free-row { margin:0; }
+.ooc-tomorrow { font-size:12.5px; line-height:17.7px; font-weight:400; color:var(--tx-soft); margin-top:16.6px; }
+
+/* personal offer sheet (W3: арт/таймер/цена в токенах вариантов) */
+#sh-offer { padding:28px 14px 21px; }
+#sh-offer .sheet-kicker.pill { margin-bottom:21px; }
+.offer-art { position:relative; height:183px; border-radius:var(--r-card-lg); background:var(--accent2); margin:0 13px 0; }
+body[data-skin="terminal"] .offer-art { border:1.6px solid var(--blue); } /* язык оффер-карты C (★draft) */
+.ends-card.float {
+  position:absolute; left:50%; bottom:-25px; transform:translateX(-50%); min-width:187px; padding:8.3px 20px 10.4px;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
+  box-shadow:var(--card-shadow);
+}
+body[data-skin="editorial"] .ends-card.float { background:#fff; }
+body[data-skin="editorial"] .ends-card.float b { background:none; padding:0; }
+.offer-big {
+  display:flex; align-items:center; justify-content:center; gap:8.3px;
+  font-size:26.5px; line-height:31.7px; letter-spacing:-.83px; font-weight:800; color:var(--tx); margin-top:48px;
+}
+.offer-big .coin-dot { width:33.3px; height:33.3px; flex-basis:33.3px; }
+#sh-offer .offer-price.big { margin-top:8px; }
+#sh-offer .btn-primary.wide { margin-top:27px; }
+
+/* daily reward sheet (W3: подарок на accent2, золото; капсула награды в токенах) */
+#sh-dailyreward { padding:28px 14px 21px; }
+.dr-days { display:flex; gap:7px; align-items:center; margin:21px -14px 21px 0; overflow:hidden; } /* Figma: Today top y476, sub gap 24 */
+#sh-dailyreward .sheet-sub { font-size:17.7px; line-height:21.3px; letter-spacing:-.44px; font-weight:600; color:var(--tx); margin-top:0; }
+.dr-gift {
+  width:123px; height:123px; margin:16px auto 0; border-radius:var(--r-card-lg); background:var(--accent2);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0;
+  color:var(--gold); position:relative; overflow:visible;
+}
+.dr-gift .chip-pill {
+  position:absolute; bottom:-18px; left:50%; transform:translateX(-50%);
+  background:var(--card); border-radius:999px; box-shadow:inset 0 0 0 1px var(--line); margin:0;
+  padding:6.2px 12.5px 6.2px 8.3px; font-size:16.6px; line-height:19.8px; white-space:nowrap;
+}
+body[data-skin="editorial"] .dr-gift .chip-pill { background:#fff; }
+.dr-gift .chip-pill .coin-dot { width:18.7px; height:18.7px; flex-basis:18.7px; margin-right:6.2px; }
+#sh-dailyreward .btn-primary.wide { margin-top:50px; }
+
+/* guides promo sheet */
+#sh-guidespromo { padding:35px 55px 28px; }
+.promo-img { height:142px; border-radius:var(--r-card-lg); background:var(--accent2); margin:0 0 22px; }
+.promo-title { font-size:24.8px; line-height:31px; font-weight:500; padding:0; }
+#sh-guidespromo .sheet-sub { font-size:12.4px; line-height:16px; margin-top:7px; }
+#sh-guidespromo .btn-primary.wide { margin-top:21px; }
+
+/* log out sheet → floating card (Figma 440:19955; W3: акцент-иконка в бейдж-токенах скина) */
+.sheet#sh-logout {
+  left:14px; right:14px; bottom:auto; top:277px; border-radius:var(--r-sheet);
+  padding:22px 21px 21px; animation:modalIn .25s cubic-bezier(.2,.8,.3,1);
+}
+.lo-ico {
+  width:50px; height:50px; margin:0 auto 21px; border-radius:50%;
+  background:var(--badge-bg); color:var(--badge-tx);
+  display:flex; align-items:center; justify-content:center;
+}
+#sh-logout h2 { font-size:24.8px; line-height:31px; }
+#sh-logout .sheet-sub { font-size:13.3px; line-height:19.9px; color:var(--tx-soft); margin-top:7px; }
+#sh-logout .btn-primary { border-radius:var(--r-btn); padding:14px 28px; font-size:13.3px; line-height:16.1px; font-weight:600; margin-top:21px; }
+#sh-logout .btn-ghost {
+  background:none; box-shadow:inset 0 0 0 1.5px var(--line); color:var(--tx);
+  border-radius:var(--r-btn); padding:14px 28px; font-size:13.3px; line-height:16.1px; font-weight:600;
+}
+
+/* ---------- modals ---------- */
+.modal {
+  position:absolute; left:14px; right:14px; top:50%; transform:translateY(-50%); z-index:2;
+  background:var(--card); border-radius:var(--r-sheet); padding:22px 21px 21px;
+  text-align:center; animation:modalIn .25s cubic-bezier(.2,.8,.3,1);
+}
+body[data-skin="editorial"] .modal { background:#FFFFFF; }
+@keyframes modalIn { from { transform:translateY(-46%) scale(.94); opacity:0; } }
+.modal h2 { font-size:24.8px; line-height:31px; font-weight:500; color:var(--tx); }
+.modal p { font-size:13.3px; line-height:19.9px; font-weight:400; color:var(--tx-soft); margin-top:7px; }
+.danger-ico {
+  width:50px; height:50px; margin:0 auto 21px; border-radius:50%;
+  background:var(--danger-bg); color:var(--danger);
+  display:flex; align-items:center; justify-content:center;
+}
+.danger-title { color:var(--danger) !important; }
+#md-delete .btn-primary { background:var(--danger); color:#fff; box-shadow:none; border-radius:var(--r-btn); padding:14px 28px; font-size:13.3px; line-height:16.1px; font-weight:600; margin-top:22px; }
+#md-delete .btn-outline { border-radius:var(--r-btn); }
+
+/* first-win modal (draft, no wireframe) */
+.trophy-art, .ach-art {
+  height:142px; border-radius:var(--r-card-lg); background:var(--accent2); margin:0 auto 21px;
+  display:flex; align-items:center; justify-content:center; color:var(--tx-soft);
+}
+.fw-earn { font-size:14.6px !important; color:var(--tx) !important; font-weight:600; }
+.fw-earn .coin-dot { width:16.6px; height:16.6px; vertical-align:-2px; }
+
+/* new achievement → bottom sheet look (Figma 440:27091) */
+.modal#md-newach {
+  top:auto; bottom:0; left:0; right:0; transform:none;
+  border-radius:var(--r-sheet) var(--r-sheet) 0 0; padding:24px 55px 28px;
+  animation:sheetUp .3s cubic-bezier(.2,.8,.3,1);
+}
+#md-newach .sheet-kicker { font-size:12.5px; line-height:15.6px; margin-bottom:22px; }
+#md-newach .btn-primary .coin-dot { width:14.6px; height:14.6px; }
+#md-newach .ach-art { margin-bottom:21px; }
+#md-newach h2 { font-size:24.8px; line-height:31px; }
+#md-newach p { font-size:12.4px; line-height:16px; color:var(--tx); }
+#md-newach .btn-primary { display:flex; align-items:center; justify-content:center; gap:4px; margin-top:21px; }
+
+/* ---------- toast ---------- */
+#toast {
+  position:absolute; bottom:96px; left:50%; transform:translateX(-50%); z-index:120;
+  background:var(--toast-bg); color:var(--toast-tx); padding:11px 18px; border-radius:var(--r-card);
+  font-size:12.5px; font-weight:500; line-height:1.4;
+  max-width:86%; width:max-content; text-align:center;
+  opacity:0; pointer-events:none;
+}
+#toast.show { animation:toastIn 2.4s forwards; }
+@keyframes toastIn {
+  0% { opacity:0; transform:translate(-50%, 8px); }
+  8% { opacity:1; transform:translate(-50%, 0); }
+  85% { opacity:1; }
+  100% { opacity:0; }
+}
+
+/* ---------- draft marking (my-design, not in Figma wireframes) ---------- */
+/* :where() keeps specificity at 0 so the badge anchor never overrides
+   an element's own positioning (.xbtn/.sheet/.modal are absolute) */
+:where(.draft) { position:relative; }
+body.drafts-on .draft { outline:1.5px dashed rgba(230,162,60,.6); outline-offset:2px; }
+body.drafts-on .draft::after {
+  content:'\2605 draft';
+  position:absolute; top:-8px; right:6px; z-index:6;
+  background:#fff7e8; color:#c8862a;
+  border:1px dashed rgba(230,162,60,.8); border-radius:6px;
+  padding:0 5px; font-size:8.5px; font-weight:700; line-height:13px;
+  letter-spacing:.03em; pointer-events:none;
+  font-family:-apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* --- difficulty badges (owner directive 24.07; draft — not in wireframes) --- */
+.gc-diff { display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.02em;
+  padding:2px 9px; border-radius:20px; margin:3px 0 2px; vertical-align:2px; }
+.gc-diff.easy { background:#e3f2e9; color:#2c9e63; }
+.gc-diff.medium { background:#fbf0dd; color:#c98a24; }
+.gc-diff.hard { background:#fbe5e3; color:#d95550; }
+/* мелкие draft-элементы (пилюли сложности): только обводка, без корнер-плашки */
+body.drafts-on .gc-diff.draft::after { content:none; }
+/* строка Settings «Style» — только при включённых драфтах (вердикт 31.07 п.25):
+   скин = разметка когорты (?skin= из пролива), юзерского переключателя стиля в проде
+   НЕТ; строка живёт как дев-инструмент для демо/симуляции когорт. Обычный drafts-off
+   лишь прячет плашки ★draft, элементы остаются — этой строке нужен полный display:none */
+body:not(.drafts-on) .set-row[data-sub="Style"] { display:none; }
+
+/* ============================================================
+   webv1 (встреча 24.07): одна игра — Home-hero, practice tasks,
+   peak-оффер, счётчик intents. Язык дизайна — те же wireframe-токены.
+   ============================================================ */
+
+/* ---------- practice tasks (guides; карточный язык вариантов, W3) ---------- */
+#practiceTasks { margin:16.6px 0 4.2px; background:var(--card); border:1px solid var(--line); border-radius:var(--r-card); padding:14.6px 14.6px 8.3px; }
+body[data-skin="editorial"] #practiceTasks { background:var(--panel2); border:none; }
+body[data-skin="terminal"] #practiceTasks { border:none; border-radius:var(--r-card-lg); }
+#practiceTasks:empty { display:none; }
+.pt-head { display:flex; flex-direction:column; gap:2px; margin-bottom:9px; }
+.pt-head b { font-size:14.6px; line-height:19.8px; font-weight:700; color:var(--tx); }
+body[data-skin="editorial"] .pt-head b { font-weight:600; font-size:15.6px; }
+.pt-head span { font-size:11.4px; line-height:15.6px; color:var(--tx-soft); }
+.pt-row {
+  display:flex; align-items:center; gap:10px;
+  padding:8px 0; font-size:12.4px; line-height:17.4px; color:var(--tx);
+  border-top:1px solid var(--line);
+}
+.pt-check {
+  width:21px; height:21px; flex:0 0 21px; border-radius:50%;
+  background:var(--bg); box-shadow:inset 0 0 0 1.5px var(--line);
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; color:#fff;
+}
+.pt-row.done .pt-check { background:var(--green); box-shadow:none; }
+.pt-row.done > span:last-child { text-decoration:line-through; opacity:.6; }
+
+/* ---------- peak offer sheet ---------- */
+#sh-peak { text-align:center; }
+.peak-flame { font-size:44px; line-height:1; margin:6px 0 8px; }
+#sh-peak h2 { font-size:17.7px; line-height:24.8px; font-weight:500; color:var(--tx); }
+#sh-peak .sheet-sub { margin:4px 0 16px; }
+.peak-opts { display:flex; flex-direction:column; gap:8.3px; margin-bottom:6px; }
+.peak-opt {
+  display:flex; align-items:center; gap:11px; width:100%;
+  background:var(--panel2); border:1px solid var(--line); border-radius:var(--r-card); padding:11px 13px;
+  text-align:left; color:var(--tx);
+}
+body[data-skin="editorial"] .peak-opt { border:none; }
+body[data-skin="terminal"] .peak-opt { background:var(--accent2); border:none; }
+.peak-opt:active { transform:scale(.98); }
+.po-ico {
+  width:39px; height:39px; flex:0 0 39px; border-radius:50%;
+  background:var(--bg); display:flex; align-items:center; justify-content:center; font-size:18px;
+}
+body[data-skin="editorial"] .po-ico { background:#fff; }
+.po-text { flex:1; display:flex; flex-direction:column; gap:1px; }
+.po-text b { font-size:13.5px; line-height:18px; font-weight:700; }
+.po-text span { font-size:11.4px; line-height:15.6px; color:var(--tx-soft); }
+.peak-opt .chev { font-size:17px; color:var(--sb); }
+
+/* ---------- payment stubs, course tiers, referral course (вердикты 27.07) ---------- */
+#sh-paystub, #sh-redirect { text-align:center; }
+.ps-price { font-size:24.8px; line-height:31px; font-weight:600; color:var(--tx); margin:10px 0 22px; }
+.stub-spinner {
+  width:44px; height:44px; margin:8px auto 18px; border-radius:50%;
+  border:4px solid var(--line); border-top-color:var(--tx);
+  animation:stubspin 1s linear infinite;
+}
+@keyframes stubspin { to { transform:rotate(360deg); } }
+.stub-close { margin-top:18px; }
+#psWait h2 { font-size:17.7px; line-height:24.8px; }
+#sh-redirect h2 { font-size:17.7px; line-height:24.8px; margin-bottom:4px; }
+#sh-tiers h2 { font-size:17.7px; line-height:24.8px; }
+#sh-tiers .sheet-sub { margin:4px 0 16px; }
+.tier-price { font-size:13.3px; line-height:18px; font-weight:600; color:var(--tx); white-space:nowrap; }
+.ref-course {
+  display:flex; align-items:center; gap:11px; width:100%;
+  background:var(--accent2); border-radius:var(--r-card); padding:14px 15px; margin-top:14px;
+  text-align:left; color:var(--tx);
+}
+.ref-course:active { transform:scale(.98); }
+.refc-ico {
+  width:42px; height:42px; flex:0 0 42px; border-radius:50%;
+  background:var(--card); display:flex; align-items:center; justify-content:center; font-size:20px;
+}
+.refc-text { flex:1; display:flex; flex-direction:column; gap:2px; }
+.refc-text b { font-size:13.3px; line-height:18px; font-weight:600; }
+.refc-text span { font-size:11px; line-height:15.5px; color:var(--tx-soft); }
+.ref-course .chev { font-size:17px; color:var(--sb); }
+
+/* ============================================================
+   Skin typography layer (verdict 29.07: ONE skeleton, per-skin visual voice).
+   Casing via CSS text-transform only; user data is NEVER transformed —
+   .prof-name, .brand-name, #userName-like nodes, ref names, emails, IDs
+   are deliberately excluded from the casing groups below (digits are
+   unaffected by text-transform by nature).
+   ============================================================ */
+.pg-title, .sub-title, .g-sec, .sheet h2, .modal h2,
+.article h1, .article h2, .signup-body h1, .ref-hero h2, .promo-title,
+#sh-notifperm .np-title, .wl-bubble h1 {
+  font-family:var(--font-head); font-weight:var(--w-head);
+  color:var(--head-tx); text-transform:var(--case-head);
+}
+.prof-name, .sub-head { font-family:var(--font-head); } /* face only: sit next to user data */
+/* digits: terminal renders numbers in mono/tabular */
+.balance-pill, .ends-card b, .stat-row b, .ref-amt, .tier-price, .ps-price, .offer-big,
+.rc-earn-val, .rc-bal-pill, .rc-tile b, .gc-event, .ach-count, .dd .amt {
+  font-family:var(--font-num); font-variant-numeric:tabular-nums;
+}
+.pack-amt, .pack-price, .bp-price, .offer-amount, .offer-price, .chip-pill, .spo-ends {
+  font-variant-numeric:tabular-nums;
+}
+/* shop: заголовок «Chip packages» есть только у A; баланс-капсула в шапке — только у C */
+body[data-skin="editorial"] .packs-title, body[data-skin="terminal"] .packs-title { display:none; }
+body[data-skin="editorial"] .packs, body[data-skin="terminal"] .packs { margin-top:16.6px; }
+.shop-balance { display:none; position:absolute; top:9px; right:14.6px; }
+body[data-skin="terminal"] .shop-balance {
+  display:flex; height:33.3px; padding:6px 12.5px; font-size:15.6px;
+}
+body[data-skin="terminal"] .shop-balance .coin-dot { width:16.6px; height:16.6px; flex-basis:16.6px; }
+#scr-shop { position:relative; }
+/* card elevation per skin (narodny soft shadow, terminal/editorial flat) */
+.offer-card, .pack, .free-row, .set-group, .ach-row, .ref-list,
+.logout-row, .peak-opt, .ref-course, #practiceTasks {
+  box-shadow:var(--card-shadow);
+}

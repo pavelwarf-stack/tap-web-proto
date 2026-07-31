@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Leverage — tap arcade</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="phone">
+  <div id="game">
+
+    <header id="hud">
+      <button id="pauseBtn" aria-label="Pause"><span></span><span></span></button>
+      <div id="timerWrap">
+        <svg viewBox="0 0 100 100">
+          <circle class="ring-bg" cx="50" cy="50" r="44"/>
+          <circle class="ring-arc" id="ringArc" cx="50" cy="50" r="44"/>
+        </svg>
+        <div id="timerVal">1:00</div>
+      </div>
+      <div id="bestPill"><span class="ico">🏆</span><span id="bestVal">—</span></div>
+    </header>
+
+    <div id="balStrip">
+      <span class="coin">🪙</span><span id="balVal">1 000</span><span id="runMult">×1.0</span>
+    </div>
+
+    <div id="chartWrap">
+      <canvas id="chart"></canvas>
+      <div id="offlineBadge" class="hidden">offline</div>
+      <div id="vignette"></div>
+      <div id="msg"></div>
+      <div id="floatLayer"></div>
+      <div id="stamp" class="hidden">LIQUIDATION</div>
+    </div>
+
+    <div id="infoCard">
+      <div id="flatInfo">
+        <div class="sym">BTC</div>
+        <div class="priceRow"><span id="flatPrice">—</span><span id="flatPct"></span></div>
+        <div class="hintText">pick your leverage and open a trade</div>
+      </div>
+      <div id="posInfo" class="hidden">
+        <div class="chipRow">
+          <span id="levChip">x5</span>
+          <span class="plTitle">Unrealized P&amp;L</span>
+          <span id="dirChip">Long</span>
+        </div>
+        <div class="plRow"><span id="plCoins">+0.0</span><span id="plPct">+0.00%</span></div>
+        <div class="subRow">
+          <div class="subCard"><div class="lbl">Entry</div><div class="val" id="entryVal">—</div></div>
+          <div class="subCard"><div class="lbl">Current</div><div class="val" id="curVal">—</div></div>
+        </div>
+        <div class="liqBlock">
+          <div id="liqLabel">to liquidation: 10%</div>
+          <div id="liqBar"><div id="liqFill"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="bottomZone">
+      <div id="tradeUI">
+        <div id="levZone">
+          <div id="levTitle">Leverage</div>
+          <div id="slider">
+            <div id="sliderTrack"><div id="sliderFill"></div>
+              <span class="stopDot" data-i="0"></span><span class="stopDot" data-i="1"></span><span class="stopDot" data-i="2"></span><span class="stopDot" data-i="3"></span><span class="stopDot" data-i="4"></span>
+              <div id="knob"></div>
+            </div>
+            <div id="levLabels"><span data-i="0">×1</span><span data-i="1">×2</span><span data-i="2">×3</span><span data-i="3">×4</span><span data-i="4">×5</span></div>
+          </div>
+        </div>
+        <div id="rowEnter">
+          <button id="btnLong">Long</button>
+          <button id="btnShort">Short</button>
+        </div>
+      </div>
+      <div id="rowExit" class="hidden">
+        <button id="btnExit"><span class="cap">Close position</span><span class="sub" id="exitSub">→ 1 000</span></button>
+      </div>
+    </div>
+
+    <canvas id="fx"></canvas>
+
+    <div class="screen" id="startScreen">
+      <div class="logo">LEVERAGE</div>
+      <div class="tagline">All-in on every trade</div>
+      <div class="rules">
+        <div>🪙 Start with 1 000 coins, 60-second round</div>
+        <div>📈 Long or short — your whole balance at once</div>
+        <div>⚡ Leverage ×1…×5 multiplies the price move</div>
+        <div>💀 Price hits the red line — liquidation</div>
+      </div>
+      <div id="startBest" class="hidden">🏆 Best: <span id="startBestVal">0</span></div>
+      <button class="bigBtn" id="playBtn">Play</button>
+    </div>
+
+    <div class="screen hidden" id="pauseScreen">
+      <div class="h2">Paused</div>
+      <button class="bigBtn" id="resumeBtn">Resume</button>
+      <button class="ghostBtn" id="restartBtn">Restart</button>
+    </div>
+
+    <div class="screen hidden" id="overScreen">
+      <div class="h2" id="overTitle">Round complete</div>
+      <div id="finalBal">🪙 0</div>
+      <div class="sub" id="finalMult">×0.0 from start</div>
+      <div id="recordNote" class="hidden">🏆 New record!</div>
+      <div id="tradesList"></div>
+      <div id="board"></div>
+      <button class="bigBtn" id="againBtn">Play again</button>
+    </div>
+
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tap-Trading — Skins Demo (A/B/C)</title>
+<link rel="icon" href="data:,">
+<style>
+/* ============================================================
+   SKINS DEMO — one screen map, three visual skins.
+   Architecture: shared DOM per screen; a skin is a set of CSS
+   custom properties + string dictionary (content:attr) + the
+   content of the single trust/money slots. body[data-skin=...]
+   ============================================================ */
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:#22262f;
+  font-family:var(--font);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- demo chrome (outside the phone) ---------- */
+.topbar{
+  display:flex;flex-wrap:wrap;align-items:center;gap:14px;
+  padding:12px 18px;background:#1a1d24;color:#dfe4ec;
+  font:13px/1.4 -apple-system,system-ui,sans-serif;
+  border-bottom:1px solid #303540;
+}
+.topbar .brand{font-weight:700;letter-spacing:.02em;margin-right:6px}
+.tabs{display:flex;gap:6px;background:#22262f;padding:4px;border-radius:10px}
+.tabs button{
+  border:0;cursor:pointer;border-radius:7px;padding:7px 14px;
+  background:transparent;color:#9aa3b2;
+  font:600 13px/1 -apple-system,system-ui,sans-serif;
+  min-height:30px;
+}
+.skin-tabs button.on{background:#4463d8;color:#fff}
+.screen-tabs button.on{background:#3a4150;color:#fff}
+.skin-note{
+  color:#9aa3b2;font:12.5px/1.5 -apple-system,system-ui,sans-serif;
+  max-width:340px;
+}
+.stage{
+  display:flex;align-items:flex-start;justify-content:center;gap:28px;
+  padding:26px 16px 40px;flex-wrap:wrap;
+}
+
+/* ---------- phone frame ---------- */
+.phone{
+  width:390px;height:844px;flex:0 0 390px;
+  border-radius:34px;overflow:hidden;position:relative;
+  background:var(--bg);color:var(--ink);
+  box-shadow:0 0 0 9px #0d0f13,0 24px 60px rgba(0,0,0,.55);
+  display:flex;flex-direction:column;
+  font-size:var(--fs);
+}
+.statusbar{
+  flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;
+  padding:12px 22px 6px;font:600 14px/1 -apple-system,system-ui,sans-serif;
+  color:var(--ink);
+}
+.statusbar .batt{opacity:.75;letter-spacing:.06em}
+.screen{display:none;flex-direction:column;overflow-y:auto;flex:1 1 auto;
+  padding:var(--pad) var(--pad) 10px;gap:var(--gap)}
+.screen>*{flex-shrink:0}
+body[data-screen="home"]  .screen-home,
+body[data-screen="trade"] .screen-trade,
+body[data-screen="shop"]  .screen-shop{display:flex}
+
+/* ---------- bottom nav (shared, fixed slot) ---------- */
+.nav{
+  flex:0 0 auto;display:flex;border-top:1px solid var(--line);
+  background:var(--surface);
+}
+.nav a{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:9px 0 14px;text-decoration:none;color:var(--muted);
+  font:600 11.5px/1 var(--font);min-height:48px;
+}
+.nav a.on{color:var(--primary)}
+.nav svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- shared atoms ---------- */
+.card{
+  background:var(--card);border:1px solid var(--line);
+  border-radius:var(--radius);padding:var(--card-pad);
+  box-shadow:var(--card-shadow);
+}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  border:0;cursor:pointer;width:100%;
+  min-height:52px;border-radius:var(--radius-btn);
+  font:var(--btn-weight) 18px/1.1 var(--font);
+  letter-spacing:var(--btn-track);
+  text-transform:var(--btn-case);
+  color:var(--primary-ink);background:var(--primary);
+  box-shadow:var(--btn-shadow);
+}
+.btn.money{background:var(--money);color:var(--money-ink);box-shadow:var(--btn-money-shadow)}
+.btn.ghost{background:var(--ghost-bg);color:var(--ghost-ink);box-shadow:none;border:var(--ghost-border)}
+.pill{
+  display:inline-flex;align-items:center;gap:6px;
+  border-radius:999px;padding:6px 12px;
+  font:700 14px/1 var(--font-num);
+  background:var(--pill-bg);color:var(--pill-ink);
+}
+.h1{font:var(--h1)}
+.h2{font:var(--h2)}
+.small{font:500 13px/1.45 var(--font);color:var(--muted)}
+.num{font-family:var(--font-num)}
+
+/* string dictionary: same DOM node, per-skin copy */
+.sw::before{content:attr(data-a)}
+body[data-skin="terminal"]  .sw::before{content:attr(data-b)}
+body[data-skin="editorial"] .sw::before{content:attr(data-c)}
+
+/* per-skin slot variants (one slot, skin-owned content) */
+.only-a,.only-b,.only-c{display:none}
+body[data-skin="narodny"]  .only-a{display:block}
+body[data-skin="terminal"] .only-b{display:block}
+body[data-skin="editorial"] .only-c{display:block}
+
+/* ============================================================
+   SKIN A — «Народный» (light warm, $-money, chunky, MLM-letter)
+   ============================================================ */
+body[data-skin="narodny"]{
+  --font:-apple-system,"SF Pro Text",Roboto,system-ui,sans-serif;
+  --font-num:var(--font);
+  --fs:18px;
+  --bg:#f6efe0;
+  --surface:#fffdf6;
+  --card:#fffdf6;
+  --ink:#2d2414;
+  --muted:#7a6f58;
+  --line:#e7dcc2;
+  --primary:#1d63d1;--primary-ink:#fff;
+  --money:#1e9e4a;--money-ink:#fff;
+  --gold:#e8a013;
+  --alert:#d2372e;
+  --up:#1e9e4a;--dn:#d2372e;
+  --pill-bg:#fdf3d7;--pill-ink:#8a6404;
+  --ghost-bg:#fdf6e6;--ghost-ink:#1d63d1;--ghost-border:2px solid #d9e4f7;
+  --radius:16px;--radius-btn:15px;
+  --pad:16px;--gap:14px;--card-pad:16px;
+  --card-shadow:0 2px 0 rgba(120,95,40,.10);
+  --btn-shadow:0 4px 0 #14479a;
+  --btn-money-shadow:0 4px 0 #146d33;
+  --btn-weight:800;--btn-track:.02em;--btn-case:uppercase;
+  --h1:800 26px/1.15 var(--font);
+  --h2:800 19px/1.2 var(--font);
+}
+body[data-skin="narodny"] .phone{background:
+  linear-gradient(180deg,#faf4e6 0%,#f6efe0 30%)}
+body[data-skin="narodny"] .letterline{
+  font:800 15px/1.3 var(--font);color:var(--alert);
+  text-transform:uppercase;letter-spacing:.03em;
+}
+body[data-skin="narodny"] .hl{
+  background:#ffe86b;padding:1px 4px;border-radius:4px;font-weight:700;
+}
+
+/* ============================================================
+   SKIN B — «Терминал» (dark, candle green/red, mono, dense, glow)
+   ============================================================ */
+body[data-skin="terminal"]{
+  --font:-apple-system,"SF Pro Text",Roboto,system-ui,sans-serif;
+  --font-num:ui-monospace,"SF Mono",Menlo,monospace;
+  --fs:16px;
+  --bg:#0b0e14;
+  --surface:#10141d;
+  --card:#141a26;
+  --ink:#e8eef5;
+  --muted:#7d8899;
+  --line:#232b3a;
+  --primary:#22d3ee;--primary-ink:#04222a;
+  --money:#16c784;--money-ink:#02150c;
+  --gold:#f3ba2f;
+  --alert:#ea3943;
+  --up:#16c784;--dn:#ea3943;
+  --pill-bg:#1b2333;--pill-ink:#f3ba2f;
+  --ghost-bg:#161d2b;--ghost-ink:#22d3ee;--ghost-border:1px solid #26405a;
+  --radius:10px;--radius-btn:9px;
+  --pad:12px;--gap:10px;--card-pad:12px;
+  --card-shadow:none;
+  --btn-shadow:0 0 18px rgba(34,211,238,.35);
+  --btn-money-shadow:0 0 18px rgba(22,199,132,.4);
+  --btn-weight:800;--btn-track:.05em;--btn-case:uppercase;
+  --h1:800 23px/1.15 var(--font);
+  --h2:700 17px/1.25 var(--font);
+}
+body[data-skin="terminal"] .phone{background:
+  radial-gradient(120% 60% at 50% 0%,#111827 0%,#0b0e14 55%)}
+
+/* ============================================================
+   SKIN C — «Редакционный» (white, serif headlines, air, calm)
+   ============================================================ */
+body[data-skin="editorial"]{
+  --font:-apple-system,"SF Pro Text",system-ui,sans-serif;
+  --font-serif:Georgia,"Times New Roman",serif;
+  --font-num:var(--font);
+  --fs:17px;
+  --bg:#ffffff;
+  --surface:#ffffff;
+  --card:#ffffff;
+  --ink:#1a2333;
+  --muted:#66707f;
+  --line:#e4e7ec;
+  --primary:#1f3a5f;--primary-ink:#fff;
+  --money:#2e7d5b;--money-ink:#fff;
+  --gold:#a8894a;
+  --alert:#b3453e;
+  --up:#2e7d5b;--dn:#b3453e;
+  --pill-bg:#f2f4f7;--pill-ink:#1f3a5f;
+  --ghost-bg:#fff;--ghost-ink:#1f3a5f;--ghost-border:1px solid #cfd6e0;
+  --radius:12px;--radius-btn:10px;
+  --pad:22px;--gap:20px;--card-pad:18px;
+  --card-shadow:none;
+  --btn-shadow:none;
+  --btn-money-shadow:none;
+  --btn-weight:600;--btn-track:0;--btn-case:none;
+  --h1:700 27px/1.2 var(--font-serif);
+  --h2:700 19px/1.3 var(--font-serif);
+}
+body[data-skin="editorial"] .h1,
+body[data-skin="editorial"] .h2{font-family:var(--font-serif)}
+body[data-skin="editorial"] .card{border-radius:12px}
+body[data-skin="editorial"] .rule{border-top:1px solid var(--line)}
+
+/* ============================================================
+   HOME
+   ============================================================ */
+.apphead{display:flex;align-items:center;justify-content:space-between}
+.apphead .logo{font:var(--h2);display:flex;align-items:center;gap:8px}
+.logo-dot{width:26px;height:26px;border-radius:8px;background:var(--primary);
+  display:inline-flex;align-items:center;justify-content:center}
+.logo-dot svg{width:16px;height:16px;stroke:var(--primary-ink);stroke-width:2.4;fill:none;stroke-linecap:round}
+body[data-skin="narodny"] .logo-dot{background:var(--money)}
+
+/* money strip — the money-coding slot ($ vs P&L vs 30-day text) */
+.money-strip .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.piggy{height:12px;border-radius:999px;background:#efe3c4;overflow:hidden;margin-top:9px}
+.piggy i{display:block;height:100%;width:62%;background:linear-gradient(90deg,var(--money),var(--gold))}
+.money-strip .big{font:800 22px/1 var(--font-num)}
+.up-c{color:var(--up)} .dn-c{color:var(--dn)}
+.spark{width:120px;height:30px}
+.spark polyline{fill:none;stroke:var(--up);stroke-width:2}
+
+/* hero */
+.hero{display:flex;flex-direction:column;gap:10px;align-items:stretch;text-align:center;
+  padding-top:2px}
+.hero .art{
+  height:118px;border-radius:var(--radius);position:relative;overflow:hidden;
+  border:1px solid var(--line);
+  background:var(--hero-bg,linear-gradient(160deg,#12305e, #1d63d1));
+}
+body[data-skin="narodny"] .hero .art{--hero-bg:linear-gradient(160deg,#1d63d1,#3f8ef0)}
+body[data-skin="terminal"] .hero .art{--hero-bg:linear-gradient(160deg,#0e1522,#15233c);border-color:#26405a}
+body[data-skin="editorial"] .hero .art{--hero-bg:#f6f7f9}
+.hero .art svg{position:absolute;inset:0;width:100%;height:100%}
+.hero .gname{font:var(--h1)}
+.hero .gsub{font:500 14.5px/1.45 var(--font);color:var(--muted);padding:0 14px}
+.playbtn{min-height:60px;font-size:21px}
+body[data-skin="narodny"] .playbtn{min-height:64px;font-size:22px}
+
+/* daily + offer row */
+.duo{display:flex;gap:var(--gap)}
+.duo .card{flex:1;display:flex;flex-direction:column;gap:8px}
+.duo .btn{min-height:44px;font-size:15px}
+.tag{display:inline-flex;align-self:flex-start;border-radius:6px;padding:3px 8px;
+  font:800 11px/1 var(--font);letter-spacing:.06em;text-transform:uppercase;
+  background:var(--gold);color:#fff}
+body[data-skin="terminal"] .tag{background:transparent;color:var(--gold);border:1px solid var(--gold)}
+body[data-skin="editorial"] .tag{background:var(--pill-bg);color:var(--pill-ink)}
+.timer{font:700 13px/1 var(--font-num);color:var(--alert)}
+
+/* trust slot */
+.trust .t-head{font:var(--h2);margin-bottom:10px}
+.testi{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px dashed var(--line)}
+.testi:first-of-type{border-top:0}
+.ava{flex:0 0 44px;width:44px;height:44px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font:800 15px/1 var(--font);color:#fff}
+.ava.a1{background:linear-gradient(140deg,#c96a2b,#8f3f14)}
+.ava.a2{background:linear-gradient(140deg,#3b7bc4,#1d4b85)}
+.testi .who{font:700 14.5px/1.3 var(--font)}
+.testi .say{font:500 14.5px/1.4 var(--font)}
+.stars{color:var(--gold);font-size:13px;letter-spacing:2px}
+.payout-counter{margin-top:10px;font:700 15px/1.4 var(--font);text-align:center}
+.lb-row{display:flex;justify-content:space-between;align-items:center;
+  padding:8px 2px;border-top:1px solid var(--line);font:600 14.5px/1 var(--font)}
+.lb-row:first-of-type{border-top:0}
+.lb-row .pnl{font:700 14.5px/1 var(--font-num);color:var(--up)}
+.livebar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;
+  font:700 13.5px/1.3 var(--font)}
+.livebar .dot{display:inline-block;width:8px;height:8px;border-radius:50%;
+  background:var(--up);margin-right:6px;box-shadow:0 0 8px var(--up)}
+.step{display:flex;gap:12px;padding:9px 0;align-items:flex-start}
+.step .n{flex:0 0 26px;width:26px;height:26px;border-radius:50%;
+  border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font:700 13px/1 var(--font-serif,serif);color:var(--primary)}
+.step p{font:500 14.5px/1.45 var(--font);color:var(--ink)}
+.step p b{display:block;font:700 15px/1.4 var(--font-serif,serif)}
+.faqline{margin-top:8px;font:600 14px/1.4 var(--font);color:var(--primary);text-decoration:underline;text-underline-offset:3px}
+
+/* ============================================================
+   TRADE (in-round)
+   ============================================================ */
+.tr-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.backb{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink);font:600 22px/1 var(--font);cursor:pointer}
+.roundpill{display:flex;flex-direction:column;align-items:center;gap:2px}
+.roundpill .lab{font:600 11px/1 var(--font);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.roundpill .val{font:800 20px/1 var(--font-num);color:var(--alert)}
+.symrow{display:flex;align-items:baseline;justify-content:space-between}
+.symrow .sym{font:var(--h2)}
+.symrow .price{font:800 22px/1 var(--font-num)}
+.symrow .chg{font:700 14px/1 var(--font-num)}
+.chartcard{padding:10px}
+.chart{width:100%;height:auto;display:block}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.chart .wick{stroke-width:1.6}
+.chart .up{fill:var(--up);stroke:var(--up)}
+.chart .dn{fill:var(--dn);stroke:var(--dn)}
+.chart .entry{stroke:var(--gold);stroke-width:1.4;stroke-dasharray:5 4}
+.chart .cur{stroke:var(--ink);stroke-width:1;stroke-dasharray:2 3;opacity:.55}
+.chart .curlab{font:700 11px var(--font-num);fill:var(--bg)}
+.chart .curbox{fill:var(--ink)}
+.chart .entrylab{font:700 10px var(--font-num);fill:var(--gold)}
+
+.poscard{display:flex;flex-direction:column;gap:10px}
+.poscard .prow{display:flex;justify-content:space-between;align-items:center}
+.posbadge{display:inline-flex;gap:6px;align-items:center;border-radius:7px;
+  padding:5px 10px;font:800 13px/1 var(--font);letter-spacing:.04em;
+  background:var(--up);color:#fff}
+.poscard .kv{display:flex;flex-direction:column;gap:2px}
+.poscard .kv .k{font:600 11.5px/1 var(--font);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.poscard .kv .v{font:800 17px/1.2 var(--font-num)}
+.pnlline{display:flex;justify-content:space-between;align-items:baseline;
+  border-top:1px solid var(--line);padding-top:10px}
+.pnlline .lab{font:600 13px/1 var(--font);color:var(--muted)}
+.pnlline .val{font:800 24px/1 var(--font-num);color:var(--up)}
+
+.segs{display:flex;flex-direction:column;gap:8px}
+.segrow{display:flex;align-items:center;gap:8px}
+.segrow .slab{flex:0 0 44px;font:700 12px/1 var(--font);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.seg{flex:1;display:flex;gap:5px}
+.seg button{
+  flex:1;min-height:44px;border-radius:9px;cursor:pointer;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  font:700 14.5px/1 var(--font-num);
+}
+.seg button.on{background:var(--primary);border-color:var(--primary);color:var(--primary-ink)}
+.seg button.lock{color:var(--muted);opacity:.65}
+.actions{display:flex;gap:10px;margin-top:auto;padding-top:6px}
+.actions .btn{flex:1;min-height:62px;flex-direction:column;gap:3px}
+.actions .btn .sub{font:600 11.5px/1 var(--font);letter-spacing:.02em;text-transform:none;opacity:.85}
+.btn.long{background:var(--up);color:#fff}
+.btn.short{background:var(--dn);color:#fff}
+body[data-skin="terminal"] .btn.long{box-shadow:0 0 20px rgba(22,199,132,.45)}
+body[data-skin="terminal"] .btn.short{box-shadow:0 0 20px rgba(234,57,67,.45)}
+body[data-skin="narodny"] .btn.long{box-shadow:0 4px 0 #146d33}
+body[data-skin="narodny"] .btn.short{box-shadow:0 4px 0 #96251e}
+
+/* ============================================================
+   SHOP
+   ============================================================ */
+.shophead{display:flex;align-items:center;justify-content:space-between}
+.offer{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:8px}
+body[data-skin="narodny"] .offer{border:2px solid var(--gold)}
+body[data-skin="terminal"] .offer{border:1px solid var(--gold);box-shadow:0 0 22px rgba(243,186,47,.18)}
+.offer .orow{display:flex;justify-content:space-between;align-items:center}
+.offer .oname{font:var(--h2)}
+.price-now{font:800 21px/1 var(--font-num)}
+.price-was{font:600 14px/1 var(--font-num);color:var(--muted);text-decoration:line-through;margin-right:8px}
+.packs{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+.pack{display:flex;flex-direction:column;gap:7px;align-items:center;text-align:center;position:relative;padding-top:20px}
+.pack .amt{font:800 20px/1 var(--font-num)}
+.pack .lbl{font:600 12.5px/1 var(--font);color:var(--muted)}
+.pack .btn{min-height:44px;font-size:15.5px}
+.pack .ribbon{position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+  border-radius:0 0 8px 8px;padding:4px 10px;font:800 10.5px/1 var(--font);white-space:nowrap;
+  letter-spacing:.07em;text-transform:uppercase;background:var(--primary);color:var(--primary-ink)}
+.pack .ribbon.best{background:var(--money);color:var(--money-ink)}
+.free .frow{display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:11px 0;border-top:1px solid var(--line)}
+.free .frow:first-of-type{border-top:0}
+.free .fname{font:600 15px/1.35 var(--font)}
+.free .btn{width:auto;min-width:112px;min-height:44px;font-size:14px;padding:0 14px}
+.chip-ic{display:inline-block;width:17px;height:17px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,var(--gold),#9a6b06);vertical-align:-3px;margin-right:5px;
+  border:2px solid rgba(255,255,255,.5)}
+</style>
+</head>
+<body data-skin="narodny" data-screen="home">
+
+<header class="topbar">
+  <div class="brand">Tap-Trading · skins demo</div>
+  <div class="tabs skin-tabs" id="skinTabs">
+    <button data-set-skin="narodny" class="on">A «Народный»</button>
+    <button data-set-skin="terminal">B «Терминал»</button>
+    <button data-set-skin="editorial">C «Редакционный»</button>
+  </div>
+  <div class="tabs screen-tabs" id="screenTabs">
+    <button data-set-screen="home" class="on">Home</button>
+    <button data-set-screen="trade">Trade</button>
+    <button data-set-screen="shop">Shop</button>
+  </div>
+  <div class="skin-note" id="skinNote"></div>
+</header>
+
+<main class="stage">
+<div class="phone">
+  <div class="statusbar"><span>9:41</span><span class="batt">100%</span></div>
+
+  <!-- ================= HOME ================= -->
+  <section class="screen screen-home">
+    <div class="apphead">
+      <div class="logo"><span class="logo-dot">
+        <svg viewBox="0 0 24 24"><path d="M3 17l6-7 4 4 8-9"/></svg></span>TapTrade</div>
+      <span class="pill"><span class="chip-ic"></span><span class="num">2,450</span></span>
+    </div>
+
+    <!-- money-coding slot: $ counter vs P&L vs 30-day result -->
+    <div class="card money-strip">
+      <div class="only-a">
+        <div class="row"><span class="small">Earned today</span>
+          <span class="big up-c">+$4.90</span></div>
+        <div class="piggy"><i></i></div>
+        <div class="small" style="margin-top:7px">$15.50 of <b>$25 cash-out</b> — almost there!</div>
+      </div>
+      <div class="only-b">
+        <div class="row"><span class="small">P&amp;L today</span>
+          <span class="big num up-c">+1,240 <span style="font-size:15px">(+8.6%)</span></span></div>
+        <div class="row" style="margin-top:6px"><span class="small">Win streak</span>
+          <span class="num" style="font-weight:800">3 🔥</span></div>
+      </div>
+      <div class="only-c">
+        <div class="row">
+          <div><div class="small">Your 30-day result</div>
+            <div class="big up-c" style="margin-top:4px">+12,400 chips</div></div>
+          <svg class="spark" viewBox="0 0 120 30"><polyline points="2,26 16,22 30,24 44,18 58,20 72,13 86,15 100,8 118,4"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- hero: the one game, big Play -->
+    <div class="hero">
+      <div class="art">
+        <svg viewBox="0 0 390 158" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 128 L60 96 L110 112 L170 66 L230 84 L290 38 L350 52 L390 18"
+                fill="none" stroke="rgba(255,255,255,.85)" stroke-width="5" stroke-linecap="round"/>
+          <path d="M0 128 L60 96 L110 112 L170 66 L230 84 L290 38 L350 52 L390 18 L390 158 L0 158 Z"
+                fill="rgba(255,255,255,.12)"/>
+          <circle cx="290" cy="38" r="8" fill="#fff"/>
+        </svg>
+      </div>
+      <div class="gname">Trade</div>
+      <div class="gsub sw"
+        data-a="Guess where the price goes — get paid in chips. Simple as that."
+        data-b="15-second rounds. Long or short. Your read against the chart."
+        data-c="A 15-second market game: predict the move, learn the mechanics as you play."></div>
+      <button class="btn money playbtn"><span class="sw" data-a="▶ Play &amp; earn" data-b="▶ Beat the market" data-c="Start round"></span></button>
+    </div>
+
+    <!-- daily credit + one-time offer (fixed slots) -->
+    <div class="duo">
+      <div class="card">
+        <span class="tag">Daily bonus</span>
+        <div class="h2"><span class="chip-ic"></span>+500</div>
+        <div class="small">Streak day 3 of 5</div>
+        <button class="btn"><span class="sw" data-a="Grab it" data-b="Claim" data-c="Claim bonus"></span></button>
+      </div>
+      <div class="card">
+        <span class="tag">One-time</span>
+        <div class="h2">7,500 + ×2</div>
+        <div class="small">Ends in <span class="timer num">09:41</span></div>
+        <button class="btn money"><span class="num">$2.99</span></button>
+      </div>
+    </div>
+
+    <!-- trust slot: one block, skin-owned content -->
+    <div class="card trust">
+      <div class="only-a">
+        <div class="letterline">Real people. Real payouts.</div>
+        <div class="testi">
+          <div class="ava a1">LM</div>
+          <div><div class="who">Linda M., 52 <span class="stars">★★★★★</span></div>
+            <div class="say">“Cashed out <span class="hl">$25 in my first week</span>. My husband didn't believe it!”</div></div>
+        </div>
+        <div class="testi">
+          <div class="ava a2">RT</div>
+          <div><div class="who">Robert T., 47 <span class="stars">★★★★★</span></div>
+            <div class="say">“I play 10 minutes with my morning coffee. Paid out 3 times already.”</div></div>
+        </div>
+        <div class="payout-counter">💵 Paid to players so far: <span class="num up-c">$1,284,506</span></div>
+      </div>
+      <div class="only-b">
+        <div class="livebar"><span><span class="dot"></span>2,847 traders in game now</span><span class="num" style="color:var(--gold)">LIVE</span></div>
+        <div class="lb-row"><span>1 · KairoFX</span><span class="pnl">+9,120</span></div>
+        <div class="lb-row"><span>2 · shortqueen</span><span class="pnl">+7,480</span></div>
+        <div class="lb-row"><span>3 · you?</span><span class="pnl" style="color:var(--muted)">—</span></div>
+      </div>
+      <div class="only-c">
+        <div class="t-head">How it works</div>
+        <div class="step"><span class="n">1</span><p><b>Watch the chart</b>A real-time price feed, 15-second rounds.</p></div>
+        <div class="step"><span class="n">2</span><p><b>Make your call</b>Long if you expect a rise, short for a fall.</p></div>
+        <div class="step"><span class="n">3</span><p><b>Learn as you go</b>Your first 3 rounds are free practice — no chips at risk.</p></div>
+        <div class="faqline">Frequently asked questions</div>
+      </div>
+    </div>
+
+    <div style="height:2px"></div>
+  </section>
+
+  <!-- ================= TRADE (in-round) ================= -->
+  <section class="screen screen-trade">
+    <div class="tr-top">
+      <button class="backb">‹</button>
+      <div class="roundpill"><span class="lab">Round ends</span><span class="val num">0:23</span></div>
+      <span class="pill"><span class="chip-ic"></span><span class="num">2,300</span></span>
+    </div>
+
+    <div class="symrow">
+      <span class="sym">BTC / USD</span>
+      <span><span class="price num">64,230.50</span> <span class="chg num up-c">+1.2%</span></span>
+    </div>
+
+    <div class="card chartcard">
+      <svg class="chart" viewBox="0 0 360 200">
+        <line class="grid" x1="0" y1="25"  x2="360" y2="25"/>
+        <line class="grid" x1="0" y1="65"  x2="360" y2="65"/>
+        <line class="grid" x1="0" y1="105" x2="360" y2="105"/>
+        <line class="grid" x1="0" y1="145" x2="360" y2="145"/>
+        <line class="grid" x1="0" y1="185" x2="360" y2="185"/>
+        <!-- candles -->
+        <g>
+          <line class="wick up" x1="15.5" y1="116" x2="15.5" y2="138"/><rect class="up" x="10" y="120" width="11" height="14"/>
+          <line class="wick dn" x1="33.5" y1="120" x2="33.5" y2="144"/><rect class="dn" x="28" y="124" width="11" height="16"/>
+          <line class="wick dn" x1="51.5" y1="132" x2="51.5" y2="156"/><rect class="dn" x="46" y="136" width="11" height="16"/>
+          <line class="wick up" x1="69.5" y1="136" x2="69.5" y2="158"/><rect class="up" x="64" y="140" width="11" height="12"/>
+          <line class="wick up" x1="87.5" y1="124" x2="87.5" y2="146"/><rect class="up" x="82" y="128" width="11" height="14"/>
+          <line class="wick dn" x1="105.5" y1="128" x2="105.5" y2="150"/><rect class="dn" x="100" y="132" width="11" height="14"/>
+          <line class="wick up" x1="123.5" y1="108" x2="123.5" y2="138"/><rect class="up" x="118" y="112" width="11" height="22"/>
+          <line class="wick up" x1="141.5" y1="96"  x2="141.5" y2="118"/><rect class="up" x="136" y="100" width="11" height="14"/>
+          <line class="wick dn" x1="159.5" y1="102" x2="159.5" y2="124"/><rect class="dn" x="154" y="106" width="11" height="14"/>
+          <line class="wick up" x1="177.5" y1="84"  x2="177.5" y2="112"/><rect class="up" x="172" y="88" width="11" height="20"/>
+          <line class="wick up" x1="195.5" y1="72"  x2="195.5" y2="94"/><rect class="up" x="190" y="76" width="11" height="14"/>
+          <line class="wick dn" x1="213.5" y1="78"  x2="213.5" y2="100"/><rect class="dn" x="208" y="82" width="11" height="14"/>
+          <line class="wick up" x1="231.5" y1="60"  x2="231.5" y2="88"/><rect class="up" x="226" y="64" width="11" height="20"/>
+          <line class="wick dn" x1="249.5" y1="66"  x2="249.5" y2="86"/><rect class="dn" x="244" y="70" width="11" height="12"/>
+          <line class="wick up" x1="267.5" y1="48"  x2="267.5" y2="76"/><rect class="up" x="262" y="52" width="11" height="20"/>
+          <line class="wick up" x1="285.5" y1="36"  x2="285.5" y2="58"/><rect class="up" x="280" y="40" width="11" height="14"/>
+          <line class="wick dn" x1="303.5" y1="42"  x2="303.5" y2="62"/><rect class="dn" x="298" y="46" width="11" height="12"/>
+          <line class="wick up" x1="321.5" y1="24"  x2="321.5" y2="52"/><rect class="up" x="316" y="28" width="11" height="20"/>
+        </g>
+        <!-- entry line + current price -->
+        <line class="entry" x1="0" y1="70" x2="360" y2="70"/>
+        <text class="entrylab" x="4" y="66">ENTRY 63,940.00</text>
+        <line class="cur" x1="0" y1="30" x2="330" y2="30"/>
+        <rect class="curbox" x="296" y="20" width="62" height="18" rx="4"/>
+        <text class="curlab" x="301" y="33">64,230.5</text>
+      </svg>
+    </div>
+
+    <div class="card poscard">
+      <div class="prow">
+        <span class="posbadge">LONG ×2</span>
+        <div class="kv" style="align-items:flex-end"><span class="k">Stake</span><span class="v">150</span></div>
+      </div>
+      <div class="prow">
+        <div class="kv"><span class="k">Entry</span><span class="v">63,940.00</span></div>
+        <div class="kv" style="align-items:flex-end"><span class="k">Liq. at −50%</span><span class="v">48,180.00</span></div>
+      </div>
+      <div class="pnlline">
+        <span class="lab sw" data-a="Your win right now" data-b="Unrealized P&amp;L" data-c="Current result"></span>
+        <span class="val num">+186 <span style="font-size:15px">(+12.4%)</span></span>
+      </div>
+    </div>
+
+    <div class="segs">
+      <div class="segrow"><span class="slab">Lev</span>
+        <div class="seg">
+          <button>×1</button><button class="on">×2</button><button>×3</button><button>×4</button><button>×5</button>
+        </div></div>
+      <div class="segrow"><span class="slab">Size</span>
+        <div class="seg">
+          <button class="lock">🔒 25%</button><button class="lock">🔒 50%</button><button class="lock">🔒 75%</button><button class="on">100%</button>
+        </div></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn long">Long<span class="sub sw" data-a="Price goes UP" data-b="▲ UP" data-c="Buy — price rises"></span></button>
+      <button class="btn short">Short<span class="sub sw" data-a="Price goes DOWN" data-b="▼ DOWN" data-c="Sell — price falls"></span></button>
+    </div>
+  </section>
+
+  <!-- ================= SHOP ================= -->
+  <section class="screen screen-shop">
+    <div class="shophead">
+      <div class="h1">Shop</div>
+      <span class="pill"><span class="chip-ic"></span><span class="num">2,450</span></span>
+    </div>
+
+    <div class="card offer">
+      <div class="orow"><span class="tag">Your personal offer</span>
+        <span class="timer num">⏱ 09:41</span></div>
+      <div class="oname sw" data-a="Mega money pack" data-b="Booster bundle" data-c="Starter bundle"></div>
+      <div class="small sw"
+        data-a="7,500 chips + ×2 earnings for 24 hours. Biggest deal we have!"
+        data-b="7,500 chips + ×2 multiplier, 24h. One purchase, double edge."
+        data-c="7,500 chips and a ×2 multiplier for 24 hours."></div>
+      <div class="orow">
+        <span><span class="price-was num">$5.99</span><span class="price-now num">$2.99</span></span>
+        <button class="btn money" style="width:auto;min-width:150px"><span class="sw" data-a="Get the deal" data-b="Grab ×2" data-c="View offer"></span></button>
+      </div>
+    </div>
+
+    <div class="packs">
+      <div class="card pack">
+        <div class="amt"><span class="chip-ic"></span>1,000</div>
+        <div class="lbl">Starter</div>
+        <button class="btn ghost"><span class="num">$0.99</span></button>
+      </div>
+      <div class="card pack"><span class="ribbon">Popular</span>
+        <div class="amt"><span class="chip-ic"></span>5,500</div>
+        <div class="lbl">+10% bonus</div>
+        <button class="btn"><span class="num">$4.99</span></button>
+      </div>
+      <div class="card pack"><span class="ribbon best">Best value</span>
+        <div class="amt"><span class="chip-ic"></span>12,000</div>
+        <div class="lbl">+20% bonus</div>
+        <button class="btn money"><span class="num">$9.99</span></button>
+      </div>
+      <div class="card pack">
+        <div class="amt"><span class="chip-ic"></span>30,000</div>
+        <div class="lbl">+50% bonus</div>
+        <button class="btn ghost"><span class="num">$19.99</span></button>
+      </div>
+    </div>
+
+    <div class="card free">
+      <div class="h2" style="margin-bottom:6px" >Free chips</div>
+      <div class="frow">
+        <span class="fname sw" data-a="Watch a short video" data-b="Watch ad" data-c="Watch a short video"></span>
+        <button class="btn ghost">+100</button>
+      </div>
+      <div class="frow">
+        <span class="fname sw" data-a="Invite a friend" data-b="Refer a trader" data-c="Invite a friend"></span>
+        <button class="btn ghost">+500</button>
+      </div>
+    </div>
+
+    <div style="height:2px"></div>
+  </section>
+
+  <!-- bottom nav (shared) -->
+  <nav class="nav">
+    <a href="#" class="on" data-set-screen="home">
+      <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5M5.5 10v9h13v-9"/></svg>Home</a>
+    <a href="#" data-set-screen="shop">
+      <svg viewBox="0 0 24 24"><path d="M5 8h14l-1.2 12H6.2L5 8zM8.5 8V6.5a3.5 3.5 0 0 1 7 0V8"/></svg>Shop</a>
+    <a href="#">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20a7.5 7.5 0 0 1 14.4 0"/></svg>Profile</a>
+  </nav>
+</div>
+</main>
+
+<script>
+(function(){
+  var notes = {
+    narodny:  'Скин A «Народный» — когорта 40–60, преленд «МЛМ-письмо» / соцболь. Язык заработок-прил (InboxDollars, Receipt Hog): доллары, копилка до кэшаута, фото-отзывы, крупные тёплые кнопки.',
+    terminal: 'Скин B «Терминал» — когорта 30–45, преленд челлендж / крипто. Жанр бинарок (Quotex, Pocket Option): тёмный график, зелёно-красная пара кнопок, моно-цифры, лидерборд.',
+    editorial:'Скин C «Редакционный» — когорта 35–55 осторожные, преленд натив / адверториал. Журнальная подача: serif-заголовки, воздух, «как это работает» по шагам.'
+  };
+  var note = document.getElementById('skinNote');
+  function setOn(container, btn){
+    container.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', b === btn); });
+  }
+  document.getElementById('skinTabs').addEventListener('click', function(e){
+    var b = e.target.closest('button[data-set-skin]'); if(!b) return;
+    document.body.dataset.skin = b.dataset.setSkin;
+    setOn(this, b);
+    note.textContent = notes[b.dataset.setSkin];
+  });
+  function switchScreen(name){
+    document.body.dataset.screen = name;
+    var tabs = document.getElementById('screenTabs');
+    tabs.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', b.dataset.setScreen === name); });
+    document.querySelectorAll('.nav a').forEach(function(a){ a.classList.toggle('on', a.dataset.setScreen === name); });
+  }
+  document.getElementById('screenTabs').addEventListener('click', function(e){
+    var b = e.target.closest('button[data-set-screen]'); if(!b) return;
+    switchScreen(b.dataset.setScreen);
+  });
+  document.querySelectorAll('.nav a[data-set-screen]').forEach(function(a){
+    a.addEventListener('click', function(e){ e.preventDefault(); switchScreen(a.dataset.setScreen); });
+  });
+  note.textContent = notes.narodny;
+})();
+</script>
+</body>
+</html>

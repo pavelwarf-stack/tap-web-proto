@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Call the Candle — tap arcade</title>
+<link rel="stylesheet" href="style.css">
+<style>/* localization fit: EN title is longer than RU original */
+#title{font-size:4.6cqw;letter-spacing:.04em;white-space:nowrap}</style>
+</head>
+<body>
+<div id="phone">
+  <div id="game">
+
+    <header id="hud">
+      <button id="pauseBtn" aria-label="Pause"><span></span><span></span></button>
+      <div id="title">CALL THE CANDLE</div>
+      <div id="hearts">
+        <span class="hp"><svg viewBox="0 0 24 22"><path d="M12 20.3C5.4 15.4 1.5 11.6 1.5 7.3 1.5 4 4 1.5 7.2 1.5c1.9 0 3.7.9 4.8 2.4C13.1 2.4 14.9 1.5 16.8 1.5 20 1.5 22.5 4 22.5 7.3c0 4.3-3.9 8.1-10.5 13z"/></svg></span>
+        <span class="hp"><svg viewBox="0 0 24 22"><path d="M12 20.3C5.4 15.4 1.5 11.6 1.5 7.3 1.5 4 4 1.5 7.2 1.5c1.9 0 3.7.9 4.8 2.4C13.1 2.4 14.9 1.5 16.8 1.5 20 1.5 22.5 4 22.5 7.3c0 4.3-3.9 8.1-10.5 13z"/></svg></span>
+        <span class="hp"><svg viewBox="0 0 24 22"><path d="M12 20.3C5.4 15.4 1.5 11.6 1.5 7.3 1.5 4 4 1.5 7.2 1.5c1.9 0 3.7.9 4.8 2.4C13.1 2.4 14.9 1.5 16.8 1.5 20 1.5 22.5 4 22.5 7.3c0 4.3-3.9 8.1-10.5 13z"/></svg></span>
+      </div>
+    </header>
+
+    <div id="statCard">
+      <div class="cardTop">
+        <div id="streakLbl">🔥 Streak: <span id="streakVal">0</span></div>
+        <div id="scorePill">
+          <span id="scoreVal">0</span><span id="multChip" class="t1">-</span>
+        </div>
+      </div>
+      <div id="segBar"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div id="segLabels"><span class="l1">×1</span><span class="l2">×1.5</span><span class="l3">×2.0</span></div>
+    </div>
+
+    <div id="chartWrap">
+      <canvas id="chart"></canvas>
+      <div id="netBadge" class="hidden">offline</div>
+      <div id="msg"></div>
+      <div id="floatLayer"></div>
+    </div>
+
+    <div id="countdown">
+      <div id="countLbl">Next candle in</div>
+      <div id="ringWrap">
+        <svg id="ring" viewBox="0 0 100 100">
+          <circle class="rbg" cx="50" cy="50" r="44"/>
+          <circle class="rarc" cx="50" cy="50" r="44"/>
+        </svg>
+        <div id="countNum">0:4</div>
+      </div>
+    </div>
+
+    <div id="controls">
+      <button id="btnUp">Long</button>
+      <button id="btnDown">Short</button>
+    </div>
+
+    <canvas id="fx"></canvas>
+
+    <div class="screen" id="startScreen">
+      <div class="goTitle">CALL THE CANDLE</div>
+      <div class="btcPill"><i>₿</i> BTC</div>
+      <div class="rules">
+        <div>📈 Live Bitcoin chart</div>
+        <div>⏱ Long or Short — before the timer ends</div>
+        <div>🔥 Streaks grow the multiplier up to ×2</div>
+        <div>🟦 Super candles double your points</div>
+        <div>❤️ Three lives — make them count</div>
+      </div>
+      <button class="blueBtn" id="playBtn">Play</button>
+    </div>
+
+    <div class="screen hidden" id="pauseScreen">
+      <div class="pauseCard">
+        <div class="goTitle small">PAUSED</div>
+        <button class="blueBtn" id="resumeBtn">Resume</button>
+        <button class="ghostBtn" id="restartBtn">Restart</button>
+      </div>
+    </div>
+
+    <div class="screen hidden" id="overScreen">
+      <div class="goTitle">ROUND COMPLETE</div>
+      <div class="btcPill"><i>₿</i> BTC</div>
+      <div class="goBand">
+        <div class="goLbl">Your score</div>
+        <div id="finalScore">0</div>
+        <div id="bonusPill" class="hidden">+×2.0 streak bonus</div>
+      </div>
+      <div class="goStats">
+        <div class="stat"><div class="sLbl">Correct</div><div class="sVal" id="stCorrect">0</div></div>
+        <div class="stat"><div class="sLbl">Streak</div><div class="sVal" id="stStreak">0🔥</div></div>
+        <div class="stat"><div class="sLbl">Best</div><div class="sVal" id="stMult">×1</div></div>
+      </div>
+      <div class="lbHead"><span>Leaderboard</span><span id="lbAll">View all</span></div>
+      <div id="board"></div>
+      <div class="goBtns">
+        <button class="blueBtn wide" id="againBtn">Play again</button>
+        <button id="homeBtn" aria-label="Home"><svg viewBox="0 0 24 24"><path d="M12 3.2 3 10.6V21h6.4v-5.8h5.2V21H21V10.6z" fill="#fff"/></svg></button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

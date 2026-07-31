@@ -1,0 +1,1544 @@
+'use strict';
+/* «Trade» — ЕДИНАЯ игра веб-версии (решение встречи 24.07): движок «Сделки»
+   (живой BTC: Binance REST+WS + генератор режимов, свечи 1.1с, сердца,
+   ликвидация −50% PnL) + лестница механик ВНУТРИ одной игры:
+     stage 1 — лонг всей котлетой (вход/выход);
+     stage 2 — + шорты (модель «Лонг/Шорт»: dir ±1);
+     stage 3 — + плечо ×1–×5 (выбор игрока, дефолт ×2 — слово владельца 25.07);
+     stage 4 — + частичные позиции 25/50/75/100% на вход И на выход.
+   Анлоки стадий 2–3 — РАУНДАМИ ОНБОРДИНГА (слово владельца 25.07): три коротких
+   обучающих раунда подряд НА СИМУЛЯЦИИ (сид всегда 1000, кошелёк игрока не трогаем):
+   раунд 1 — базовая торговля (туториал «как у Миши») → анлок шортов; раунд 2 — с
+   шортами → анлок плеча; раунд 3 — с плечами. Дальше — основная игра на фишках.
+   UI онбординга — пиксель-перфект по макетам Миши (вердикт 30.07 п.23,
+   _рабочее/onboarding-new): гейты раунда в G.caps (r1 Buy-only / r2 +Short /
+   r3 +Leverage), интро-модалки шортов/плеча в онбординге заменены хаб-баблами,
+   карточка позиции с бейджами xN/Long-Short и полосой ликвидации (r3+),
+   сим-раунды — кебаб ⋮ вместо сердец (сердца возвращаются в реальных раундах).
+   Stage 4 (частичные) — залоченные Size + тап «🔒 Open» → обучающий раунд (вердикт 25.07).
+   Прогресс: localStorage 'trade.progress' (общий с шеллом, same-origin). */
+
+// ============================== CONFIG ==============================
+const CFG = {
+  ROUND_SEC: 60,
+  OB_ROUND_SEC: 15,     // онбординг-раунды короткие («первый раунд на 15 секунд торгов» — владелец 25.07)
+  START_BAL: 1000,
+  LEV_BASE: 2,          // stages 1–2: скрытая часть буста по PnL (вердикт 26.07: ×2 очки × ×2 волатильность = те же ×4, но качели видны на графике)
+  OB_VOL: 2,            // stages 1–2: множитель хода фейк-цены — график видимо скачет сильнее (вердикт 26.07)
+  LEVS: [1, 2, 3, 4, 5], // stage 3+: выбор игрока ×1–×5, дефолт ×2 (слово владельца 25.07)
+  LEV_DEF: 2,
+  FRACS: [0.25, 0.5, 0.75, 1], // stage 4+: доли котлеты на вход/выход
+  LIQ_PNL: -50,         // ликвидация: PnL позиции −50% (расстояние цены = 50%/lev)
+  MELT_MIN_PEAK: 12,
+  MELT_DROP: 8,
+  HEARTS: 3,
+  // рынок в темпе «Лонг/Шорт» (approved-эталон)
+  CANDLE_DUR: 1.1,      // сек на свечу (геймовый темп)
+  VISIBLE: 13,          // свечей на экране
+  GAIN: 30,             // усиление реальных BTC-движений до геймового масштаба
+  SIM_TICK: 0.125,      // рынок шагает 8 раз/сек (без дрожи 60Гц)
+  VIS_EASE: 0.13,       // тау глайда визуальной цены, сек
+  TXT_EVERY: 0.2,       // цифры обновляются 5 раз/сек
+};
+
+/* ── Анлоки (вердикт владельца 25.07): стадии 2–3 открываются РАУНДАМИ онбординга
+   (раунд 1 пройден → шорты; раунд 2 → плечо), НЕ порогами. Stage 4 (частичные позиции,
+   вердикт 25.07 вечер): в основной игре сегменты Size видны ЗАЛОЧЕННЫМИ + кнопка 🔒 —
+   тап запускает ОБУЧАЮЩИЙ 4-й раунд (симуляция, про хеджирование рисков), после него
+   стадия открыта навсегда. Порогов больше нет. */
+const OB_ROUNDS = 3;                            // раундов онбординга (симуляция)
+const MAX_STAGE = 4;
+
+const NICKS = [
+  ['Alex', 5800], ['Tony Scorpos', 5400], ['Fill Simpany', 4990],
+  ['CandleSam', 3100], ['LunaLong', 2050],
+];
+
+// ============================== PROGRESS (ladder) ==============================
+const P = (() => {
+  const def = {
+    stage: 1,
+    profitTrades: 0,   // закрытых сделок в плюс (за всё время)
+    cumEarned: 0,      // сумма ПЛЮСОВЫХ раундовых дельт
+    rounds: 0,
+    hotStreak: 0,      // подряд выигранных раундов с PnL ≥ +30% (триггер «пика», вердикт 25.07)
+    pendingPartial: false, // тренировка частичных заказана тапом 🔒 — стартует СЛЕДУЮЩИМ раундом
+    intros: { short: false, lev: false, partial: false }, // one-time онбординги
+  };
+  let s = {};
+  try { s = JSON.parse(localStorage.getItem('trade.progress') || '{}') || {}; } catch (e) {}
+  const out = Object.assign({}, def, s);
+  out.intros = Object.assign({}, def.intros, (typeof s.intros === 'object' && s.intros) || {});
+  out.stage = Math.min(MAX_STAGE, Math.max(1, +out.stage || 1));
+  // миграция с порожной системы (до 25.07): stage уже открыт старыми порогами →
+  // rounds не ниже обратной лесенки targetStage (stage N достигается ПОСЛЕ раунда N−1).
+  // Было `stage>=3 ? 3` — это выбивало 3-й раунд онбординга в реальный (QA 27.07:
+  // rounds прыгал 2→3 на буте айфрейма, раунд шёл с живым кошельком без fee)
+  // считаем соответствующие онбординг-раунды сыгранными, не гоним игрока в симуляции
+  out.rounds = Math.max(+out.rounds || 0, out.stage - 1);
+  out.profitTrades = Math.max(0, +out.profitTrades || 0);
+  out.cumEarned = Math.max(0, +out.cumEarned || 0);
+  out.rounds = Math.max(0, +out.rounds || 0);
+  return out;
+})();
+function saveP() { try { localStorage.setItem('trade.progress', JSON.stringify(P)); } catch (e) {} }
+/** Онбординг активен, пока не сыграны все OB_ROUNDS (симуляция, кошелёк не трогаем). */
+function onboarding() { return P.rounds < OB_ROUNDS; }
+function targetStage() {
+  // стадии 2–3 — раундами онбординга: сыгран раунд N → стадия N+1 (вердикт 25.07).
+  // Stage 4 — ТОЛЬКО через обучающий раунд по тапу (см. finishRound/G.partialTraining)
+  return Math.min(3, P.rounds + 1);
+}
+
+/* practice tasks (обучающий модуль, решение встречи п.6): живые галочки в хабе */
+const Tasks = {
+  get() { try { return JSON.parse(localStorage.getItem('trade.tasks') || '{}') || {}; } catch (e) { return {}; } },
+  set(flag) {
+    const t = this.get();
+    if (t[flag]) return;
+    t[flag] = true;
+    try { localStorage.setItem('trade.tasks', JSON.stringify(t)); } catch (e) {}
+  },
+};
+
+// ============================== GAME I18N (новые строки — 8 языков) ==============================
+/* Язык берём из настроек хаба (hub.state.lang). Торговые термины (Long/Short/
+   Exit/×2/25%) — English во всех языках (действующее продуктовое решение). */
+const HUB_LANGS = ['en', 'es', 'fr', 'de', 'ja', 'zh', 'pt', 'ar'];
+const GLANG = (() => {
+  try { return HUB_LANGS[(JSON.parse(localStorage.getItem('hub.state') || '{}') || {}).lang | 0] || 'en'; }
+  catch (e) { return 'en'; }
+})();
+const GT_DICT = {
+en: {
+  'stage.badge': 'Stage {0} of {1}',
+  'mech.short': 'Shorts', 'mech.lev': 'Leverage ×2–×5', 'mech.partial': 'Partial positions',
+  'unlock.band': 'New mechanic unlocked: {0}',
+  'gotit': 'Got it',
+  'intro.short.t': 'Shorts unlocked',
+  'intro.short.1': 'Until now you could only bet on the price going UP (long). A short is the opposite: you profit when the price goes DOWN.',
+  'intro.short.2': 'Tap Short when you expect a drop, then Exit to lock in the difference. Wrong direction works against you the same way.',
+  'intro.lev.t': 'Leverage unlocked',
+  'intro.lev.1': 'Leverage multiplies your position: with ×5, a 1% price move changes your stake by 5%.',
+  'intro.lev.2': 'Pick ×2–×5 before entering. Careful: liquidation (−50% of your stake) gets closer as leverage grows.',
+  'hint.partial': 'New: partial positions — enter and exit with 25/50/75% of your stack',
+  'hint.trainq': 'Training round starts right after this one',
+  'intro.partial.t': 'Partial positions — hedge your risk',
+  'intro.partial.1': 'Pros rarely go all-in. Entering with a part of your stack keeps the rest in cash — that reserve is your hedge when the market turns.',
+  'intro.partial.2': 'Had 1000 and entered at 75%? 750 works in BTC, 250 stays safe. Exit in parts too: lock in profit, let the rest ride. Try it in a training round.',
+  'howto.1.enter': 'Tap to enter: your whole balance in',
+  'howto.1.exit': 'Tap to exit: don’t get greedy!',
+  'howto.short': 'Long earns on rise, Short earns on fall',
+  'howto.lev': 'Leverage ×2–×5 multiplies gains AND losses',
+  'howto.partial': 'Trade a part of your stack: 25 / 50 / 75 / 100%',
+  'howto.chart': 'The chart is Bitcoin’s live price',
+  'howto.liq': '−50% is liquidation — you lose a heart',
+  /* игровой хром по онбординг-макетам (30.07); Buy/Long/Short — English во всех языках */
+  'ui.balance': 'Balance',
+  'ui.leverage': 'Leverage',
+  'ui.size': 'Trade size',
+  'ui.upnl': 'Unrealized P&L',
+  'ui.enter': 'Enter',
+  'ui.current': 'Current',
+  'ui.liq': 'Liquidation',
+  'ui.liqCaption': 'Liquidation at −50% of the rate',
+  'ui.close': 'Close position',
+  'ui.closeFrac': 'Close {0}%',
+},
+es: {
+  'stage.badge': 'Etapa {0} de {1}',
+  'mech.short': 'Shorts', 'mech.lev': 'Apalancamiento ×2–×5', 'mech.partial': 'Posiciones parciales',
+  'unlock.band': 'Nueva mecánica desbloqueada: {0}',
+  'gotit': 'Entendido',
+  'intro.short.t': 'Shorts desbloqueados',
+  'intro.short.1': 'Hasta ahora solo podías apostar a que el precio SUBE (long). El short es lo contrario: ganas cuando el precio BAJA.',
+  'intro.short.2': 'Toca Short cuando esperes una caída y luego Exit para asegurar la diferencia. La dirección equivocada juega en tu contra igual.',
+  'intro.lev.t': 'Apalancamiento desbloqueado',
+  'intro.lev.1': 'El apalancamiento multiplica tu posición: con ×5, un movimiento del 1% cambia tu apuesta un 5%.',
+  'intro.lev.2': 'Elige ×2–×5 antes de entrar. Cuidado: la liquidación (−50% de tu apuesta) se acerca al subir el apalancamiento.',
+  'hint.partial': 'Nuevo: posiciones parciales — entra y sal con 25/50/75% de tu stack',
+  'hint.trainq': 'La ronda de práctica empieza justo después de esta',
+  'intro.partial.t': 'Posiciones parciales — cubre tu riesgo',
+  'intro.partial.1': 'Los profesionales rara vez van all-in. Entrar con una parte deja el resto en efectivo: esa reserva es tu cobertura cuando el mercado gira.',
+  'intro.partial.2': '¿Tenías 1000 y entraste al 75%? 750 trabajan en BTC, 250 quedan a salvo. Sal también por partes: asegura ganancia y deja correr el resto. Pruébalo en una ronda de práctica.',
+  'howto.1.enter': 'Toca para entrar: todo tu saldo dentro',
+  'howto.1.exit': 'Toca para salir: ¡no seas avaro!',
+  'howto.short': 'Long gana al subir, Short gana al bajar',
+  'howto.lev': 'El apalancamiento ×2–×5 multiplica ganancias Y pérdidas',
+  'howto.partial': 'Opera una parte del stack: 25 / 50 / 75 / 100%',
+  'howto.chart': 'El gráfico es el precio real de Bitcoin',
+  'howto.liq': '−50% es liquidación — pierdes un corazón',
+  'ui.balance': 'Saldo',
+  'ui.leverage': 'Apalancamiento',
+  'ui.size': 'Tamaño de operación',
+  'ui.upnl': 'P&L no realizado',
+  'ui.enter': 'Entrada',
+  'ui.current': 'Actual',
+  'ui.liq': 'Liquidación',
+  'ui.liqCaption': 'Liquidación al −50% de la tasa',
+  'ui.close': 'Cerrar posición',
+  'ui.closeFrac': 'Cerrar {0}%',
+},
+fr: {
+  'stage.badge': 'Étape {0} sur {1}',
+  'mech.short': 'Shorts', 'mech.lev': 'Levier ×2–×5', 'mech.partial': 'Positions partielles',
+  'unlock.band': 'Nouvelle mécanique débloquée : {0}',
+  'gotit': 'Compris',
+  'intro.short.t': 'Shorts débloqués',
+  'intro.short.1': 'Jusqu’ici tu ne pouvais parier que sur la HAUSSE (long). Le short, c’est l’inverse : tu gagnes quand le prix BAISSE.',
+  'intro.short.2': 'Touche Short quand tu attends une chute, puis Exit pour encaisser la différence. La mauvaise direction joue contre toi pareil.',
+  'intro.lev.t': 'Levier débloqué',
+  'intro.lev.1': 'Le levier multiplie ta position : avec ×5, un mouvement de 1% change ta mise de 5%.',
+  'intro.lev.2': 'Choisis ×2–×5 avant d’entrer. Attention : la liquidation (−50% de la mise) se rapproche quand le levier monte.',
+  'hint.partial': 'Nouveau : positions partielles — entre et sors avec 25/50/75% du stack',
+  'hint.trainq': 'La manche d’entraînement démarre juste après celle-ci',
+  'intro.partial.t': 'Positions partielles — couvre ton risque',
+  'intro.partial.1': 'Les pros vont rarement all-in. Entrer avec une partie du stack garde le reste en cash : cette réserve est ta couverture quand le marché se retourne.',
+  'intro.partial.2': 'Tu avais 1000 et tu entres à 75%? 750 travaillent en BTC, 250 restent au chaud. Sors aussi par étapes : sécurise le profit, laisse courir le reste. Essaie-le dans une manche d’entraînement.',
+  'howto.1.enter': 'Touche pour entrer : tout ton solde',
+  'howto.1.exit': 'Touche pour sortir : ne sois pas gourmand !',
+  'howto.short': 'Long gagne à la hausse, Short gagne à la baisse',
+  'howto.lev': 'Le levier ×2–×5 multiplie gains ET pertes',
+  'howto.partial': 'Trade une partie du stack : 25 / 50 / 75 / 100%',
+  'howto.chart': 'Le graphique est le prix réel du Bitcoin',
+  'howto.liq': '−50% = liquidation — tu perds un cœur',
+  'ui.balance': 'Solde',
+  'ui.leverage': 'Levier',
+  'ui.size': 'Taille du trade',
+  'ui.upnl': 'P&L latent',
+  'ui.enter': 'Entrée',
+  'ui.current': 'Actuel',
+  'ui.liq': 'Liquidation',
+  'ui.liqCaption': 'Liquidation à −50% du cours',
+  'ui.close': 'Clôturer la position',
+  'ui.closeFrac': 'Clôturer {0}%',
+},
+de: {
+  'stage.badge': 'Stufe {0} von {1}',
+  'mech.short': 'Shorts', 'mech.lev': 'Hebel ×2–×5', 'mech.partial': 'Teilpositionen',
+  'unlock.band': 'Neue Mechanik freigeschaltet: {0}',
+  'gotit': 'Verstanden',
+  'intro.short.t': 'Shorts freigeschaltet',
+  'intro.short.1': 'Bisher konntest du nur auf STEIGENDE Preise setzen (Long). Der Short ist das Gegenteil: du gewinnst, wenn der Preis FÄLLT.',
+  'intro.short.2': 'Tippe Short, wenn du einen Fall erwartest, dann Exit, um die Differenz zu sichern. Die falsche Richtung wirkt genauso gegen dich.',
+  'intro.lev.t': 'Hebel freigeschaltet',
+  'intro.lev.1': 'Der Hebel multipliziert deine Position: mit ×5 ändert eine 1%-Bewegung deinen Einsatz um 5%.',
+  'intro.lev.2': 'Wähle ×2–×5 vor dem Einstieg. Vorsicht: die Liquidation (−50% des Einsatzes) rückt mit höherem Hebel näher.',
+  'hint.partial': 'Neu: Teilpositionen — mit 25/50/75% des Stacks ein- und aussteigen',
+  'hint.trainq': 'Die Trainingsrunde startet direkt nach dieser',
+  'intro.partial.t': 'Teilpositionen — sichere dein Risiko ab',
+  'intro.partial.1': 'Profis gehen selten all-in. Wer nur einen Teil einsetzt, behält den Rest in Cash — diese Reserve ist deine Absicherung, wenn der Markt dreht.',
+  'intro.partial.2': '1000 gehabt und mit 75% rein? 750 arbeiten in BTC, 250 bleiben sicher. Steig auch in Teilen aus: Gewinn sichern, den Rest laufen lassen. Probier es in einer Trainingsrunde.',
+  'howto.1.enter': 'Tippen zum Einstieg: dein ganzes Guthaben',
+  'howto.1.exit': 'Tippen zum Ausstieg: nicht gierig werden!',
+  'howto.short': 'Long verdient beim Anstieg, Short beim Fall',
+  'howto.lev': 'Hebel ×2–×5 multipliziert Gewinne UND Verluste',
+  'howto.partial': 'Handle einen Teil des Stacks: 25 / 50 / 75 / 100%',
+  'howto.chart': 'Der Chart ist der echte Bitcoin-Preis',
+  'howto.liq': '−50% = Liquidation — du verlierst ein Herz',
+  'ui.balance': 'Guthaben',
+  'ui.leverage': 'Hebel',
+  'ui.size': 'Positionsgröße',
+  'ui.upnl': 'Unrealisierter P&L',
+  'ui.enter': 'Einstieg',
+  'ui.current': 'Aktuell',
+  'ui.liq': 'Liquidation',
+  'ui.liqCaption': 'Liquidation bei −50% des Kurses',
+  'ui.close': 'Position schließen',
+  'ui.closeFrac': '{0}% schließen',
+},
+ja: {
+  'stage.badge': 'ステージ {0} / {1}',
+  'mech.short': 'ショート', 'mech.lev': 'レバレッジ ×2–×5', 'mech.partial': '部分ポジション',
+  'unlock.band': '新メカニクス解放: {0}',
+  'gotit': 'わかった',
+  'intro.short.t': 'ショート解放',
+  'intro.short.1': 'これまでは価格の上昇（ロング）にしか賭けられませんでした。ショートはその逆で、価格が下がると利益になります。',
+  'intro.short.2': '下落を予想したら Short をタップ、Exit で差額を確定。方向を間違えれば同じだけ損になります。',
+  'intro.lev.t': 'レバレッジ解放',
+  'intro.lev.1': 'レバレッジはポジションを倍増します。×5なら価格1%の動きで賭け金は5%変わります。',
+  'intro.lev.2': 'エントリー前に ×2–×5 を選択。注意: レバレッジが上がるほど清算（賭け金の−50%）が近づきます。',
+  'hint.partial': '新機能: 部分ポジション — スタックの25/50/75%で出入りできます',
+  'hint.trainq': 'このラウンドの直後にトレーニングラウンドが始まります',
+  'intro.partial.t': '部分ポジション — リスクをヘッジ',
+  'intro.partial.1': 'プロはめったに全額を投じません。一部だけでエントリーすれば残りは現金のまま — その余力が相場反転時のヘッジになります。',
+  'intro.partial.2': '1000のうち75%でエントリー? 750がBTCで働き、250は安全に待機。決済も部分的に: 利益を確定し、残りを走らせる。トレーニングラウンドで試そう。',
+  'howto.1.enter': 'タップでエントリー: 残高全額を投入',
+  'howto.1.exit': 'タップで決済: 欲張らないで！',
+  'howto.short': 'Long は上昇で、Short は下落で稼ぐ',
+  'howto.lev': 'レバレッジ ×2–×5 は利益も損失も倍増',
+  'howto.partial': 'スタックの一部で取引: 25 / 50 / 75 / 100%',
+  'howto.chart': 'チャートはビットコインのライブ価格',
+  'howto.liq': '−50%で清算 — ハートを1つ失う',
+  'ui.balance': '残高',
+  'ui.leverage': 'レバレッジ',
+  'ui.size': '取引サイズ',
+  'ui.upnl': '含み損益',
+  'ui.enter': 'エントリー',
+  'ui.current': '現在',
+  'ui.liq': '清算',
+  'ui.liqCaption': 'レートの−50%で清算',
+  'ui.close': 'ポジションを決済',
+  'ui.closeFrac': '{0}%決済',
+},
+zh: {
+  'stage.badge': '第 {0} 阶段，共 {1} 阶段',
+  'mech.short': '做空', 'mech.lev': '杠杆 ×2–×5', 'mech.partial': '部分仓位',
+  'unlock.band': '解锁新机制: {0}',
+  'gotit': '知道了',
+  'intro.short.t': '做空已解锁',
+  'intro.short.1': '之前你只能押价格上涨（做多）。做空正相反: 价格下跌时你赚钱。',
+  'intro.short.2': '预期下跌时点 Short，再点 Exit 锁定差价。方向错了同样会亏损。',
+  'intro.lev.t': '杠杆已解锁',
+  'intro.lev.1': '杠杆会放大你的仓位: ×5 时，价格波动1%，你的本金变化5%。',
+  'intro.lev.2': '入场前选择 ×2–×5。注意: 杠杆越高，爆仓（本金−50%）越近。',
+  'hint.partial': '新功能: 部分仓位 — 用25/50/75%的资金进出场',
+  'hint.trainq': '本回合结束后立即开始训练回合',
+  'intro.partial.t': '部分仓位 — 对冲你的风险',
+  'intro.partial.1': '高手很少全仓。只用一部分资金进场，其余留作现金 — 这笔储备就是行情反转时的对冲。',
+  'intro.partial.2': '有1000、按75%进场? 750在BTC里工作，250安然无恙。平仓也可以分批: 锁定利润，让剩余继续跑。来一局训练回合试试。',
+  'howto.1.enter': '点击入场: 全部余额投入',
+  'howto.1.exit': '点击离场: 别太贪心！',
+  'howto.short': 'Long 靠上涨赚钱，Short 靠下跌赚钱',
+  'howto.lev': '杠杆 ×2–×5 同时放大盈利和亏损',
+  'howto.partial': '用部分资金交易: 25 / 50 / 75 / 100%',
+  'howto.chart': '图表是比特币实时价格',
+  'howto.liq': '−50% 即爆仓 — 失去一颗心',
+  'ui.balance': '余额',
+  'ui.leverage': '杠杆',
+  'ui.size': '交易规模',
+  'ui.upnl': '未实现盈亏',
+  'ui.enter': '入场',
+  'ui.current': '当前',
+  'ui.liq': '爆仓',
+  'ui.liqCaption': '价格变动−50%时爆仓',
+  'ui.close': '平仓',
+  'ui.closeFrac': '平仓{0}%',
+},
+pt: {
+  'stage.badge': 'Fase {0} de {1}',
+  'mech.short': 'Shorts', 'mech.lev': 'Alavancagem ×2–×5', 'mech.partial': 'Posições parciais',
+  'unlock.band': 'Nova mecânica desbloqueada: {0}',
+  'gotit': 'Entendi',
+  'intro.short.t': 'Shorts desbloqueados',
+  'intro.short.1': 'Até agora você só podia apostar na ALTA (long). O short é o oposto: você lucra quando o preço CAI.',
+  'intro.short.2': 'Toque em Short quando esperar queda e em Exit para garantir a diferença. A direção errada joga contra você do mesmo jeito.',
+  'intro.lev.t': 'Alavancagem desbloqueada',
+  'intro.lev.1': 'A alavancagem multiplica sua posição: com ×5, um movimento de 1% muda sua aposta em 5%.',
+  'intro.lev.2': 'Escolha ×2–×5 antes de entrar. Cuidado: a liquidação (−50% da aposta) fica mais perto com alavancagem maior.',
+  'hint.partial': 'Novo: posições parciais — entre e saia com 25/50/75% do stack',
+  'hint.trainq': 'A rodada de treino começa logo após esta',
+  'intro.partial.t': 'Posições parciais — proteja seu risco',
+  'intro.partial.1': 'Profissionais raramente vão all-in. Entrar com uma parte deixa o resto em caixa: essa reserva é sua proteção quando o mercado vira.',
+  'intro.partial.2': 'Tinha 1000 e entrou com 75%? 750 trabalham em BTC, 250 ficam seguros. Saia em partes também: garanta o lucro e deixe o resto correr. Teste em uma rodada de treino.',
+  'howto.1.enter': 'Toque para entrar: todo o seu saldo',
+  'howto.1.exit': 'Toque para sair: não seja ganancioso!',
+  'howto.short': 'Long ganha na alta, Short ganha na queda',
+  'howto.lev': 'Alavancagem ×2–×5 multiplica ganhos E perdas',
+  'howto.partial': 'Negocie uma parte do stack: 25 / 50 / 75 / 100%',
+  'howto.chart': 'O gráfico é o preço real do Bitcoin',
+  'howto.liq': '−50% é liquidação — você perde um coração',
+  'ui.balance': 'Saldo',
+  'ui.leverage': 'Alavancagem',
+  'ui.size': 'Tamanho da operação',
+  'ui.upnl': 'P&L não realizado',
+  'ui.enter': 'Entrada',
+  'ui.current': 'Atual',
+  'ui.liq': 'Liquidação',
+  'ui.liqCaption': 'Liquidação a −50% da cotação',
+  'ui.close': 'Fechar posição',
+  'ui.closeFrac': 'Fechar {0}%',
+},
+ar: {
+  'stage.badge': 'المرحلة {0} من {1}',
+  'mech.short': 'البيع على المكشوف', 'mech.lev': 'الرافعة ×2–×5', 'mech.partial': 'صفقات جزئية',
+  'unlock.band': 'آلية جديدة مفتوحة: {0}',
+  'gotit': 'فهمت',
+  'intro.short.t': 'فُتح البيع على المكشوف',
+  'intro.short.1': 'حتى الآن كان بإمكانك المراهنة فقط على صعود السعر (لونغ). الشورت هو العكس: تربح عندما ينخفض السعر.',
+  'intro.short.2': 'اضغط Short عندما تتوقع هبوطاً، ثم Exit لتثبيت الفرق. الاتجاه الخاطئ يعمل ضدك بنفس القدر.',
+  'intro.lev.t': 'فُتحت الرافعة المالية',
+  'intro.lev.1': 'الرافعة تضاعف صفقتك: مع ×5، تحرك السعر 1% يغيّر رهانك 5%.',
+  'intro.lev.2': 'اختر ×2–×5 قبل الدخول. انتبه: التصفية (−50% من الرهان) تقترب مع زيادة الرافعة.',
+  'hint.partial': 'جديد: صفقات جزئية — ادخل واخرج بـ 25/50/75% من رصيدك',
+  'hint.trainq': 'تبدأ جولة التدريب مباشرة بعد هذه الجولة',
+  'intro.partial.t': 'صفقات جزئية — حوّط مخاطرك',
+  'intro.partial.1': 'المحترفون نادراً ما يدخلون بكل الرصيد. الدخول بجزء يبقي الباقي نقداً — هذا الاحتياطي هو تحوّطك عندما ينقلب السوق.',
+  'intro.partial.2': 'كان معك 1000 ودخلت بـ 75%؟ 750 تعمل في BTC و250 في أمان. اخرج على دفعات أيضاً: ثبّت الربح ودع الباقي يعمل. جرّبها في جولة تدريبية.',
+  'howto.1.enter': 'اضغط للدخول: كل رصيدك في الصفقة',
+  'howto.1.exit': 'اضغط للخروج: لا تكن جشعاً!',
+  'howto.short': 'Long يربح مع الصعود، وShort يربح مع الهبوط',
+  'howto.lev': 'الرافعة ×2–×5 تضاعف الأرباح والخسائر معاً',
+  'howto.partial': 'تداول بجزء من رصيدك: 25 / 50 / 75 / 100%',
+  'howto.chart': 'الرسم البياني هو سعر بيتكوين الحقيقي',
+  'howto.liq': '−50% تعني التصفية — تخسر قلباً',
+  'ui.balance': 'الرصيد',
+  'ui.leverage': 'الرافعة المالية',
+  'ui.size': 'حجم الصفقة',
+  'ui.upnl': 'الأرباح والخسائر غير المحققة',
+  'ui.enter': 'الدخول',
+  'ui.current': 'الحالي',
+  'ui.liq': 'التصفية',
+  'ui.liqCaption': 'التصفية عند −50% من السعر',
+  'ui.close': 'إغلاق الصفقة',
+  'ui.closeFrac': 'إغلاق {0}%',
+},
+};
+function gt(key) {
+  const d = GT_DICT[GLANG] || GT_DICT.en;
+  let s = (key in d) ? d[key] : GT_DICT.en[key];
+  if (s === undefined) s = key;
+  for (let i = 1; i < arguments.length; i++) s = s.split('{' + (i - 1) + '}').join(arguments[i]);
+  return s;
+}
+/* draft-подсветка в игре — по тумблеру хаба (Settings → Show design drafts) */
+const DRAFTS_ON = (() => {
+  try { const s = JSON.parse(localStorage.getItem('hub.state') || '{}'); return !s || s.drafts !== false; }
+  catch (e) { return true; }
+})();
+
+// ============================== UTILS ==============================
+const $ = id => document.getElementById(id);
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+function gauss() {
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+// монеты/числа: «63 370» (пробел-тысячи, как в макетах онбординга), БЕЗ знака $;
+// дроби только у небольших значений
+const thou = (n, sep) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+function fmtCoins(v, sign = false) {
+  const a = Math.abs(v);
+  const s = v < 0 ? '−' : (sign ? '+' : '');
+  const num = a < 1000 && Math.abs(a - Math.round(a)) > 0.005
+    ? a.toFixed(2)
+    : thou(Math.round(a), ' ');
+  return s + num;
+}
+// шкала графика и флаг цены: «63.370» (точка-тысячи — так в макетах)
+const fmtAxis = v => thou(Math.round(v), '.');
+function fmtPct(p, sign = true) {
+  const a = Math.abs(p);
+  const d = a < 10 ? 2 : a < 100 ? 1 : 0;
+  return (p < 0 ? '−' : (sign ? '+' : '')) + a.toFixed(d) + '%';
+}
+const fmtTimer = s => { const t = Math.max(0, Math.ceil(s)); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
+
+// ============================== SOUND ==============================
+const Sound = {
+  ctx: null, on: true,
+  ensure() {
+    if (!this.ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) this.ctx = new AC();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+  },
+  tone(freq, dur, { type = 'sine', gain = 0.12, when = 0, slide = 0 } = {}) {
+    if (!this.on || !this.ctx) return;
+    const t0 = this.ctx.currentTime + when;
+    const o = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t0);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, freq + slide), t0 + dur);
+    g.gain.setValueAtTime(gain, t0);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g).connect(this.ctx.destination);
+    o.start(t0); o.stop(t0 + dur + 0.05);
+  },
+  noise(dur, gain = 0.25) {
+    if (!this.on || !this.ctx) return;
+    const n = this.ctx.sampleRate * dur;
+    const buf = this.ctx.createBuffer(1, n, this.ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    const src = this.ctx.createBufferSource(); src.buffer = buf;
+    const g = this.ctx.createGain(); g.gain.value = gain;
+    src.connect(g).connect(this.ctx.destination); src.start();
+  },
+  enter()  { this.tone(420, .09, {type:'square', gain:.08}); this.tone(640, .12, {type:'square', gain:.08, when:.06}); },
+  short()  { this.tone(640, .09, {type:'square', gain:.08}); this.tone(420, .12, {type:'square', gain:.08, when:.06}); },
+  exitWin(){ [523,659,784,1047].forEach((f,i)=>this.tone(f,.14,{type:'triangle',gain:.12,when:i*.06})); },
+  exitLoss(){ this.tone(360,.18,{type:'sawtooth',gain:.07,slide:-160}); this.tone(240,.22,{type:'sawtooth',gain:.07,when:.1,slide:-100}); },
+  warn()   { this.tone(880,.07,{type:'square',gain:.05}); },
+  count()  { this.tone(1200,.06,{type:'square',gain:.06}); },
+  liq()    { this.noise(.6,.3); this.tone(110,.7,{type:'sawtooth',gain:.22,slide:-70}); },
+  best()   { [659,784,988,1319,1568].forEach((f,i)=>this.tone(f,.18,{type:'triangle',gain:.13,when:i*.09})); },
+  unlock() { [523,784,1047,1568].forEach((f,i)=>this.tone(f,.16,{type:'triangle',gain:.13,when:i*.07})); },
+};
+
+// ============================== BINANCE FEED ==============================
+const Feed = {
+  ready: false, wsLive: false, lastPrice: null, lastAt: 0, pendingReal: null,
+  ws: null, wsTries: 0,
+  async init() {
+    try {
+      const ctl = new AbortController();
+      const to = setTimeout(() => ctl.abort(), 5000);
+      const r = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=60', { signal: ctl.signal });
+      clearTimeout(to);
+      const k = await r.json();
+      const closes = k.map(x => +x[4]).filter(x => x > 0);
+      if (closes.length < 10) throw new Error('bad klines');
+      this.lastPrice = closes[closes.length - 1];
+      this.lastAt = performance.now();
+      try { localStorage.setItem('trade_lastprice', String(this.lastPrice)); } catch (e) {}
+      this.ready = true;
+      this.openWs();
+    } catch (e) { this.ready = false; }
+  },
+  openWs() {
+    if (this.wsTries >= 5) return;
+    this.wsTries++;
+    try {
+      this.ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
+      this.ws.onmessage = ev => {
+        const p = +JSON.parse(ev.data).p;
+        if (p > 0) {
+          this.lastPrice = p; this.pendingReal = p;
+          this.lastAt = performance.now(); this.wsLive = true;
+          this.wsTries = 0;
+        }
+      };
+      this.ws.onclose = () => { this.wsLive = false; setTimeout(() => this.openWs(), 2500); };
+      this.ws.onerror = () => { try { this.ws.close(); } catch (e) {} };
+    } catch (e) { this.wsLive = false; }
+  },
+  fresh() { return this.lastPrice != null && performance.now() - this.lastAt < 5000; },
+};
+Feed.init();
+
+// ============================== PRICE ENGINE ==============================
+// Порт рынка «Сделки» (approved): собственная симуляция режимов + усиленные
+// ×GAIN движения живого BTC; vis — глайд; свечи фикс-темпа CANDLE_DUR.
+class PriceEngine {
+  constructor(p0, live) {
+    this.price = p0;
+    this.vis = p0;
+    this.live = live;
+    this.simTime = 0;
+    this.tickAcc = 0;
+    this.startPrice = p0;
+    this.regime = { drift: 0, sigma: 0.011, until: 0 };
+    this.trendStreak = 0; this.lastDir = 0;
+    this.lastReal = null;
+    this.candles = [];
+    this.hist = [];
+    this.nextRegime();
+  }
+  nextRegime() {
+    const rel = this.price / this.startPrice;
+    let upW = 0.38, dnW = 0.38;
+    if (rel > 1.6) { upW = 0.30; dnW = 0.46; }
+    else if (rel < 0.45) { upW = 0.46; dnW = 0.30; }
+    const r = Math.random();
+    let dir = 0;
+    if (r < upW) dir = 1; else if (r < upW + dnW) dir = -1;
+    let dur, drift, sigma;
+    if (dir === 0) {
+      dur = 0.9 + Math.random() * 3.1;
+      drift = (Math.random() - 0.5) * 0.008;
+      sigma = 0.010 + Math.random() * 0.008;
+    } else {
+      dur = 1.2 + Math.random() * 5.2;
+      drift = dir * (0.010 + Math.random() * 0.017);
+      sigma = 0.008 + Math.random() * 0.005;
+      const q = Math.random();
+      if (q < 0.10) { dur = 0.7 + Math.random() * 0.7; drift *= 2.4; }
+      else if (q < 0.28) { dur = 0.5 + Math.random() * 0.9;
+        drift *= (Math.random() < 0.5 ? -1 : 1) * (1.4 + Math.random()); }
+    }
+    this.regime = { drift, sigma, until: this.simTime + dur };
+  }
+  marketTick(dt) {
+    if (this.simTime >= this.regime.until) this.nextRegime();
+    let realDp = 0;
+    const live = this.live && Feed.fresh();
+    if (live && Feed.pendingReal) {
+      if (this.lastReal) realDp = clamp(Math.log(Feed.pendingReal / this.lastReal) * CFG.GAIN, -0.02, 0.02);
+      this.lastReal = Feed.pendingReal;
+      Feed.pendingReal = null;
+    }
+    const genScale = live ? 0.7 : 1;
+    // stage<3 (до анлока плеча): цена ходит ×OB_VOL активнее — новичок ВИДИТ качели
+    // на самом графике; вторая половина буста (×2 по очкам) — LEV_BASE (вердикт 26.07)
+    const volX = P.stage < 3 ? CFG.OB_VOL : 1;
+    const dp = (this.regime.drift * dt * genScale +
+               this.regime.sigma * genScale * Math.sqrt(dt) * gauss() + realDp) * volX;
+    this.price = Math.max(1, this.price * Math.exp(dp));
+  }
+  step(dt) {
+    if (this.live && !Feed.fresh()) {
+      this.live = false;
+      G.offline = true;
+      $('offlineBadge').classList.remove('hidden');
+    }
+    this.simTime += dt;
+    this.tickAcc += dt;
+    while (this.tickAcc >= CFG.SIM_TICK) { this.tickAcc -= CFG.SIM_TICK; this.marketTick(CFG.SIM_TICK); }
+    this.vis += (this.price - this.vis) * (1 - Math.exp(-dt / CFG.VIS_EASE));
+    let c = this.candles[this.candles.length - 1];
+    if (!c || this.simTime - c.t0 >= CFG.CANDLE_DUR) {
+      c = { t0: c ? c.t0 + CFG.CANDLE_DUR : this.simTime, o: this.vis, h: this.vis, l: this.vis, c: this.vis };
+      this.candles.push(c);
+      if (this.candles.length > CFG.VISIBLE + 4) this.candles.shift();
+    }
+    c.c = this.vis; if (this.vis > c.h) c.h = this.vis; if (this.vis < c.l) c.l = this.vis;
+    this.hist.push({ t: this.simTime, p: this.vis });
+    while (this.hist.length && this.simTime - this.hist[0].t > 3) this.hist.shift();
+  }
+  prefill() {
+    for (let i = 0; i < (CFG.VISIBLE + 1) * CFG.CANDLE_DUR * 30; i++) this.step(1 / 30);
+  }
+}
+
+// ============================== FX (конфетти) ==============================
+const FX = {
+  cv: null, cx: null, parts: [],
+  init() { this.cv = $('fx'); this.cx = this.cv.getContext('2d'); this.resize(); },
+  resize() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    this.cv.width = SW * dpr; this.cv.height = SH * dpr;
+    this.cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  },
+  burst(x, y, n, big = false) {
+    const colors = ['#1fa05c', '#ef4136', '#f7a92c', '#4a63e7', '#46345e', '#ffd977'];
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, sp = (big ? 260 : 180) * (0.4 + Math.random());
+      this.parts.push({
+        x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - (big ? 160 : 80),
+        w: 5 + Math.random() * 6, h: 8 + Math.random() * 7,
+        rot: Math.random() * Math.PI, vr: (Math.random() - .5) * 10,
+        c: colors[(Math.random() * colors.length) | 0], life: 1.4 + Math.random() * .8,
+      });
+    }
+  },
+  rain() { for (let i = 0; i < 90; i++) setTimeout(() => this.burst(20 + Math.random() * 335, -10, 1, true), i * 18); },
+  update(dt) {
+    if (!this.parts.length) { this.cx.clearRect(0, 0, 375, 812); return; }
+    this.cx.clearRect(0, 0, 375, 812);
+    this.parts = this.parts.filter(p => (p.life -= dt) > 0);
+    for (const p of this.parts) {
+      p.vy += 520 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt;
+      this.cx.save();
+      this.cx.translate(p.x, p.y); this.cx.rotate(p.rot);
+      this.cx.globalAlpha = clamp(p.life, 0, 1);
+      this.cx.fillStyle = p.c;
+      this.cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      this.cx.restore();
+    }
+  },
+};
+
+// ============================== GAME STATE ==============================
+const G = {
+  screen: 'start', paused: false, over: false,
+  gameT: 0,
+  cash: CFG.START_BAL,       // свободные монеты
+  dispBal: CFG.START_BAL, seed: CFG.START_BAL,
+  pos: null,                 // {dir, lev, frac, entryPrice, stake, entryT, peakPnl}
+  hearts: CFG.HEARTS,
+  trades: [],
+  liqsThisRound: 0,
+  streak: 0,                 // подряд закрытых сделок в плюс (сигнал «пика», встреча п.5)
+  peakSent: false,
+  best: (() => { try { return Number(localStorage.getItem('trade_best') || 0); } catch (e) { return 0; } })(),
+  engine: null, offline: false, startPrice: 0,
+  dispPrice: 0,
+  txtAcc: 9,
+  axisTxt: '',
+  lastFrame: 0, lastDt: 1 / 60, lastCountSec: 99, melting: false,
+  yMin: 0, yMax: 1, yInit: false,
+  // выбор игрока (контролы)
+  lev: CFG.LEV_BASE,         // stage<3 — скрытый LEV_BASE; stage 3+ — выбор из LEVS
+  frac: 1,                   // stage<4 — всегда 1; stage 4+ — выбор из FRACS
+  // возможности ТЕКУЩЕГО раунда (фиксируются на старте; вердикт 30.07 п.23):
+  // онбординг-сим 1 — только лонг; сим 2 — +шорт; сим 3 — +плечо; реальные — по стадии
+  caps: { short: false, lev: false, frac: false, ob: 0 },
+};
+/* гейты раунда (вердикт 30.07 п.23): в онбординге механики открываются ПО РАУНДАМ
+   (1 лонг / 2 шорт / 3 плечо), частичные позиции — всегда пост-онбординг (п.18 без
+   изменений); в реальных раундах — прежняя стадийная логика */
+function roundCaps() {
+  if (G.simRound && !G.partialTraining) {
+    const n = clamp(P.rounds + 1, 1, OB_ROUNDS);
+    return { short: n >= 2, lev: n >= 3, frac: false, ob: n };
+  }
+  return { short: P.stage >= 2, lev: P.stage >= 3, frac: P.stage >= 4 || !!G.partialTraining, ob: 0 };
+}
+// полный баланс «по себестоимости»: кэш + вложенное в позицию (двигается при закрытии)
+function balTotal() { return G.cash + (G.pos ? G.pos.stake : 0); }
+
+const chart = $('chart');
+const ctx = chart.getContext('2d');
+let chartW = 0, chartH = 0;
+// стейдж = фигма-фрейм онбординг-макетов @1x (375×812); в окне/айфрейме масштабируется
+const SW = 375, SH = 812;
+const RING_LEN = 219.9; // 2π×35 — кольцо таймера из макета (76×76, страйк 6)
+
+function resizeAll() {
+  const s = Math.min(window.innerWidth / SW, window.innerHeight / SH);
+  $('stage').style.setProperty('--s', s);
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const r = $('chartWrap').getBoundingClientRect();
+  const st = $('stage').getBoundingClientRect();
+  chartW = st.width > 0 ? r.width / (st.width / SW) : SW;
+  chartH = st.height > 0 ? r.height / (st.height / SH) : 300;
+  chart.width = Math.max(10, Math.round(chartW * dpr));
+  chart.height = Math.max(10, Math.round(chartH * dpr));
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  FX.resize();
+}
+
+/* PnL позиции в % от стейка: dir-осознанный (шорты по модели «Лонг/Шорт»),
+   плечо игрока (stage 3+) или скрытый буст ×4 (stage 1–2) */
+function pnlNow() {
+  if (!G.pos) return 0;
+  return G.pos.dir * (G.dispPrice / G.pos.entryPrice - 1) * 100 * G.pos.lev;
+}
+function liqPriceOf(pos) {
+  // pnl = dir*(p/e−1)*lev*100 = LIQ_PNL → p = e*(1 + LIQ_PNL/(100*lev*dir))
+  return pos.entryPrice * (1 + CFG.LIQ_PNL / (100 * pos.lev * pos.dir));
+}
+
+// ---------- screens ----------
+function show(name) {
+  G.screen = name;
+  $('screen-start').classList.toggle('hidden', name !== 'start');
+  $('screen-game').classList.toggle('hidden', name !== 'game');
+  $('screen-result').classList.toggle('hidden', name !== 'result');
+  if (name === 'start') renderStart();
+  resizeAll();
+}
+
+// hub integration: из хаба раунд играется котлетой кошелька (hub.balance)
+function hubStartBal() {
+  if (window.parent === window) return null;
+  try {
+    const v = parseInt(localStorage.getItem('hub.balance'), 10);
+    if (Number.isFinite(v)) return Math.max(0, v);
+  } catch (e) {}
+  return null;
+}
+
+// ---------- start screen: лесенка механик + стадия ----------
+function renderStart() {
+  const badge = $('stageBadge');
+  badge.textContent = gt('stage.badge', P.stage, MAX_STAGE);
+  badge.classList.toggle('draftable', DRAFTS_ON);
+  const list = $('howtoList');
+  const rows = [['👆', gt('howto.1.enter')], ['📈', gt('howto.chart')], ['✋', gt('howto.1.exit')]];
+  if (P.stage >= 2) rows.push(['↕️', gt('howto.short')]);
+  if (P.stage >= 3) rows.push(['⚡', gt('howto.lev')]);
+  if (P.stage >= 4) rows.push(['🧩', gt('howto.partial')]);
+  rows.push(['💥', gt('howto.liq')]);
+  list.innerHTML = rows.map(([i, s]) => `<li><span class="how-ico">${i}</span> ${s}</li>`).join('');
+}
+
+// ---------- intro overlays (one-time онбординг ступеней; решение встречи п.3) ----------
+function introDue() {
+  if (P.stage >= 2 && !P.intros.short) return 'short';
+  if (P.stage >= 3 && !P.intros.lev) return 'lev';
+  return null;
+}
+function showIntro(kind, onDone) {
+  // пауза на время интро: без неё раунд дотикивал и ликвидировался ПОД оверлеем (QA 25.07)
+  const wasPaused = G.paused;
+  G.paused = true;
+  const ov = $('introOverlay');
+  $('introTitle').textContent = gt('intro.' + kind + '.t');
+  $('introBody').innerHTML =
+    `<p>${gt('intro.' + kind + '.1')}</p><p>${gt('intro.' + kind + '.2')}</p>` +
+    (kind === 'short'
+      ? `<div class="intro-demo"><span class="demo-pill long">Long ▲</span><span class="demo-pill short">Short ▼</span></div>`
+      : kind === 'partial'
+      ? `<div class="intro-demo"><span class="demo-pill lev">25%</span><span class="demo-pill lev">50%</span><span class="demo-pill lev on">75%</span><span class="demo-pill lev">100%</span></div>`
+      : `<div class="intro-demo"><span class="demo-pill lev">×1</span><span class="demo-pill lev on">×2</span><span class="demo-pill lev">×3</span><span class="demo-pill lev">×4</span><span class="demo-pill lev">×5</span></div>`);
+  $('introDraft').classList.toggle('hidden', !DRAFTS_ON);
+  ov.classList.remove('hidden');
+  $('btnIntroOk').textContent = gt('gotit');
+  $('btnIntroOk').onclick = () => {
+    ov.classList.add('hidden');
+    G.paused = wasPaused;
+    P.intros[kind] = true;
+    saveP();
+    if (onDone) onDone();
+  };
+}
+
+function startRound() {
+  // интро-модалки шортов/плеча в онбординге НЕ показываются (вердикт 30.07 п.23:
+  // их заменяют хабовые баблы туториала); путь для игрока, миновавшего онбординг
+  // (миграция со старых порогов), оставлен рабочим
+  if (!onboarding()) {
+    const intro = introDue();
+    if (intro) { showIntro(intro, startRound); return; }
+  }
+
+  const liveOk = Feed.ready && Feed.fresh();
+  const seed = Feed.lastPrice || (() => { try { return Number(localStorage.getItem('trade_lastprice')); } catch (e) { return 0; } })() || 63370;
+  G.offline = !liveOk;
+  $('offlineBadge').classList.toggle('hidden', liveOk);
+  G.engine = new PriceEngine(seed, liveOk);
+  G.engine.prefill();
+
+  // онбординг = СИМУЛЯЦИЯ (вердикт 25.07): сид всегда 1000, кошелёк игрока не трогаем;
+  // обучающий раунд частичных позиций (тап по 🔒) — тоже симуляция, тем же контуром.
+  // Флаги фиксируем на старте, чтобы финиш раунда судился по тому, чем раунд БЫЛ
+  G.partialTraining = !!P.pendingPartial;
+  if (P.pendingPartial) { P.pendingPartial = false; saveP(); }
+  G.simRound = onboarding() || G.partialTraining;
+  const hb = hubStartBal();
+  G.seed = G.simRound ? CFG.START_BAL : (hb !== null ? hb : CFG.START_BAL);
+  G.gameT = 0; G.cash = G.seed; G.dispBal = G.seed;
+  G.pos = null; G.trades = []; G.over = false; G.paused = false;
+  G.hubReported = false;
+  G.hearts = CFG.HEARTS; G.lastCountSec = 99; G.melting = false; G.yInit = false;
+  G.liqsThisRound = 0; G.streak = 0; G.peakSent = false;
+  // длительность зафиксирована на старте (обучающие 15с / обычный 60с); плашки не врут
+  G.roundMs = (G.simRound ? CFG.OB_ROUND_SEC : CFG.ROUND_SEC) * 1000;
+  document.querySelectorAll('.js-roundlen').forEach(el => { el.textContent = (G.roundMs / 1000) + ' sec'; });
+  // таймер сразу показывает ДЛИНУ ЭТОГО раунда (QA 30.07: замороженный за баблами
+  // онбординг-раунд светил статикой «1:00» при 15-секундном раунде)
+  $('timerText').textContent = fmtTimer(G.roundMs / 1000);
+  $('timerText').classList.remove('hot');
+  $('ringArc').style.strokeDasharray = '0 ' + RING_LEN;
+  G.startPrice = G.engine.vis;
+  G.dispPrice = G.engine.vis;
+  G.txtAcc = 9; G.axisTxt = '';
+  // гейты раунда — по типу раунда (онбординг-сим N / реальный), фиксируются на старте
+  G.caps = roundCaps();
+  // дефолт плеча ×2 (вердикт 25.07): в каждой новой сессии игры, пока игрок сам не
+  // выбрал сегмент (G.levUserSet живёт в рамках iframe) — LEV_BASE входит в LEVS,
+  // поэтому проверка принадлежности дефолт не чинила (находка QA 25.07)
+  if (G.caps.lev) { if (!G.levUserSet || !CFG.LEVS.includes(G.lev)) G.lev = CFG.LEV_DEF; }
+  else G.lev = CFG.LEV_BASE;
+  G.frac = 1;
+
+  // онбординг-симы: сердца скрыты, справа кебаб (макеты onb1–onb3; ★draft: данные
+  // сердец живут, кебаб открывает существующее пауза-меню; в реальных раундах — сердца)
+  const obSim = G.caps.ob > 0;
+  $('hearts').classList.toggle('hidden', obSim);
+  $('btnKebab').classList.toggle('hidden', !obSim);
+  document.querySelectorAll('#hearts .heart').forEach(h => h.classList.remove('lost', 'pop'));
+  $('pnlBox').classList.add('hidden');
+  $('tickerBox').classList.remove('hidden');
+  $('liqOverlay').classList.add('hidden');
+  $('meltWarn').classList.add('hidden');
+  renderControls();
+  show('game');
+
+  // обучающий раунд частичных позиций — плашка-подсказка, чем он отличается
+  if (G.partialTraining) hintFloat(gt('hint.partial'));
+}
+
+/* тап по залоченным Size (вердикт 25.07): интро про хеджирование → обучающий сим-раунд.
+   Живой раунд НЕ перезапускаем (QA 25.07: сжигал fee и результат) — тренировка встаёт
+   в очередь (P.pendingPartial, переживает закрытие iframe) и стартует следующим раундом. */
+function startPartialTraining() {
+  showIntro('partial', () => {
+    // рефанд входа (вердикт 27.07 вечер): игрок ПЛАТНОГО раунда проваливается в обучение —
+    // просим хаб вернуть fee. Только реальный раунд (!G.simRound: онбординг/повтор
+    // тренировки бесплатны) и один запрос на заказ (гейт !P.pendingPartial); хаб сам
+    // дополнительно гардит «ровно один рефанд на платный раунд» (hub:feeRefund в shell.js)
+    if (!G.simRound && !P.pendingPartial && window.parent !== window) {
+      try { window.parent.postMessage({ type: 'hub:feeRefund', game: 'trade' }, '*'); } catch (e) {}
+    }
+    P.pendingPartial = true;
+    saveP();
+    if (G.over) { startRound(); return; }
+    hintFloat(gt('hint.trainq'));
+  });
+}
+
+// ---------- controls (кнопки + ряды Leverage / Trade size по гейтам раунда) ----------
+function renderControls() {
+  const inPos = !!G.pos;
+  const caps = G.caps;
+  // кнопки действий: раунд без шортов = одна зелёная Buy (макет onb1-1);
+  // с шортами — пара Long/Short; в позиции — синяя Close position
+  $('btnLong').classList.toggle('hidden', inPos);
+  $('btnShort').classList.toggle('hidden', inPos || !caps.short);
+  $('btnExit').classList.toggle('hidden', !inPos);
+  $('lblLong').textContent = caps.short ? 'Long' : 'Buy';
+  if (inPos) {
+    $('lblExit').textContent = (caps.frac && G.frac < 1)
+      ? gt('ui.closeFrac', Math.round(G.frac * 100))
+      : gt('ui.close');
+  }
+  // ряд плеча: всегда виден вне позиции; до анлока — залочен (замок + пилюли 30%,
+  // «выбран» показывается x1 — макеты onb1-4/onb2-4)
+  const levCtl = $('levCtl');
+  const levLocked = !caps.lev;
+  levCtl.classList.toggle('locked', levLocked);
+  levCtl.querySelector('.lock-ico').classList.toggle('hidden', !levLocked);
+  levCtl.querySelectorAll('button[data-lev]').forEach(b =>
+    b.classList.toggle('on', +b.dataset.lev === (levLocked ? 1 : G.lev)));
+  // ряд доли: весь онбординг залочен (100% «выбран»); в основной игре на stage 3 —
+  // залочен + кнопка 🔒 Open (обучающий раунд, вердикт 25.07 / п.18); stage 4+ открыт
+  const fracCtl = $('fracCtl');
+  const fracLocked = !caps.frac;
+  const fracUnlockable = fracLocked && P.stage >= 3 && !onboarding() && !G.simRound;
+  fracCtl.classList.toggle('locked', fracLocked);
+  fracCtl.querySelector('.lock-ico').classList.toggle('hidden', !fracLocked);
+  fracCtl.querySelectorAll('button[data-frac]').forEach(b =>
+    b.classList.toggle('on', +b.dataset.frac === (fracLocked ? 1 : G.frac)));
+  $('fracUnlock').classList.toggle('hidden', !fracUnlockable);
+  // в позиции ряды скрыты — карточка PnL раскрывается на их место (макеты onb1-5/onb3-5)
+  $('ctlBar').classList.toggle('hidden', inPos);
+  $('infoCard').classList.toggle('inpos', inPos);
+  $('infoCard').classList.toggle('haslev', inPos && caps.lev);
+  $('liqBlock').classList.toggle('hidden', !inPos || !caps.lev);
+  $('ctlBar').classList.toggle('draftable', DRAFTS_ON && !inPos);
+}
+
+// ---------- позиция ----------
+/* комиссия за вход: 0.5% вложенного стейка (душит микро-скальпинг; решение 24.07) */
+const TRADE_FEE = 0.005;
+function feeFloat(txt) { floatMsg(txt, '#e8b64e'); }
+function hintFloat(txt) { floatMsg(txt, '#4a63e7', 2600); }
+function floatMsg(txt, color, life = 950) {
+  const d = document.createElement('div');
+  d.textContent = txt;
+  d.style.cssText = 'position:fixed;left:50%;top:26%;transform:translate(-50%,0);color:' + color + ';' +
+    'font:700 15px -apple-system,Arial;opacity:1;transition:all ' + (life / 1000) + 's ease-out;z-index:60;' +
+    'pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.45);max-width:320px;text-align:center;';
+  document.body.appendChild(d);
+  requestAnimationFrame(() => { d.style.opacity = '0'; d.style.transform = 'translate(-50%,-30px)'; });
+  setTimeout(() => d.remove(), life + 60);
+}
+
+/* вход: stake = frac × кэш (частичные позиции, stage 4), плечо игрока (stage 3+).
+   Математика: позиция = frac × stack × lev (номинал); PnL в % считается от стейка.
+   Пример-эталон (встреча): 1000 монет, вход 75% → 750 в позиции, 250 в кэше. */
+function enterPos(dir) {
+  if (G.pos || G.cash < 1) return;
+  if (dir === -1 && !G.caps.short) return; // шорт закрыт до его гейта (сим 2 / stage 2)
+  const frac = G.caps.frac ? G.frac : 1;
+  const gross = G.cash * frac;
+  const fee = gross * TRADE_FEE;
+  const stake = gross - fee;
+  G.cash -= gross;
+  if (fee > 0) feeFloat('fee −' + fmtCoins(Math.max(1, Math.round(fee))));
+  G.pos = {
+    dir,
+    lev: G.caps.lev ? G.lev : CFG.LEV_BASE,
+    frac,
+    entryPrice: G.dispPrice,
+    stake,
+    entryT: G.gameT,
+    peakPnl: 0,
+  };
+  G.melting = false;
+  G.frac = 1; // после входа селектор доли = доля ВЫХОДА, дефолт 100%
+  $('pnlBox').classList.remove('hidden');
+  $('tickerBox').classList.add('hidden');
+  $('entryPriceEl').textContent = fmtCoins(G.pos.entryPrice);
+  renderPosMeta();
+  renderControls();
+  if (dir === 1) Sound.enter(); else Sound.short();
+}
+
+/* бейджи карточки позиции (макет onb3-5): слева синий xN, справа Long/Short —
+   только с открытым плечом (онбординг-сим 3 / stage 3+); в ранних симах карточка чистая */
+function renderPosMeta() {
+  const p = G.pos;
+  if (!p) return;
+  const showB = G.caps.lev;
+  const lb = $('posLevBadge'), db = $('posDirBadge');
+  lb.classList.toggle('hidden', !showB);
+  db.classList.toggle('hidden', !showB);
+  if (showB) {
+    lb.textContent = 'x' + p.lev;
+    db.textContent = p.dir === 1 ? 'Long' : 'Short';
+    db.classList.toggle('long', p.dir === 1);
+    db.classList.toggle('short', p.dir === -1);
+  }
+}
+
+/* выход: доля fracExit реализуется в кэш; остаток позиции живёт с той же ценой входа */
+function exitPos(auto = false) {
+  if (!G.pos) return;
+  const fracExit = (G.caps.frac && !auto) ? G.frac : 1;
+  const pnl = clamp(pnlNow(), CFG.LIQ_PNL, 99999);
+  const part = G.pos.stake * fracExit;
+  const realized = Math.max(0, part * (1 + pnl / 100));
+  G.cash += realized;
+  G.pos.stake -= part;
+  recordTrade(pnl, realized - part, false, auto);
+  if (fracExit === 0.5) Tasks.set('partial50'); // practice task №3
+  const closedAll = fracExit >= 1 || G.pos.stake < 1;
+  if (closedAll) {
+    if (G.pos.stake > 0) { G.cash += Math.max(0, G.pos.stake * (1 + pnl / 100)); G.pos.stake = 0; }
+    closePosUI();
+  } else {
+    renderPosMeta();
+    renderControls();
+  }
+  if (pnl >= 0) Sound.exitWin(); else Sound.exitLoss();
+  if (pnl >= 30) FX.burst(188, 370, 36);
+  flash(false);
+}
+
+function recordTrade(pnl, usd, liq, auto) {
+  const p = G.pos;
+  G.trades.push({
+    pnl, usd,
+    dir: p ? p.dir : 1,
+    lev: p ? p.lev : CFG.LEV_BASE,
+    dur: Math.max(1, Math.round((G.gameT - (p ? p.entryT : G.gameT)) / 1000)),
+    liq: !!liq, auto: !!auto,
+  });
+  if (usd > 0 && !liq) {
+    P.profitTrades++;
+    saveP();
+    Tasks.set('profit'); // practice task №1
+    G.streak++;
+    // (вердикт 25.07) пик-триггер «4 профитных закрытия подряд» ОТМЕНЁН — теперь пик
+    // считается по РАУНДАМ (3 выигранных подряд с PnL ≥ +30%, см. finishRound)
+  } else if (usd < 0 || liq) {
+    G.streak = 0;
+  }
+}
+
+function closePosUI() {
+  G.pos = null; G.melting = false;
+  $('pnlBox').classList.add('hidden');
+  $('tickerBox').classList.remove('hidden');
+  $('meltWarn').classList.add('hidden');
+  G.frac = 1;
+  renderControls();
+}
+
+function flash(red) {
+  const f = $('flash');
+  f.classList.toggle('red', red);
+  f.classList.remove('on'); void f.offsetWidth; f.classList.add('on');
+}
+
+// ---------- ликвидация / конец раунда ----------
+function liquidate() {
+  const part = G.pos.stake;
+  const realized = Math.max(0, part * (1 + CFG.LIQ_PNL / 100));
+  G.cash += realized;
+  G.pos.stake = 0;
+  recordTrade(CFG.LIQ_PNL, realized - part, true, false);
+  closePosUI();
+  G.liqsThisRound++;
+  G.hearts--;
+  const hearts = document.querySelectorAll('#hearts .heart');
+  const h = hearts[G.hearts];
+  if (h) { h.classList.add('lost'); h.classList.remove('pop'); void h.offsetWidth; h.classList.add('pop'); }
+  Sound.liq();
+  flash(true);
+  $('liqSub').textContent = G.hearts > 0
+    ? `−50% · ${G.hearts === 2 ? 'two hearts' : 'one heart'} left`
+    : '−50% · no hearts left';
+  $('liqOverlay').classList.remove('hidden');
+  const st = $('stage');
+  st.classList.remove('shake'); void st.offsetWidth; st.classList.add('shake');
+  if (G.hearts <= 0) {
+    G.over = true;
+    setTimeout(() => finishRound(), 1600);
+  } else {
+    setTimeout(() => $('liqOverlay').classList.add('hidden'), 1200);
+  }
+}
+
+function endRound() {
+  G.over = true;
+  if (G.pos) exitPos(true);
+  setTimeout(() => finishRound(), 450);
+}
+
+// hub integration: результат раунда + лесенка (stage/stagedUp) — контракт hub:roundEnd.
+// sim=true (раунд онбординга) → шелл НЕ зачисляет фишки; peak=true → прайм-момент
+// «пика» по вердикту 25.07 (3 выигранных раунда подряд с PnL ≥ +30%)
+function reportToHub(earned, stagedUp) {
+  if (window.parent === window) return;
+  try {
+    window.parent.postMessage({
+      type: 'hub:roundEnd', game: 'trade', earned: Math.round(earned),
+      stage: P.stage, stagedUp: !!stagedUp,
+      sim: !!G.simRound, peak: !G.simRound && P.hotStreak >= 3,
+      // АДДИТИВНЫЕ поля (30.07, под новый Round Complete хаба; старые не переименованы):
+      // obRound — номер только что сыгранного онбординг-сима (1..3, 0 = не онбординг);
+      // trades/wins/liqs — закрытия за раунд; bestTradePnl — лучший PnL сделки, %
+      obRound: G.caps.ob || 0,
+      trades: G.trades.length,
+      wins: G.trades.filter(t => t.usd > 0 && !t.liq).length,
+      liqs: G.liqsThisRound,
+      bestTradePnl: G.trades.length ? Math.round(Math.max(...G.trades.map(t => t.pnl))) : 0,
+    }, '*');
+  } catch (e) {}
+}
+
+function finishRound() {
+  $('liqOverlay').classList.add('hidden');
+  if (Feed.lastPrice) localStorage.setItem('trade_lastprice', String(Feed.lastPrice));
+  const profit = Math.round(G.cash - G.seed);
+
+  // прогресс лесенки: раунды двигают стадии 2–3 (онбординг), cumEarned копит ПЛЮСОВЫЕ
+  // раунды для порога stage 4; стадия применяется в конце раунда
+  P.rounds++;
+  if (profit > 0) P.cumEarned += profit;
+  // «пик» (вердикт 25.07): 3 выигранных раунда ПОДРЯД с PnL ≥ +30% («на деле будет позже»).
+  // Считаем ТОЛЬКО реальные раунды с живым сидом (находка QA: симы и сид 0 кормили серию)
+  if (!G.simRound && G.seed > 0) P.hotStreak = profit >= G.seed * 0.30 ? (P.hotStreak || 0) + 1 : 0;
+  const before = P.stage;
+  const tgt = targetStage();
+  if (tgt > P.stage) P.stage = tgt;
+  if (G.partialTraining) P.stage = MAX_STAGE; // обучение пройдено → частичные открыты (вердикт 25.07)
+  const stagedUp = P.stage > before;
+  // онбординг-сим: механику уже научили хаб-баблы этого раунда (вердикт 30.07 п.23) —
+  // старые интро-модалки шортов/плеча гасим навсегда; для миновавших онбординг путь жив
+  if (G.caps.ob > 0) {
+    if (P.stage >= 2) P.intros.short = true;
+    if (P.stage >= 3) P.intros.lev = true;
+  }
+  saveP();
+
+  // practice task №2: раунд с ≥1 закрытой сделкой и без единой ликвидации
+  if (G.trades.length > 0 && G.liqsThisRound === 0) Tasks.set('survive');
+
+  if (!G.hubReported) { G.hubReported = true; reportToHub(profit, stagedUp); }
+  const isBest = profit > G.best;
+  if (isBest) { G.best = profit; localStorage.setItem('trade_best', String(profit)); }
+
+  $('resScore').textContent = fmtCoins(profit, true);
+  $('resScore').style.color = profit < 0 ? 'var(--red)' : 'var(--ink)';
+  $('resMult').textContent = '×' + (Math.max(0, G.cash) / (G.seed || 1)).toFixed(1) + ' from start';
+  $('resBest').textContent = 'Best result: ' + fmtCoins(G.best, true);
+  $('resBestBadge').classList.toggle('hidden', !isBest);
+  $('tradesAll').textContent = `View all (${G.trades.length})`;
+
+  // плашка «открыта новая механика» (черновой дизайн; draft-помечена)
+  const ub = $('unlockBand');
+  if (stagedUp) {
+    const names = [];
+    for (let s = before + 1; s <= P.stage; s++) {
+      names.push(gt(s === 2 ? 'mech.short' : s === 3 ? 'mech.lev' : 'mech.partial'));
+    }
+    ub.querySelector('.ub-text').textContent = gt('unlock.band', names.join(' + '));
+    ub.classList.remove('hidden');
+    ub.classList.toggle('draftable', DRAFTS_ON);
+    Sound.unlock();
+    FX.rain();
+  } else {
+    ub.classList.add('hidden');
+  }
+
+  // история сделок
+  const tr = $('resTrades');
+  tr.innerHTML = '';
+  if (!G.trades.length) tr.innerHTML = '<div class="res-none">No trades — be bolder!</div>';
+  G.trades.slice(-7).reverse().forEach(t => {
+    const d = document.createElement('div');
+    d.className = 'trade-row';
+    const dirTag = `<span class="dir-badge ${t.dir === 1 ? 'long' : 'short'}">${t.dir === 1 ? '▲ Long' : '▼ Short'}</span>`;
+    const levTag = G.caps.lev ? ` ×${t.lev}` : ''; // до анлока плеча скрытый буст не светим
+    d.innerHTML =
+      `<div class="trade-ico">${t.dir === 1 ? '📈' : '📉'}</div>` +
+      `<div class="trade-main"><div class="trade-pair">BTC/USDT${levTag}</div><div class="trade-dur">${dirTag} ${t.dur}s${t.auto ? ' · auto' : ''}</div></div>` +
+      (t.liq ? '<span class="liq-badge">LIQUIDATION</span>' : '') +
+      `<div class="trade-pnl ${t.usd >= 0 ? 'win' : 'loss'}">${fmtCoins(Math.round(t.usd), true)}</div>`;
+    tr.appendChild(d);
+  });
+
+  // лидерборд: топ-3 + You
+  const lb = $('leaderboard');
+  lb.innerHTML = '';
+  const rows = NICKS.map(([n, s]) => ({ n, s, me: false }));
+  rows.push({ n: 'You', s: profit, me: true });
+  rows.sort((a, b) => b.s - a.s);
+  const myIdx = rows.findIndex(r => r.me);
+  let shown;
+  if (myIdx <= 3) shown = rows.slice(0, 4).map((r, i) => ({ ...r, place: i + 1 }));
+  else {
+    shown = rows.slice(0, 3).map((r, i) => ({ ...r, place: i + 1 }));
+    const fakeRank = clamp(4 + Math.round((rows[2].s - profit) / 120), 4, 99);
+    shown.push({ n: 'You', s: profit, me: true, place: fakeRank });
+  }
+  shown.forEach(r => {
+    const d = document.createElement('div');
+    d.className = 'lb-row' + (r.me ? ' me' : '');
+    d.innerHTML = `<div class="lb-place">${r.place}</div><div class="lb-name">${r.n}</div>` +
+      `<div class="lb-score">${fmtCoins(r.s, true)}</div>`;
+    lb.appendChild(d);
+  });
+
+  show('result');
+  if (isBest && profit > 0 && !stagedUp) { Sound.best(); FX.rain(); }
+}
+
+// ============================== CHART RENDER ==============================
+/* по онбординг-макетам: сетка/свечи на всю ширину, подписи шкалы ПОВЕРХ справа
+   (Nunito 600 14, чернила 70%, точка-тысячи), белый пунктир 1px [6,6], свечи
+   #13A86D/#F54040 (тело ~0.68 слота, r1, фитиль 1px), синий флаг цены прижат к
+   правому краю (r12, белая обводка 2), зелёная зона профита #22C55E 30% c белыми
+   кромками, линия ликвидации — красный пунктир без подписи (onb3-3) */
+const C_GREEN = '#13A86D', C_RED = '#F54040', C_BLUE = '#4068F5';
+const AXIS_FONT = '600 14px Nunito, ui-rounded, system-ui, sans-serif';
+
+function niceStep(raw) {
+  const pow = Math.pow(10, Math.floor(Math.log10(raw)));
+  const m = raw / pow;
+  return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * pow;
+}
+
+function drawChart() {
+  const W = chartW, H = chartH;
+  ctx.clearRect(0, 0, W, H);
+  const e = G.engine;
+  if (!e || !e.candles.length) return;
+  const plotW = W;
+  const candles = e.candles;
+  const slot = plotW / CFG.VISIBLE;
+  const bodyW = slot * 0.68;
+  const cur = candles[candles.length - 1];
+  const progress = clamp((e.simTime - cur.t0) / CFG.CANDLE_DUR, 0, 1);
+  const first = Math.max(0, candles.length - (CFG.VISIBLE + 1));
+
+  let lo = Infinity, hi = -Infinity;
+  for (let i = first; i < candles.length; i++) {
+    if (candles[i].l < lo) lo = candles[i].l;
+    if (candles[i].h > hi) hi = candles[i].h;
+  }
+  if (G.pos) { lo = Math.min(lo, G.pos.entryPrice); hi = Math.max(hi, G.pos.entryPrice); }
+  const pad = Math.max((hi - lo) * 0.22, e.price * 0.004);
+  const tLo = lo - pad, tHi = hi + pad;
+  if (!G.yInit) { G.yMin = tLo; G.yMax = tHi; G.yInit = true; }
+  const kY = 1 - Math.exp(-6 * G.lastDt);
+  G.yMin += (tLo - G.yMin) * kY;
+  G.yMax += (tHi - G.yMax) * kY;
+
+  const Y = p => H - ((p - G.yMin) / (G.yMax - G.yMin)) * H;
+  const xOf = i => plotW - (candles.length - 1 - i + progress) * slot + slot * 0.5;
+
+  const pnl = pnlNow();
+
+  // зелёная зона: сторона профита от уровня входа до текущей цены (для лонга выше
+  // входа, для шорта ниже — onb1-3/onb2-3); в минусе зоны нет (макет onb3-3)
+  if (G.pos && pnl >= 0 && Math.abs(Y(G.pos.entryPrice) - Y(e.vis)) >= 3) {
+    const eY = Y(G.pos.entryPrice), cY = Y(e.vis);
+    const top = Math.min(eY, cY), hgt = Math.abs(cY - eY);
+    ctx.fillStyle = 'rgba(34,197,94,0.30)';
+    ctx.fillRect(0, top, plotW, hgt);
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, top + 0.5); ctx.lineTo(plotW, top + 0.5);
+    ctx.moveTo(0, top + hgt - 0.5); ctx.lineTo(plotW, top + hgt - 0.5);
+    ctx.stroke();
+  }
+
+  // сетка: белый пунктир 1px [6,6]; подписи над линиями у правого края
+  const range = G.yMax - G.yMin;
+  const step = Math.max(niceStep(range / 5.5), 1); // ~4–5 линий, плотность как в макете
+  const firstLine = Math.ceil(G.yMin / step) * step;
+  const lines = [];
+  let gridTop = H, gridBot = 0;
+  for (let p = firstLine; p < G.yMax; p += step) {
+    const y = Y(p);
+    lines.push([p, y]);
+    if (y < gridTop) gridTop = y;
+    if (y > gridBot) gridBot = y;
+  }
+  ctx.setLineDash([6, 6]);
+  ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+  ctx.lineWidth = 1;
+  for (const [, y] of lines) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(plotW, y); ctx.stroke();
+  }
+  // вертикальный пунктир — между крайними линиями сетки (как в макете)
+  if (lines.length > 1) {
+    for (let i = first; i < candles.length; i++) {
+      if (Math.round(candles[i].t0 / CFG.CANDLE_DUR) % 2 !== 0) continue;
+      const x = xOf(i);
+      if (x < -4 || x > plotW + 4) continue;
+      ctx.beginPath(); ctx.moveTo(x, gridTop); ctx.lineTo(x, gridBot); ctx.stroke();
+    }
+  }
+  ctx.setLineDash([]);
+  ctx.font = AXIS_FONT;
+  ctx.fillStyle = 'rgba(76,51,74,0.70)';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'bottom';
+  for (const [p, y] of lines) ctx.fillText(fmtAxis(p), plotW - 1, y - 2);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+
+  // линия ликвидации: красный пунктир на всю ширину, без подписи (onb3-3);
+  // только с открытым плечом (гейт caps.lev) — в симах 1–2 ликвидацию ещё не учили,
+  // макеты onb1-5/onb2-5 линии не показывают (скрытый LEV_BASE мог её засветить)
+  if (G.pos && G.caps.lev) {
+    const lY = Y(liqPriceOf(G.pos));
+    if (lY > 0 && lY < H) {
+      ctx.setLineDash([6, 6]);
+      ctx.strokeStyle = 'rgba(245,64,64,0.85)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(0, lY); ctx.lineTo(plotW, lY); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  // свечи
+  for (let i = first; i < candles.length; i++) {
+    const cd = candles[i];
+    const x = xOf(i);
+    if (x < -slot || x > plotW + slot) continue;
+    const up = cd.c >= cd.o;
+    const col = up ? C_GREEN : C_RED;
+    ctx.fillStyle = col;
+    ctx.fillRect(x - 0.5, Y(cd.h), 1, Math.max(1, Y(cd.l) - Y(cd.h)));
+    const y1 = Y(Math.max(cd.o, cd.c)), y2 = Y(Math.min(cd.o, cd.c));
+    const bh = Math.max(3, y2 - y1);
+    if (typeof ctx.roundRect === 'function') {
+      ctx.beginPath(); ctx.roundRect(x - bodyW / 2, y1, bodyW, bh, 1); ctx.fill();
+    } else ctx.fillRect(x - bodyW / 2, y1, bodyW, bh);
+  }
+
+  // флаг текущей цены: прижат к правому краю (заходит за него), r12, белая обводка.
+  // Ширина от ТЕКСТА (QA 30.07: фикс fX=W−54 резал последнюю цифру у широких цен —
+  // в макете onb1-1 цена видна целиком, справа воздух ~4px, флаг уходит за край)
+  const curY = clamp(Y(e.vis), 20, H - 20);
+  ctx.font = AXIS_FONT;
+  const label = G.axisTxt || fmtAxis(e.vis);
+  const tw = ctx.measureText(label).width;
+  const fH = 36, fX = Math.round(W - tw - 12), fW = Math.round(tw + 26);
+  ctx.beginPath();
+  if (typeof ctx.roundRect === 'function') ctx.roundRect(fX, curY - fH / 2, fW, fH, 12);
+  else ctx.rect(fX, curY - fH / 2, fW, fH);
+  ctx.fillStyle = C_BLUE;
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.font = AXIS_FONT;
+  ctx.fillStyle = '#fff';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, fX + 8, curY + 1);
+  ctx.textBaseline = 'alphabetic';
+}
+
+// ============================== HUD ==============================
+function updateHUD(dt) {
+  const bt = balTotal();
+  G.dispBal += (bt - G.dispBal) * Math.min(1, dt * 9);
+  $('balTop').textContent = fmtCoins(Math.abs(G.dispBal - Math.round(G.dispBal)) < 0.005 ? Math.round(G.dispBal) : G.dispBal);
+
+  const total = (G.roundMs || CFG.ROUND_SEC * 1000) / 1000;
+  const left = Math.max(0, total - G.gameT / 1000);
+  const sec = Math.ceil(left);
+  $('timerText').textContent = fmtTimer(left);
+  // кольцо по макету: синяя дуга = ПРОЙДЕННОЕ время, растёт по часовой от 12 часов
+  const elapsed = clamp(1 - left / total, 0, 1);
+  $('ringArc').style.strokeDasharray = (elapsed * RING_LEN).toFixed(1) + ' ' + RING_LEN;
+  const hot = left <= 10;
+  $('timerText').classList.toggle('hot', hot);
+  if (hot && sec !== G.lastCountSec && sec <= 5 && sec > 0) Sound.count();
+  G.lastCountSec = sec;
+
+  G.txtAcc += dt;
+  const txtTick = G.txtAcc >= CFG.TXT_EVERY;
+  if (txtTick) { G.txtAcc = 0; G.axisTxt = fmtAxis(G.dispPrice); }
+
+  if (G.pos) {
+    const pnl = pnlNow();
+    if (pnl > G.pos.peakPnl) G.pos.peakPnl = pnl;
+    if (txtTick) {
+      const usd = G.pos.stake * pnl / 100;
+      $('uPnlUsd').textContent = fmtCoins(usd, true);
+      $('uPnlPct').textContent = fmtPct(pnl);
+      $('curPriceEl').textContent = fmtCoins(G.dispPrice);
+      // полоса ликвидации (со стадии плеча): красный градиент растёт по мере
+      // приближения PnL к −50% (макеты onb3-3/onb3-5)
+      if (G.caps.lev) $('liqFill').style.width = (clamp(pnl / CFG.LIQ_PNL, 0, 1) * 100).toFixed(1) + '%';
+    }
+
+    const drop = G.pos.peakPnl - pnl;
+    const meltNow = G.pos.peakPnl >= CFG.MELT_MIN_PEAK && drop >= Math.max(CFG.MELT_DROP, G.pos.peakPnl * 0.35) && pnl > -20;
+    if (meltNow && !G.melting) Sound.warn();
+    G.melting = meltNow;
+    $('meltWarn').classList.toggle('hidden', !meltNow);
+    const box = $('pnlBox');
+    box.classList.toggle('neg', pnl < 0 && !meltNow);
+    box.classList.toggle('melt', meltNow);
+    const mag = clamp(Math.abs(pnl) / 60, 0, 1);
+    const beat = 1 + mag * 0.15 + 0.05 * mag * Math.sin(performance.now() / 110);
+    $('uPnlUsd').style.transform = `scale(${beat})`;
+    $('uPnlUsd').style.display = 'inline-block';
+  } else if (txtTick) {
+    $('tickerPrice').textContent = fmtCoins(G.dispPrice);
+    const chg = (G.dispPrice / G.startPrice - 1) * 100;
+    const el = $('tickerChg');
+    el.textContent = fmtPct(chg);
+    el.classList.toggle('up', chg >= 0);
+    el.classList.toggle('down', chg < 0);
+  }
+}
+
+// ============================== DEMO BOT (?demo=1 или ?auto) ==============================
+const _qs = new URLSearchParams(location.search);
+const DEMO = _qs.has('demo') || _qs.has('auto');
+let demoCooldown = 0;
+function demoBot(dt) {
+  demoCooldown -= dt;
+  if (demoCooldown > 0) return;
+  const e = G.engine, h = e.hist;
+  if (h.length < 10) return;
+  let j = h.length - 1;
+  while (j > 0 && e.simTime - h[j].t < 0.5) j--;
+  const lev = G.caps.lev ? G.lev : CFG.LEV_BASE;
+  const mLev = (e.vis - h[j].p) / h[j].p * lev * 100;
+  if (!G.pos) {
+    if (mLev > 2.2) { enterPos(1); demoCooldown = 0.8; }
+    else if (G.caps.short && mLev < -2.2) { enterPos(-1); demoCooldown = 0.8; }
+  } else {
+    const pnl = pnlNow(), drop = G.pos.peakPnl - pnl;
+    if ((G.pos.peakPnl > 10 && drop > G.pos.peakPnl * 0.3) || pnl < -16) {
+      exitPos(); demoCooldown = 1.2;
+    }
+  }
+}
+
+// ============================== MAIN LOOP ==============================
+let lastWinW = 0, lastWinH = 0, sizeCheck = 0;
+function frame(ts) {
+  requestAnimationFrame(frame);
+  if (!G.lastFrame) { G.lastFrame = ts; return; }
+  let dt = (ts - G.lastFrame) / 1000;
+  G.lastFrame = ts;
+  dt = clamp(dt, 0, 0.05);
+  G.lastDt = Math.max(dt, 0.001);
+
+  if (++sizeCheck >= 30) {
+    sizeCheck = 0;
+    if (window.innerWidth !== lastWinW || window.innerHeight !== lastWinH) {
+      lastWinW = window.innerWidth; lastWinH = window.innerHeight;
+      resizeAll();
+    }
+  }
+
+  FX.update(dt);
+
+  if (G.screen !== 'game' || G.paused || G.over) {
+    if (G.screen === 'game' && !G.over) drawChart();
+    return;
+  }
+
+  G.gameT += dt * 1000;
+  G.engine.step(dt);
+  G.dispPrice = G.engine.vis;
+
+  // ликвидация проверяется ДО бота/ввода — её нельзя «переиграть» выходом
+  if (G.pos && pnlNow() <= CFG.LIQ_PNL) { liquidate(); drawChart(); updateHUD(dt); return; }
+  if (DEMO) demoBot(dt);
+  if (G.gameT >= (G.roundMs || CFG.ROUND_SEC * 1000)) { endRound(); return; }
+
+  drawChart();
+  updateHUD(dt);
+}
+
+// ============================== INPUT ==============================
+function onAction(dir) {
+  Sound.ensure();
+  if (G.screen !== 'game' || G.paused || G.over) return;
+  if (!G.pos) enterPos(dir || 1); else exitPos();
+}
+
+function bind() {
+  $('btnPlay').addEventListener('click', () => { Sound.ensure(); startRound(); });
+  $('btnAgain').addEventListener('click', () => { Sound.ensure(); startRound(); });
+  $('btnHome').addEventListener('click', () => show('start'));
+  $('btnLong').addEventListener('pointerdown', e => { e.preventDefault(); onAction(1); });
+  $('btnShort').addEventListener('pointerdown', e => { e.preventDefault(); onAction(-1); });
+  $('btnExit').addEventListener('pointerdown', e => { e.preventDefault(); onAction(); });
+  window.addEventListener('keydown', e => {
+    if (e.code === 'Space') { e.preventDefault(); onAction(1); }
+  });
+  // сегменты плеча и доли
+  $('levCtl').addEventListener('pointerdown', e => {
+    const b = e.target.closest('button[data-lev]');
+    if (!b || G.pos) return;
+    G.lev = +b.dataset.lev;
+    G.levUserSet = true;
+    renderControls();
+  });
+  $('fracCtl').addEventListener('pointerdown', e => {
+    // залочено (stage 3, основная игра) — любой тап по сегменту/🔒 = старт обучения (вердикт 25.07)
+    if (!$('fracUnlock').classList.contains('hidden')) { startPartialTraining(); return; }
+    const b = e.target.closest('button[data-frac]');
+    if (!b) return;
+    G.frac = +b.dataset.frac;
+    renderControls();
+  });
+  $('btnPause').addEventListener('click', () => {
+    if (G.over) return;
+    G.paused = true;
+    $('pauseOverlay').classList.remove('hidden');
+  });
+  // кебаб ⋮ (онбординг-симы, макеты onb1–onb3): ★draft — своего меню в макетах нет,
+  // открывает существующее пауза-меню игры (Resume / End round / Sound / Exit)
+  $('btnKebab').addEventListener('click', () => {
+    if (G.over) return;
+    G.paused = true;
+    $('pauseOverlay').classList.remove('hidden');
+  });
+  $('btnResume').addEventListener('click', () => {
+    G.paused = false;
+    $('pauseOverlay').classList.add('hidden');
+  });
+  $('btnExitRound').addEventListener('click', () => {
+    G.paused = false;
+    $('pauseOverlay').classList.add('hidden');
+    endRound();
+  });
+  $('btnSound').addEventListener('click', () => {
+    Sound.on = !Sound.on;
+    $('btnSound').textContent = Sound.on ? '🔊 Sound: on' : '🔇 Sound: off';
+  });
+  window.addEventListener('resize', resizeAll);
+}
+
+// ============================== BOOT ==============================
+/* локализация статичного хрома (data-gt в index.html): Balance / Leverage /
+   Trade size / Unrealized P&L / Enter / Current / Liquidation / подпись −50% */
+function applyGT() {
+  document.querySelectorAll('[data-gt]').forEach(el => { el.textContent = gt(el.dataset.gt); });
+}
+window.__trade = { G, CFG, Feed, P, saveP, targetStage, roundCaps, startRound, enterPos, exitPos, Tasks, OB_ROUNDS }; // QA hook
+applyGT();
+FX.init();
+bind();
+show('start');
+resizeAll();
+requestAnimationFrame(frame);
+if (DEMO) {
+  const t0 = performance.now();
+  const w = setInterval(() => {
+    if ((Feed.ready && Feed.fresh()) || performance.now() - t0 > 6000) {
+      clearInterval(w); startRound();
+    }
+  }, 200);
+}
+
+/* hub: выход в меню из паузы (только в iframe хаба) */
+(function(){
+  if (window.parent === window) return;
+  function mount(){
+    if (document.getElementById('hubExitBtn')) return;
+    var anchor = document.getElementById('btnSound');
+    if (!anchor) return;
+    var b = document.createElement('button');
+    b.id = 'hubExitBtn'; b.className = 'ghostbtn'; b.textContent = 'Exit to menu';
+    b.addEventListener('click', function(){
+      try { window.parent.postMessage({type:'hub:exit', game:'trade'}, '*'); } catch(e){}
+    });
+    anchor.insertAdjacentElement('afterend', b);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
+  else mount();
+})();

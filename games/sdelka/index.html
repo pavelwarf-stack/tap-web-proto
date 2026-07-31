@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>The Trade — enter/exit</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <div id="stage">
+
+    <!-- ===== START ===== -->
+    <section id="screen-start" class="screen">
+      <div class="start-inner">
+        <h1 class="logo">THE TRADE</h1>
+        <div class="tagline">Get in. Ride it. Cash out.</div>
+        <div class="chips-row">
+          <div class="pill"><span class="btc-coin"></span>BTC</div>
+          <div class="pill">60 sec</div>
+        </div>
+        <ul class="howto">
+          <li><span class="how-ico">👆</span> Tap to enter: your whole balance in</li>
+          <li><span class="how-ico">📈</span> The chart is Bitcoin’s live price</li>
+          <li><span class="how-ico">✋</span> Tap to exit: don’t get greedy!</li>
+          <li><span class="how-ico">💥</span> −50% is liquidation — you lose a heart</li>
+        </ul>
+        <div class="start-note">Start with 1 000 coins · 3 hearts per round</div>
+      </div>
+      <div class="action-zone">
+        <button id="btnPlay" class="bigbtn green"><span class="btn-label">Play</span></button>
+      </div>
+    </section>
+
+    <!-- ===== GAME ===== -->
+    <section id="screen-game" class="screen hidden">
+      <header id="topbar">
+        <button id="btnPause" class="squarebtn" aria-label="Pause"><span class="pause-ico"></span></button>
+        <div id="timerCircle">
+          <svg viewBox="0 0 68 68">
+            <circle class="ring-track" cx="34" cy="34" r="29"/>
+            <circle id="ringArc" class="ring-arc" cx="34" cy="34" r="29"/>
+          </svg>
+          <div id="timerText">1:00</div>
+        </div>
+        <div id="hearts">
+          <span class="heart"></span><span class="heart"></span><span class="heart"></span>
+        </div>
+      </header>
+
+      <div id="balanceBand"><span class="coin"></span><span id="balTop">1 000</span></div>
+      <div id="offlineBadge" class="hidden">⚡ offline mode</div>
+
+      <div id="chartWrap">
+        <canvas id="chart"></canvas>
+        <div id="meltWarn" class="hidden">⚠ Profit is melting — lock it in!</div>
+      </div>
+
+      <div id="infoCard">
+        <!-- flat: тикер -->
+        <div id="tickerBox">
+          <div class="card-label">BTC</div>
+          <div class="ticker-line"><span id="tickerPrice">63 370</span><span id="tickerChg" class="up">+0.00%</span></div>
+        </div>
+        <!-- в позиции: PnL -->
+        <div id="pnlBox" class="hidden">
+          <div class="card-label">Unrealized P&amp;L</div>
+          <div class="pnl-line"><span id="uPnlUsd">+0.00</span><span id="uPnlPct">+0.00%</span></div>
+          <div class="pnl-chips">
+            <div class="pnl-chip"><div class="pc-label">Entry</div><div id="entryPriceEl" class="pc-val">63 370</div></div>
+            <div class="pnl-chip"><div class="pc-label">Current</div><div id="curPriceEl" class="pc-val">63 420</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-zone game-action">
+        <button id="btnAction" class="bigbtn green"><span class="btn-label" id="btnLabel">Enter</span></button>
+      </div>
+    </section>
+
+    <!-- ===== RESULT ===== -->
+    <section id="screen-result" class="screen hidden">
+      <div class="res-scroll">
+        <div class="res-head">
+          <div class="res-title">ROUND COMPLETE</div>
+          <div class="chips-row">
+            <div class="pill"><span class="btc-coin"></span>BTC</div>
+            <div class="pill">60 sec</div>
+          </div>
+        </div>
+
+        <div class="score-band">
+          <div class="score-label">Round score</div>
+          <div id="resScore" class="score-value">+0</div>
+          <div id="resMult" class="score-mult">×1.0 from start</div>
+          <div id="resBest" class="score-best">Best result: +0</div>
+          <div id="resBestBadge" class="best-badge hidden">🏆 New record!</div>
+        </div>
+
+        <div class="sect-head"><span class="sect-title">Trade history</span><span id="tradesAll" class="sect-link">View all</span></div>
+        <div id="resTrades" class="list-card"></div>
+
+        <div class="sect-head"><span class="sect-title">Leaderboard</span><span class="sect-link">View all</span></div>
+        <div id="leaderboard" class="list-card"></div>
+      </div>
+      <div class="action-zone res-action">
+        <button id="btnAgain" class="bigbtn blue"><span class="btn-label">One more round</span></button>
+        <button id="btnHome" class="squarebtn dark" aria-label="Home">⌂</button>
+      </div>
+    </section>
+
+    <!-- ===== OVERLAYS ===== -->
+    <div id="pauseOverlay" class="overlay hidden">
+      <div class="pause-card">
+        <div class="pause-title">Paused</div>
+        <button id="btnResume" class="bigbtn green slim"><span class="btn-label">Resume</span></button>
+        <button id="btnExitRound" class="ghostbtn">End round</button>
+        <button id="btnSound" class="ghostbtn">🔊 Sound: on</button>
+      </div>
+    </div>
+
+    <div id="liqOverlay" class="overlay hidden">
+      <svg id="cracks" viewBox="0 0 390 844" preserveAspectRatio="none">
+        <g stroke="#3a2222" stroke-width="3" fill="none" opacity="0.8">
+          <path d="M195 420 L150 340 L160 250 L110 180 L120 90 L80 20"/>
+          <path d="M195 420 L260 360 L255 260 L320 210 L310 100 L360 40"/>
+          <path d="M195 420 L120 470 L60 450 L20 520"/>
+          <path d="M195 420 L275 480 L340 470 L375 560"/>
+          <path d="M195 420 L180 540 L220 640 L190 760 L210 844"/>
+          <path d="M195 420 L100 600 L120 700 L60 800"/>
+          <path d="M195 420 L300 590 L280 690 L340 790"/>
+        </g>
+        <g stroke="#ffffff" stroke-width="1.5" fill="none" opacity="0.85">
+          <path d="M195 420 L152 342 L162 252 L112 182"/>
+          <path d="M195 420 L258 362 L253 262 L318 212"/>
+          <path d="M195 420 L182 538 L218 638"/>
+        </g>
+      </svg>
+      <div class="liq-text">LIQUIDATION</div>
+      <div class="liq-sub" id="liqSub">−50% · held through the reversal</div>
+    </div>
+
+    <canvas id="fx"></canvas>
+    <div id="flash"></div>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

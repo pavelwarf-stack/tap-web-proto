@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Trade — one game, four stages</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <div id="stage">
+
+    <!-- ===== START ===== -->
+    <section id="screen-start" class="screen">
+      <div class="start-inner">
+        <h1 class="logo">TRADE</h1>
+        <div class="tagline">Get in. Ride it. Cash out.</div>
+        <div class="chips-row">
+          <div class="pill"><span class="btc-coin"></span>BTC</div>
+          <div class="pill js-roundlen">60 sec</div>
+          <div class="pill stage-pill" id="stageBadge">Stage 1 of 4</div>
+        </div>
+        <ul class="howto" id="howtoList"></ul>
+        <div class="start-note">3 hearts per round · unlock new mechanics as you trade</div>
+      </div>
+      <div class="action-zone">
+        <button id="btnPlay" class="bigbtn green"><span class="btn-label">Play</span></button>
+      </div>
+    </section>
+
+    <!-- ===== GAME ===== -->
+    <section id="screen-game" class="screen hidden">
+      <header id="topbar">
+        <button id="btnPause" class="squarebtn" aria-label="Pause"><span class="pause-ico"></span></button>
+        <div id="timerCircle">
+          <svg viewBox="0 0 76 76">
+            <circle class="ring-track" cx="38" cy="38" r="35"/>
+            <circle id="ringArc" class="ring-arc" cx="38" cy="38" r="35"/>
+          </svg>
+          <div id="timerText">1:00</div>
+        </div>
+        <div id="topRight">
+          <div id="hearts">
+            <span class="heart"></span><span class="heart"></span><span class="heart"></span>
+          </div>
+          <button id="btnKebab" class="squarebtn hidden" aria-label="Menu">
+            <svg viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="5.5" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="18.5" r="2" fill="currentColor"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div id="balanceBand">
+        <div class="bal-pill"><span class="bal-lbl" data-gt="ui.balance">Balance</span><svg class="coin-v" viewBox="0 0 24 24"><ellipse cx="10" cy="12" rx="4.2" ry="8.6"/><path d="M10 3.4h3.6c2.5 0 4.4 3.8 4.4 8.6s-1.9 8.6-4.4 8.6H10"/><path d="M13.4 7.5h3.4M14.6 12h3.4M13.4 16.5h3.4"/></svg><span id="balTop">1 000</span></div>
+      </div>
+      <div id="offlineBadge" class="hidden">⚡ offline mode</div>
+
+      <div id="chartWrap">
+        <canvas id="chart"></canvas>
+        <div id="chartTag">BTC</div>
+        <div id="meltWarn" class="hidden">⚠ Profit is melting — lock it in!</div>
+      </div>
+
+      <div id="belowChart">
+        <div id="infoCard">
+          <!-- flat: тикер -->
+          <div id="tickerBox">
+            <div class="card-label">BTC</div>
+            <div class="ticker-line"><span id="tickerPrice">63 370</span><span id="tickerChg" class="up">+0.00%</span></div>
+          </div>
+          <!-- в позиции: PnL -->
+          <div id="pnlBox" class="hidden">
+            <span id="posLevBadge" class="pos-badge lev hidden">x2</span>
+            <span id="posDirBadge" class="pos-badge dir long hidden">Long</span>
+            <div class="pnl-mid">
+              <div class="card-label" data-gt="ui.upnl">Unrealized P&amp;L</div>
+              <div class="pnl-line"><svg class="coin-v" viewBox="0 0 24 24"><ellipse cx="10" cy="12" rx="4.2" ry="8.6"/><path d="M10 3.4h3.6c2.5 0 4.4 3.8 4.4 8.6s-1.9 8.6-4.4 8.6H10"/><path d="M13.4 7.5h3.4M14.6 12h3.4M13.4 16.5h3.4"/></svg><span id="uPnlUsd">+0.00</span><span id="uPnlPct">+0.00%</span></div>
+              <div class="pnl-chips">
+                <div class="pnl-chip"><div class="pc-label" data-gt="ui.enter">Enter</div><div id="entryPriceEl" class="pc-val">63 370</div></div>
+                <div class="pnl-chip"><div class="pc-label" data-gt="ui.current">Current</div><div id="curPriceEl" class="pc-val">63 420</div></div>
+              </div>
+            </div>
+            <div id="liqBlock" class="hidden">
+              <div class="liq-lbl" data-gt="ui.liq">Liquidation</div>
+              <div class="liq-track"><div id="liqFill"></div></div>
+              <div class="liq-cap" data-gt="ui.liqCaption">Liquidation at −50% of the rate</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- контролы лесенки: плечо и доля котлеты -->
+        <div id="ctlBar">
+          <div class="ctl-row" id="levCtl">
+            <div class="ctl-head"><span class="lock-ico hidden"><svg viewBox="0 0 20 20"><path fill="#DE8225" d="M10 1.8a4.1 4.1 0 0 0-4.1 4.1v1.6H5.2A1.9 1.9 0 0 0 3.3 9.4v6.4a1.9 1.9 0 0 0 1.9 1.9h9.6a1.9 1.9 0 0 0 1.9-1.9V9.4a1.9 1.9 0 0 0-1.9-1.9h-.7V5.9A4.1 4.1 0 0 0 10 1.8Zm2.3 5.7H7.7V5.9a2.3 2.3 0 1 1 4.6 0Z"/></svg></span><span class="ctl-lbl" data-gt="ui.leverage">Leverage</span></div>
+            <div class="pills">
+              <button data-lev="1">x1</button><button data-lev="2" class="on">x2</button><button data-lev="3">x3</button><button data-lev="4">x4</button><button data-lev="5">x5</button>
+            </div>
+          </div>
+          <div class="ctl-row" id="fracCtl">
+            <div class="ctl-head"><span class="lock-ico hidden"><svg viewBox="0 0 20 20"><path fill="#DE8225" d="M10 1.8a4.1 4.1 0 0 0-4.1 4.1v1.6H5.2A1.9 1.9 0 0 0 3.3 9.4v6.4a1.9 1.9 0 0 0 1.9 1.9h9.6a1.9 1.9 0 0 0 1.9-1.9V9.4a1.9 1.9 0 0 0-1.9-1.9h-.7V5.9A4.1 4.1 0 0 0 10 1.8Zm2.3 5.7H7.7V5.9a2.3 2.3 0 1 1 4.6 0Z"/></svg></span><span class="ctl-lbl" data-gt="ui.size">Trade size</span></div>
+            <div class="pills">
+              <button data-frac="0.25">25%</button><button data-frac="0.5">50%</button><button data-frac="0.75">75%</button><button data-frac="1" class="on">100%</button>
+              <button id="fracUnlock" class="unlock hidden">🔒 Open</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-zone game-action">
+        <button id="btnLong" class="bigbtn green"><span class="btn-label" id="lblLong">Buy</span></button>
+        <button id="btnShort" class="bigbtn red hidden"><span class="btn-label">Short</span></button>
+        <button id="btnExit" class="bigbtn blue hidden"><span class="btn-label" id="lblExit">Close position</span></button>
+      </div>
+    </section>
+
+    <!-- ===== RESULT ===== -->
+    <section id="screen-result" class="screen hidden">
+      <div class="res-scroll">
+        <div class="res-head">
+          <div class="res-title">ROUND COMPLETE</div>
+          <div class="chips-row">
+            <div class="pill"><span class="btc-coin"></span>BTC</div>
+            <div class="pill js-roundlen">60 sec</div>
+          </div>
+        </div>
+
+        <div id="unlockBand" class="hidden"><span class="ub-ico">🔓</span><span class="ub-text"></span></div>
+
+        <div class="score-band">
+          <div class="score-label">Round score</div>
+          <div id="resScore" class="score-value">+0</div>
+          <div id="resMult" class="score-mult">×1.0 from start</div>
+          <div id="resBest" class="score-best">Best result: +0</div>
+          <div id="resBestBadge" class="best-badge hidden">🏆 New record!</div>
+        </div>
+
+        <div class="sect-head"><span class="sect-title">Trade history</span><span id="tradesAll" class="sect-link">View all</span></div>
+        <div id="resTrades" class="list-card"></div>
+
+        <div class="sect-head"><span class="sect-title">Leaderboard</span><span class="sect-link">View all</span></div>
+        <div id="leaderboard" class="list-card"></div>
+      </div>
+      <div class="action-zone res-action">
+        <button id="btnAgain" class="bigbtn blue"><span class="btn-label">One more round</span></button>
+        <button id="btnHome" class="squarebtn dark" aria-label="Home">⌂</button>
+      </div>
+    </section>
+
+    <!-- ===== OVERLAYS ===== -->
+    <div id="pauseOverlay" class="overlay hidden">
+      <div class="pause-card">
+        <div class="pause-title">Paused</div>
+        <button id="btnResume" class="bigbtn green slim"><span class="btn-label">Resume</span></button>
+        <button id="btnExitRound" class="ghostbtn">End round</button>
+        <button id="btnSound" class="ghostbtn">🔊 Sound: on</button>
+      </div>
+    </div>
+
+    <!-- one-time онбординг ступеней (шорты / плечо) -->
+    <div id="introOverlay" class="overlay intro-overlay hidden">
+      <div class="intro-card">
+        <span id="introDraft" class="draft-chip hidden">★ draft</span>
+        <div id="introTitle" class="intro-title">Shorts unlocked</div>
+        <div id="introBody" class="intro-body"></div>
+        <button id="btnIntroOk" class="bigbtn green slim"><span class="btn-label">Got it</span></button>
+      </div>
+    </div>
+
+    <div id="liqOverlay" class="overlay hidden">
+      <svg id="cracks" viewBox="0 0 375 812" preserveAspectRatio="none">
+        <g stroke="#3a2222" stroke-width="3" fill="none" opacity="0.8">
+          <path d="M188 405 L145 330 L155 242 L106 175 L116 87 L77 19"/>
+          <path d="M188 405 L250 347 L245 251 L308 202 L298 96 L346 38"/>
+          <path d="M188 405 L115 453 L58 434 L19 501"/>
+          <path d="M188 405 L264 463 L327 453 L361 539"/>
+          <path d="M188 405 L173 521 L212 617 L183 733 L202 812"/>
+          <path d="M188 405 L96 578 L115 674 L58 771"/>
+          <path d="M188 405 L288 569 L269 665 L327 762"/>
+        </g>
+        <g stroke="#ffffff" stroke-width="1.5" fill="none" opacity="0.85">
+          <path d="M188 405 L146 331 L156 244 L108 177"/>
+          <path d="M188 405 L248 349 L243 253 L306 204"/>
+          <path d="M188 405 L175 519 L210 615"/>
+        </g>
+      </svg>
+      <div class="liq-text">LIQUIDATION</div>
+      <div class="liq-sub" id="liqSub">−50% · held through the reversal</div>
+    </div>
+
+    <canvas id="fx"></canvas>
+    <div id="flash"></div>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

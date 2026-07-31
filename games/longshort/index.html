@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Long/Short — tap-trading</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <div id="stage">
+
+    <!-- ===================== START ===================== -->
+    <section id="screen-start" class="screen">
+      <div class="start-inner">
+        <div class="logo">Long <span class="logo-slash">/</span> Short</div>
+        <div class="tagline">live BTC chart · ride the moves both ways</div>
+        <ul class="howto">
+          <li><span class="how-ico">📈</span>Price going up — tap <b class="tx-green">Long</b></li>
+          <li><span class="how-ico">📉</span>Price going down — tap <b class="tx-red">Short</b></li>
+          <li><span class="how-ico">🎯</span>All-in on every trade, <b>Close position</b> locks it in</li>
+          <li><span class="how-ico">⏱</span>60 seconds — multiply 1 000 coins</li>
+        </ul>
+        <div class="action-zone start-zone">
+          <button id="btn-start" class="bigbtn green"><span class="btn-label">Play</span><span class="btn-sub">round · 60 sec</span></button>
+        </div>
+        <div class="start-best hidden" id="start-best"></div>
+      </div>
+    </section>
+
+    <!-- ===================== GAME ===================== -->
+    <section id="screen-game" class="screen hidden">
+      <header class="topbar">
+        <button id="btn-pause" class="pause-btn" aria-label="Pause">
+          <svg width="18" height="18" viewBox="0 0 18 18"><rect x="3" y="2" width="4.6" height="14" rx="2.1" fill="currentColor"/><rect x="10.4" y="2" width="4.6" height="14" rx="2.1" fill="currentColor"/></svg>
+        </button>
+        <div class="ring-wrap">
+          <svg class="ring" viewBox="0 0 84 84">
+            <circle class="ring-track" cx="42" cy="42" r="36"/>
+            <circle class="ring-arc" id="ring-arc" cx="42" cy="42" r="36"/>
+          </svg>
+          <div id="hud-timer">1:00</div>
+        </div>
+        <div class="hearts" id="hearts">
+          <span class="heart"></span><span class="heart"></span><span class="heart"></span>
+        </div>
+        <div id="net-badge" class="hidden"><span class="net-dot"></span>offline</div>
+      </header>
+
+      <div class="balance-strip">
+        <span class="coin small"></span>
+        <span id="hud-balance">1 000</span>
+        <span id="hud-preview" class="hidden"></span>
+      </div>
+
+      <div class="chart-wrap">
+        <canvas id="chart"></canvas>
+        <div id="trades-log"></div>
+        <div id="melt-warn" class="hidden">🔥 profit is melting — lock it in!</div>
+        <div id="hint-idle">tap <b class="tx-green">Long</b> or <b class="tx-red">Short</b></div>
+      </div>
+
+      <div class="info-card">
+        <div id="card-idle">
+          <div class="card-label">BTC</div>
+          <div class="card-big" id="card-price">63 370</div>
+          <div class="card-pct" id="card-pct">+0.00%</div>
+        </div>
+        <div id="card-pos" class="hidden">
+          <div id="dir-pill" class="long">Long</div>
+          <div class="card-label">Unrealized P&amp;L</div>
+          <div class="card-big" id="pnl-value">+0.0%</div>
+          <div class="card-chips">
+            <div class="mini-chip"><div class="mini-label">Entry</div><div class="mini-val" id="entry-price">63 370</div></div>
+            <div class="mini-chip"><div class="mini-label">Current</div><div class="mini-val" id="cur-price">63 370</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-zone">
+        <div id="entry-buttons" class="btn-row">
+          <button id="btn-long" class="bigbtn green"><span class="btn-label">Long</span></button>
+          <button id="btn-short" class="bigbtn red"><span class="btn-label">Short</span></button>
+        </div>
+        <button id="btn-exit" class="bigbtn blue hidden">
+          <span class="btn-label">Close position</span>
+          <span class="btn-sub" id="exit-preview">→ 1 000 coins</span>
+        </button>
+      </div>
+
+      <div id="countdown" class="hidden">3</div>
+
+      <div id="pause-overlay" class="overlay hidden">
+        <div class="overlay-card">
+          <div class="overlay-title">Paused</div>
+          <button id="btn-resume" class="bigbtn green slim"><span class="btn-label">Resume</span></button>
+          <button id="btn-restart" class="ghostbtn">Restart</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== RESULT ===================== -->
+    <section id="screen-result" class="screen hidden">
+      <div class="result-inner">
+        <div class="result-title" id="result-title">Round complete</div>
+        <div class="result-balance"><span class="coin big"></span><span id="result-balance">1 000</span></div>
+        <div class="result-chips">
+          <div class="chip" id="result-mult">×1.0 from start</div>
+          <div class="chip gold hidden" id="result-record">🏆 new record!</div>
+        </div>
+        <div class="result-best" id="result-best"></div>
+
+        <div class="panel">
+          <div class="panel-title">Trades <span id="trades-count"></span></div>
+          <div class="trades-list" id="trades-list"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Leaderboard</div>
+          <div class="leaderboard" id="leaderboard"></div>
+        </div>
+
+        <div class="action-zone">
+          <button id="btn-again" class="bigbtn blue"><span class="btn-label">Play again</span></button>
+        </div>
+      </div>
+    </section>
+
+    <canvas id="fx"></canvas>
+    <div id="flash"></div>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
