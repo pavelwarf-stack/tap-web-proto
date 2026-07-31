@@ -72,7 +72,7 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="8.5" width="17" height="4" rx="1"/><rect x="5.5" y="12.5" width="13" height="8" rx="1"/><path d="M12 8.5v12M12 8.5c-2.5 0-5-1-5-3a2 2 0 0 1 4-1c.6.8 1 2.5 1 4zm0 0c2.5 0 5-1 5-3a2 2 0 0 0-4-1c-.6.8-1 2.5-1 4z"/></svg>
           </button>
           <button class="balance-pill" id="balancePill" data-act="open-shop" aria-label="Balance — open shop">
-            <span class="coin-dot"></span><span id="balanceVal" data-balance>8 253</span>
+            <span class="coin-dot"></span><span id="balanceVal" data-balance>8 253</span><span class="bal-plus" aria-hidden="true">+</span>
           </button>
           <button class="icon-sq" data-act="open-notifications" aria-label="Notifications">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 16v-5a6 6 0 1 0-12 0v5l-1.7 2.4a.6.6 0 0 0 .5 1h14.4a.6.6 0 0 0 .5-1L18 16z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
@@ -81,26 +81,30 @@
         </div>
       </header>
 
-      <!-- Hero: заголовок игры + описание + спецоффер + большой Play (webv1: одна игра) -->
+      <!-- Hero (622-мокап): карта игры + зелёная карта стартер-оффера + маскот + большой Play -->
       <div class="home-hero">
-        <h2 class="hero-title">Trade</h2>
-        <p class="hero-desc" data-i18n="game.trade.desc">Buy and sell Bitcoin on the live chart</p>
-        <!-- витрина СУЩЕСТВУЮЩЕГО personal offer (offer-150k-1.99): открывает его шит -->
-        <button class="sp-offer draft" data-act="open-offer" data-pack="offer-150k-1.99" data-draft="Home special-offer card (mockups): a storefront for the EXISTING personal offer — same sheet, same payment stub, live shared timer">
+        <div class="trade-card">
+          <h2 class="hero-title">Trade</h2>
+          <p class="hero-desc" data-i18n="game.trade.desc">Buy and sell Bitcoin on the live chart</p>
+        </div>
+        <!-- витрина стартер-пака п.27 (★draft): видна со 2-й сессии, живое 2ч-окно, открывает его шит -->
+        <button class="sp-offer draft" id="spOfferHome" data-act="open-starter" hidden data-draft="Home special-offer card (622 mockup): storefront for the starter pack п.27 — visible from the 2nd session while its 2h window is live; opens the starter sheet (same payment stub, intent log)">
           <span class="spo-top">
             <span class="spo-badge" data-i18n="offer.badge">Special offer</span>
-            <span class="spo-ends"><span data-i18n="shop.endsin">Ends in</span> <b id="offerTimerHome">14:24:32</b></span>
+            <span class="spo-ends"><span data-i18n="shop.endsin">Ends in</span> <b id="offerTimerHome">2:00:00</b></span>
           </span>
-          <span class="spo-title" data-i18n="offer.t">Starter chip pack</span>
-          <span class="spo-desc" data-i18n="offer.d" data-i18n-arg="150 000|1.99$">Get 150 000 chips for just 1.99$ and speed up your progress.</span>
+          <span>
+            <span class="spo-title" data-i18n="offer.t">Starter chip pack</span>
+            <span class="spo-desc" data-i18n="offer.d" data-i18n-arg="5 000|1.99$">Get 5 000 chips for just 1.99$ and speed up your progress.</span>
+          </span>
           <span class="spo-foot">
-            <b class="spo-price">1.99$</b>
+            <b class="spo-price">$1.99</b>
             <span class="spo-buy" data-i18n="buy">Buy</span>
           </span>
         </button>
       </div>
+      <img class="home-mascot" src="mascot-tt-home.webp" alt="" width="604" height="1034">
       <button class="btn btn-primary hero-play" data-act="play" data-game="trade"><span data-i18n="play">Play</span>&nbsp;&rarr;</button>
-      <div class="hero-stage draft" id="heroStage" data-draft="Stage ladder indicator; unlock thresholds are DRAFT (owner did not fix criteria)"></div>
     </section>
 
     <!-- SHOP (полный рескин, вердикт 30.07 п.24: mockups A/B/C-shop) -->
@@ -109,9 +113,9 @@
       <div class="balance-pill shop-balance draft" data-draft="Shop-header balance capsule: only mockup C has it; hidden in A/B per their mockups"><span class="coin-dot"></span><span data-balance>8 253</span></div>
       <div class="offer-card" data-act="open-offer">
         <div class="offer-left">
-          <span class="save-tag" data-i18n="savePct" data-i18n-arg="80">Save 80%</span>
           <div class="offer-amount"><span class="coin-dot"></span><span>150 000</span><span class="chips-word" data-i18n="chips">chips</span></div>
           <div class="offer-price"><s>9.99$</s> <b>1.99$</b></div>
+          <span class="save-tag" data-i18n="savePct" data-i18n-arg="80">Save 80%</span>
           <button class="btn btn-dark sm" data-act="open-offer" data-pack="offer-150k-1.99" data-i18n="buy">Buy</button>
         </div>
         <div class="offer-right">

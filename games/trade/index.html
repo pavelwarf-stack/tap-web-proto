@@ -11,21 +11,55 @@
 <div id="app">
   <div id="stage">
 
-    <!-- ===== START ===== -->
+    <!-- ===== START: «Deal» pre-round Level settings (Figma 622 / f2055) ===== -->
     <section id="screen-start" class="screen">
-      <div class="start-inner">
-        <h1 class="logo">TRADE</h1>
-        <div class="tagline">Get in. Ride it. Cash out.</div>
-        <div class="chips-row">
-          <div class="pill"><span class="btc-coin"></span>BTC</div>
-          <div class="pill js-roundlen">60 sec</div>
-          <div class="pill stage-pill" id="stageBadge">Stage 1 of 4</div>
+      <div class="deal-inner">
+        <header class="deal-top">
+          <h1 class="deal-title" data-gt="deal.title">Deal</h1>
+          <div class="deal-topbtns">
+            <button id="btnInfo" class="infobtn" aria-label="How to play">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11.2v4.6"/><circle cx="12" cy="8" r="1.15" fill="#fff" stroke="none"/></svg>
+            </button>
+            <button id="btnDealKebab" class="squarebtn" aria-label="Menu">
+              <svg viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="5.5" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="18.5" r="2" fill="currentColor"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <div class="deal-balband">
+          <div class="dbb-label" data-gt="deal.balance">Your balance</div>
+          <div class="dbb-row"><svg class="coin-v" viewBox="0 0 24 24"><ellipse cx="10" cy="12" rx="4.2" ry="8.6"/><path d="M10 3.4h3.6c2.5 0 4.4 3.8 4.4 8.6s-1.9 8.6-4.4 8.6H10"/><path d="M13.4 7.5h3.4M14.6 12h3.4M13.4 16.5h3.4"/></svg><span id="dealBal">1 000</span></div>
         </div>
-        <ul class="howto" id="howtoList"></ul>
-        <div class="start-note">3 hearts per round · unlock new mechanics as you trade</div>
-      </div>
-      <div class="action-zone">
-        <button id="btnPlay" class="bigbtn green"><span class="btn-label">Play</span></button>
+
+        <div class="deal-head">
+          <div class="deal-h" data-gt="deal.settings">Level settings</div>
+          <div class="deal-sub" data-gt="deal.setup">Set up the level before starting the game</div>
+        </div>
+
+        <div class="asset-band">
+          <div class="asset-lbl" data-gt="deal.asset">Trading asset</div>
+          <div class="asset-chips" id="assetChips">
+            <button class="asset-chip on" data-asset="BTC"><img src="coin-btc.webp" alt="">BTC</button>
+            <button class="asset-chip" data-asset="ETH"><img src="coin-eth.webp" alt="">ETH</button>
+            <button class="asset-chip" data-asset="SOL"><img src="coin-sol.webp" alt="">SOL</button>
+          </div>
+        </div>
+
+        <!-- unlock banner: показывается, когда игроку реально доступна новая механика
+             (частичные позиции на stage 3 — ровно кейс макета f2055) -->
+        <div id="dealUnlock" class="deal-unlock hidden">
+          <div class="du-head">
+            <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="#13A86D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 9V6.4a3.8 3.8 0 0 1 7.4-1.1"/><rect x="3.5" y="9" width="13" height="8.5" rx="2"/></svg>
+            <span data-gt="deal.unlock.t">New mechanic unlocked!</span>
+          </div>
+          <div class="du-name" id="duName"></div>
+          <div class="du-desc" id="duDesc"></div>
+          <button id="btnLearn" class="bigbtn blue learn"><span class="btn-label" data-gt="deal.learn">Learn</span></button>
+        </div>
+
+        <div class="deal-cta">
+          <button id="btnPlay" class="bigbtn blue"><span class="btn-label" data-gt="deal.start">Start game</span></button>
+        </div>
       </div>
     </section>
 
@@ -57,7 +91,7 @@
 
       <div id="chartWrap">
         <canvas id="chart"></canvas>
-        <div id="chartTag">BTC</div>
+        <div id="chartTag">Bitcoin chart (BTC/USD)</div>
         <div id="meltWarn" class="hidden">⚠ Profit is melting — lock it in!</div>
       </div>
 
@@ -65,7 +99,7 @@
         <div id="infoCard">
           <!-- flat: тикер -->
           <div id="tickerBox">
-            <div class="card-label">BTC</div>
+            <div class="card-label" id="tickerAsset">BTC</div>
             <div class="ticker-line"><span id="tickerPrice">63 370</span><span id="tickerChg" class="up">+0.00%</span></div>
           </div>
           <!-- в позиции: PnL -->
@@ -119,7 +153,7 @@
         <div class="res-head">
           <div class="res-title">ROUND COMPLETE</div>
           <div class="chips-row">
-            <div class="pill"><span class="btc-coin"></span>BTC</div>
+            <div class="pill"><img id="resAssetIco" class="coin-img" src="coin-btc.webp" alt=""><span id="resAssetLbl">BTC</span></div>
             <div class="pill js-roundlen">60 sec</div>
           </div>
         </div>
@@ -163,6 +197,25 @@
         <div id="introTitle" class="intro-title">Shorts unlocked</div>
         <div id="introBody" class="intro-body"></div>
         <button id="btnIntroOk" class="bigbtn green slim"><span class="btn-label">Got it</span></button>
+      </div>
+    </div>
+
+    <!-- ★draft: (i) на Deal-экране — в макете f2055 кнопка есть, контент не задан;
+         показываем правила игры (бывший стартовый список howto) -->
+    <div id="infoOverlay" class="overlay intro-overlay hidden">
+      <div class="intro-card">
+        <div class="intro-title" data-gt="deal.howto.t">How to play</div>
+        <ul class="howto" id="howtoList"></ul>
+        <button id="btnInfoOk" class="bigbtn green slim"><span class="btn-label" data-gt="gotit">Got it</span></button>
+      </div>
+    </div>
+
+    <!-- ★draft: кебаб на Deal-экране — меню в макете не задано; звук + выход в хаб -->
+    <div id="dealMenu" class="overlay intro-overlay hidden">
+      <div class="pause-card">
+        <button id="btnDealSound" class="ghostbtn">🔊 Sound: on</button>
+        <button id="btnDealExit" class="ghostbtn hidden">Exit to menu</button>
+        <button id="btnDealMenuOk" class="bigbtn green slim"><span class="btn-label" data-gt="gotit">Got it</span></button>
       </div>
     </div>
 

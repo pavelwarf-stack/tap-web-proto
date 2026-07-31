@@ -22,11 +22,11 @@ body {
   --ink-soft:rgba(76,51,74,.70);
   --ink-mut:#7D6972;     /* подписи Liquidation */
   --green:#13A86D;
-  --green-dark:#0E7F52;
+  --green-dark:#108859;   /* 3D-цоколь зелёных CTA (DS TapTrade 622) */
   --red:#F54040;
   --red-dark:#C02F2F;
   --blue:#4068F5;
-  --blue-dark:#2F4CC0;
+  --blue-dark:#3353C4;    /* 3D-цоколь кобальтовых CTA (Button component 622) */
   --lock:#DE8225;
   --edge:rgba(0,0,0,.20); /* 3D-низ кнопок (Figma: drop-shadow (0,10) r0 20%) */
 }
@@ -40,13 +40,9 @@ body {
   box-shadow:0 30px 80px rgba(30,20,10,.55);
   color:var(--ink);
 }
-#stage::before { /* лёгкая бумажная фактура (в макете — картинка Paper_02) */
+#stage::before { /* бумажная фактура Paper_02 из макетов (alpha 15% вшита в webp) */
   content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
-  background-image:
-    radial-gradient(rgba(120,90,40,.03) 1px, transparent 1.4px),
-    radial-gradient(rgba(255,255,255,.25) 1px, transparent 1.4px);
-  background-size:7px 7px, 11px 11px;
-  background-position:0 0, 4px 6px;
+  background:url('../../paper.webp') center / cover no-repeat;
 }
 
 .screen { position:absolute; inset:0; display:flex; flex-direction:column; z-index:1; }
@@ -57,7 +53,8 @@ body {
   margin-top:auto; padding:0 16px calc(24px + env(safe-area-inset-bottom));
   flex-shrink:0; display:flex; gap:9px;
 }
-/* CTA по макету: слот 70px = тело 60 + 3D-низ 10, r16, Nunito 900 20px */
+/* CTA по Button component (622): тело 60, r16, цоколь 6px цветом-тенью (#3353C4 /
+   #108859), сверху лёгкий внутренний блик 6px, снизу внутренняя кромка 2px */
 .bigbtn {
   flex:1; border:none; cursor:pointer; position:relative;
   border-radius:16px; height:60px; margin-bottom:10px;
@@ -69,14 +66,14 @@ body {
 .bigbtn .btn-label { font-size:20px; font-weight:900; line-height:1; text-shadow:0 2px 0 rgba(0,0,0,.15); }
 .bigbtn.slim { height:48px; margin-bottom:8px; }
 .bigbtn.slim .btn-label { font-size:18px; }
-.bigbtn.green { background:var(--green); box-shadow:0 10px 0 var(--green-dark), 0 12px 4px rgba(0,0,0,.12); }
-.bigbtn.red   { background:var(--red);   box-shadow:0 10px 0 var(--red-dark), 0 12px 4px rgba(0,0,0,.12); }
-.bigbtn.blue  { background:var(--blue);  box-shadow:0 10px 0 var(--blue-dark), 0 12px 4px rgba(0,0,0,.12); }
-.bigbtn.slim.green { box-shadow:0 8px 0 var(--green-dark), 0 10px 4px rgba(0,0,0,.12); }
-.bigbtn:active, .bigbtn.pressed { transform:translateY(7px); }
-.bigbtn.green:active { box-shadow:0 3px 0 var(--green-dark); }
-.bigbtn.red:active   { box-shadow:0 3px 0 var(--red-dark); }
-.bigbtn.blue:active  { box-shadow:0 3px 0 var(--blue-dark); }
+.bigbtn.green { background:var(--green); box-shadow:0 6px 0 var(--green-dark), 0 10px 4px rgba(0,0,0,.18), inset 0 6px 0 rgba(255,255,255,.25), inset 0 -2px 2px rgba(0,0,0,.10); }
+.bigbtn.red   { background:var(--red);   box-shadow:0 6px 0 var(--red-dark), 0 10px 4px rgba(0,0,0,.18), inset 0 6px 0 rgba(255,255,255,.25), inset 0 -2px 2px rgba(0,0,0,.10); }
+.bigbtn.blue  { background:var(--blue);  box-shadow:0 6px 0 var(--blue-dark), 0 10px 4px rgba(0,0,0,.18), inset 0 6px 0 rgba(255,255,255,.25), inset 0 -2px 2px rgba(0,0,0,.10); }
+.bigbtn.slim.green { box-shadow:0 4px 0 var(--green-dark), 0 8px 4px rgba(0,0,0,.15), inset 0 5px 0 rgba(255,255,255,.25), inset 0 -2px 2px rgba(0,0,0,.10); }
+.bigbtn:active, .bigbtn.pressed { transform:translateY(4px); }
+.bigbtn.green:active { box-shadow:0 2px 0 var(--green-dark), inset 0 6px 0 rgba(255,255,255,.25); }
+.bigbtn.red:active   { box-shadow:0 2px 0 var(--red-dark), inset 0 6px 0 rgba(255,255,255,.25); }
+.bigbtn.blue:active  { box-shadow:0 2px 0 var(--blue-dark), inset 0 6px 0 rgba(255,255,255,.25); }
 .bigbtn.bounce { animation:btnBounce .3s ease; }
 @keyframes btnBounce { 0%{transform:scale(1)} 40%{transform:scale(.96)} 75%{transform:scale(1.02)} 100%{transform:scale(1)} }
 
@@ -113,38 +110,84 @@ body {
   display:flex; align-items:center; gap:8px;
   box-shadow:0 3px 10px rgba(120,90,40,.1);
 }
-.btc-coin {
-  display:inline-block; width:22px; height:22px; border-radius:50%;
-  background:radial-gradient(circle at 34% 30%, #ffd977 0%, #f7a92c 55%, #d97d06 100%);
-  box-shadow:inset 0 -2px 3px rgba(140,70,0,.4), inset 0 2px 2px rgba(255,255,255,.6);
-  position:relative;
-}
-.btc-coin::after {
-  content:"₿"; position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  font-size:13px; font-weight:900; color:#8a5200;
-}
+.coin-img { width:22px; height:22px; display:block; }
 /* контурная монета (Phosphor CoinVertical из макета), красится currentColor */
 .coin-v { fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; }
 
-/* ===================== START ===================== */
-#screen-start .start-inner {
-  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-  padding:0 28px; text-align:center; gap:14px;
+/* ===================== START: «Deal» pre-round screen (Figma f2055, 375×812) ===== */
+.deal-inner { position:relative; flex:1; }
+.deal-top {
+  position:absolute; top:0; left:0; right:0; height:80px;
+  display:flex; align-items:flex-start; justify-content:space-between;
+  padding:16px 16px 0;
 }
-.logo {
-  font-size:56px; font-weight:900; letter-spacing:2px; line-height:1; color:var(--ink);
-  animation:logoPop .6s cubic-bezier(.2,1.5,.4,1) both;
+.deal-title { font-size:24px; font-weight:900; line-height:36px; color:var(--ink); margin-top:2px; }
+.deal-topbtns { display:flex; gap:9px; align-items:flex-start; }
+/* info-кнопка: тёмная (чернила), тело 40 + цоколь 4 (спека: Box 41×40, DROP 0,4) */
+.infobtn {
+  width:41px; height:40px; border:none; cursor:pointer; border-radius:12px;
+  background:var(--ink); color:#fff;
+  box-shadow:0 4px 0 #362435, 0 6px 3px rgba(0,0,0,.15), inset 0 -2px 2px rgba(0,0,0,.10);
+  display:flex; align-items:center; justify-content:center; font-family:inherit;
 }
-@keyframes logoPop { from{transform:scale(.7); opacity:0} to{transform:scale(1); opacity:1} }
-.tagline { font-size:17px; font-weight:800; color:var(--ink-soft); }
-.howto { margin-top:10px; list-style:none; text-align:left; display:flex; flex-direction:column; gap:10px; width:100%; }
+.infobtn:active { transform:translateY(3px); box-shadow:0 1px 0 #362435; }
+.infobtn svg { filter:drop-shadow(0 1.5px 0 rgba(0,0,0,.15)); }
+/* полоса баланса (0,80) 375×97: белые кромки, по центру подпись + монета и сумма */
+.deal-balband {
+  position:absolute; top:80px; left:0; right:0; height:97px;
+  background:var(--bg); border-top:2px solid #fff; border-bottom:2px solid #fff;
+  box-shadow:0 5px 0 rgba(0,0,0,.06);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+}
+.dbb-label { font-size:14px; font-weight:600; line-height:21px; color:var(--ink-soft); }
+.dbb-row { display:flex; align-items:center; gap:3px; color:var(--ink); }
+.dbb-row .coin-v { width:25px; height:25px; stroke-width:1.6; }
+#dealBal { font-size:24px; font-weight:900; line-height:36px; }
+.deal-head { position:absolute; top:255px; left:0; right:0; text-align:center; }
+.deal-h { font-size:24px; font-weight:900; line-height:31px; color:var(--ink); }
+.deal-sub { margin-top:12px; font-size:14px; font-weight:600; line-height:21px; color:var(--ink); }
+/* селектор актива (0,335) 375×109 на полупрозрачной белой полосе */
+.asset-band {
+  position:absolute; top:335px; left:0; right:0; height:109px;
+  background:rgba(255,255,255,.20); padding:16px 16px 0;
+}
+.asset-lbl { font-size:14px; font-weight:600; line-height:21px; color:var(--ink); }
+.asset-chips { display:flex; gap:8px; margin-top:8px; }
+.asset-chip {
+  flex:1; height:48px; border-radius:16px; cursor:pointer; font-family:inherit;
+  background:var(--bg); border:2px solid #fff;
+  display:flex; align-items:center; gap:8px; padding:8px 10px 8px 8px;
+  font-size:14px; font-weight:600; color:var(--ink);
+  transition:border-color .12s ease;
+}
+.asset-chip img { width:32px; height:32px; display:block; }
+.asset-chip.on { border-color:var(--green); }
+/* баннер «новая механика» (16,523) 343×178, r20 */
+.deal-unlock {
+  position:absolute; top:523px; left:16px; right:16px; height:178px;
+  background:var(--bg); border:1px solid #fff; border-radius:20px;
+  padding:16px 18px; text-align:left;
+}
+.du-head { display:flex; align-items:center; gap:8px; font-size:15px; font-weight:600; line-height:20px; color:#19213D; }
+.du-name { margin-top:8px; font-size:18px; font-weight:600; line-height:25px; color:#19213D; }
+.du-desc { margin-top:4px; font-size:12px; font-weight:600; line-height:16px; color:#7D676F; }
+.bigbtn.learn { height:42px; margin:8px 0 0; width:100%; border-radius:12px;
+  box-shadow:0 4px 0 var(--blue-dark), 0 7px 3px rgba(0,0,0,.15), inset 0 5px 0 rgba(255,255,255,.25), inset 0 -2px 2px rgba(0,0,0,.10); }
+.bigbtn.learn:active { box-shadow:0 1px 0 var(--blue-dark); }
+.bigbtn.learn .btn-label { font-size:16.5px; }
+.deal-cta { position:absolute; top:731px; left:16px; right:16px; }
+.deal-cta .bigbtn { width:100%; margin-bottom:0; }
+/* онбординг-сим (?tut=1): Deal-экран пропускается — шелл сам стартует раунд;
+   контент прячем, чтобы игрок не тапнул Start в окне ожидания фида (★draft) */
+#stage.tutboot #screen-start .deal-inner { visibility:hidden; }
+/* правила игры в (i)-оверлее (бывший стартовый howto-список) */
+.howto { list-style:none; text-align:left; display:flex; flex-direction:column; gap:8px; width:100%; }
 .howto li {
-  background:var(--card); border-radius:16px; padding:12px 16px;
-  font-size:15px; font-weight:700; border:2px solid #fff;
+  background:var(--card); border-radius:14px; padding:10px 14px;
+  font-size:14px; font-weight:700; border:2px solid #fff;
   box-shadow:0 4px 12px rgba(120,90,40,.1);
 }
 .how-ico { margin-right:8px; }
-.start-note { font-size:14px; font-weight:700; color:var(--ink-soft); }
 
 /* ===================== TOP BAR (макет: pause 16/24, таймер 150/12 76×76, кебаб 319/16) ===================== */
 #topbar {
@@ -202,11 +245,12 @@ body {
 /* ===================== CHART (148..451, фикс 303 — карточка всегда на 451) ===================== */
 #chartWrap { position:relative; flex:0 0 303px; min-height:0; z-index:1; }
 #chart { position:absolute; inset:0; width:100%; height:100%; }
-#chartTag { /* плашка BTC слева, скругление только справа */
-  position:absolute; left:0; top:50px; width:51px; height:37px;
+#chartTag { /* плашка «BITCOIN CHART (BTC/USD)» слева, скругление только справа (f2057) */
+  position:absolute; left:0; top:50px; height:37px;
   background:rgba(255,255,255,.30); border-radius:0 12px 12px 0;
-  display:flex; align-items:center; padding-left:12px;
+  display:flex; align-items:center; padding:0 12px;
   font-size:14px; font-weight:600; color:var(--ink-soft);
+  text-transform:uppercase; white-space:nowrap; letter-spacing:.2px;
 }
 #meltWarn {
   position:absolute; left:50%; transform:translateX(-50%); bottom:10px;
@@ -411,7 +455,6 @@ body {
 .ub-ico { font-size:22px; }
 
 /* ===================== ЛЕСЕНКА / ДРАФТ-МЕТКИ ===================== */
-.stage-pill { background:#efe3c4; color:#7a6a52; position:relative; }
 .draftable { outline:1.5px dashed rgba(230,162,60,.6); outline-offset:2px; position:relative; }
 .draftable::after {
   content:"★ draft"; position:absolute; top:-9px; right:-6px; z-index:6;

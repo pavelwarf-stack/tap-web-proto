@@ -54,6 +54,16 @@ const NICKS = [
   ['CandleSam', 3100], ['LunaLong', 2050],
 ];
 
+/* ── Trading asset (Deal-экран, Figma f2055): выбор BTC/ETH/SOL меняет подпись
+   графика и сид цены; движок симуляции ЕДИНЫЙ. ★draft: живой фид Binance в игре
+   только BTC — ETH/SOL идут на том же генераторе режимов от типичного сида
+   (честный минимум по заданию 31.07); выбор живёт в рамках iframe, дефолт BTC */
+const ASSETS = {
+  BTC: { name: 'Bitcoin',  ticker: 'BTC', seed: 63370, live: true,  icon: 'coin-btc.webp' },
+  ETH: { name: 'Ethereum', ticker: 'ETH', seed: 3420,  live: false, icon: 'coin-eth.webp' },
+  SOL: { name: 'Solana',   ticker: 'SOL', seed: 180,   live: false, icon: 'coin-sol.webp' },
+};
+
 // ============================== PROGRESS (ladder) ==============================
 const P = (() => {
   const def = {
@@ -144,6 +154,18 @@ en: {
   'ui.liqCaption': 'Liquidation at −50% of the rate',
   'ui.close': 'Close position',
   'ui.closeFrac': 'Close {0}%',
+  /* Deal pre-round screen (Figma 622 / f2055); RU copy макета переведена в EN-базу */
+  'deal.title': 'Deal',
+  'deal.balance': 'Your balance',
+  'deal.settings': 'Level settings',
+  'deal.setup': 'Set up the level before starting the game',
+  'deal.asset': 'Trading asset',
+  'deal.start': 'Start game',
+  'deal.unlock.t': 'New mechanic unlocked!',
+  'deal.learn': 'Learn',
+  'deal.mech.partial.d': 'Now you can choose your position size and control your risk',
+  'deal.howto.t': 'How to play',
+  'ui.chartlbl': '{0} chart ({1}/USD)',
 },
 es: {
   'stage.badge': 'Etapa {0} de {1}',
@@ -178,6 +200,17 @@ es: {
   'ui.liqCaption': 'Liquidación al −50% de la tasa',
   'ui.close': 'Cerrar posición',
   'ui.closeFrac': 'Cerrar {0}%',
+  'deal.title': 'Operación',
+  'deal.balance': 'Tu saldo',
+  'deal.settings': 'Ajustes del nivel',
+  'deal.setup': 'Configura el nivel antes de empezar la partida',
+  'deal.asset': 'Activo de trading',
+  'deal.start': 'Empezar el juego',
+  'deal.unlock.t': '¡Nueva mecánica desbloqueada!',
+  'deal.learn': 'Aprender',
+  'deal.mech.partial.d': 'Ahora puedes elegir el tamaño de tu posición y controlar el riesgo',
+  'deal.howto.t': 'Cómo jugar',
+  'ui.chartlbl': 'Gráfico de {0} ({1}/USD)',
 },
 fr: {
   'stage.badge': 'Étape {0} sur {1}',
@@ -212,6 +245,17 @@ fr: {
   'ui.liqCaption': 'Liquidation à −50% du cours',
   'ui.close': 'Clôturer la position',
   'ui.closeFrac': 'Clôturer {0}%',
+  'deal.title': 'Transaction',
+  'deal.balance': 'Ton solde',
+  'deal.settings': 'Réglages du niveau',
+  'deal.setup': 'Configure le niveau avant de lancer la partie',
+  'deal.asset': 'Actif de trading',
+  'deal.start': 'Lancer la partie',
+  'deal.unlock.t': 'Nouvelle mécanique débloquée !',
+  'deal.learn': 'Découvrir',
+  'deal.mech.partial.d': 'Tu peux maintenant choisir la taille de ta position et contrôler ton risque',
+  'deal.howto.t': 'Comment jouer',
+  'ui.chartlbl': 'Graphique {0} ({1}/USD)',
 },
 de: {
   'stage.badge': 'Stufe {0} von {1}',
@@ -246,6 +290,17 @@ de: {
   'ui.liqCaption': 'Liquidation bei −50% des Kurses',
   'ui.close': 'Position schließen',
   'ui.closeFrac': '{0}% schließen',
+  'deal.title': 'Deal',
+  'deal.balance': 'Dein Guthaben',
+  'deal.settings': 'Level-Einstellungen',
+  'deal.setup': 'Stelle das Level vor dem Spielstart ein',
+  'deal.asset': 'Handels-Asset',
+  'deal.start': 'Spiel starten',
+  'deal.unlock.t': 'Neue Mechanik freigeschaltet!',
+  'deal.learn': 'Ansehen',
+  'deal.mech.partial.d': 'Jetzt kannst du deine Positionsgröße wählen und dein Risiko steuern',
+  'deal.howto.t': 'So wird gespielt',
+  'ui.chartlbl': '{0}-Chart ({1}/USD)',
 },
 ja: {
   'stage.badge': 'ステージ {0} / {1}',
@@ -280,6 +335,17 @@ ja: {
   'ui.liqCaption': 'レートの−50%で清算',
   'ui.close': 'ポジションを決済',
   'ui.closeFrac': '{0}%決済',
+  'deal.title': 'ディール',
+  'deal.balance': 'あなたの残高',
+  'deal.settings': 'レベル設定',
+  'deal.setup': 'ゲームを始める前にレベルを設定しよう',
+  'deal.asset': '取引資産',
+  'deal.start': 'ゲーム開始',
+  'deal.unlock.t': '新メカニクス解放！',
+  'deal.learn': '学ぶ',
+  'deal.mech.partial.d': 'ポジションのサイズを選んでリスクをコントロールできるようになりました',
+  'deal.howto.t': '遊び方',
+  'ui.chartlbl': '{0}チャート ({1}/USD)',
 },
 zh: {
   'stage.badge': '第 {0} 阶段，共 {1} 阶段',
@@ -314,6 +380,17 @@ zh: {
   'ui.liqCaption': '价格变动−50%时爆仓',
   'ui.close': '平仓',
   'ui.closeFrac': '平仓{0}%',
+  'deal.title': '交易',
+  'deal.balance': '你的余额',
+  'deal.settings': '关卡设置',
+  'deal.setup': '开始游戏前先设置关卡',
+  'deal.asset': '交易资产',
+  'deal.start': '开始游戏',
+  'deal.unlock.t': '解锁新机制！',
+  'deal.learn': '学习',
+  'deal.mech.partial.d': '现在你可以选择仓位大小并控制风险',
+  'deal.howto.t': '玩法说明',
+  'ui.chartlbl': '{0}图表 ({1}/USD)',
 },
 pt: {
   'stage.badge': 'Fase {0} de {1}',
@@ -348,6 +425,17 @@ pt: {
   'ui.liqCaption': 'Liquidação a −50% da cotação',
   'ui.close': 'Fechar posição',
   'ui.closeFrac': 'Fechar {0}%',
+  'deal.title': 'Operação',
+  'deal.balance': 'Seu saldo',
+  'deal.settings': 'Configurações do nível',
+  'deal.setup': 'Configure o nível antes de começar o jogo',
+  'deal.asset': 'Ativo de trading',
+  'deal.start': 'Começar o jogo',
+  'deal.unlock.t': 'Nova mecânica desbloqueada!',
+  'deal.learn': 'Aprender',
+  'deal.mech.partial.d': 'Agora você pode escolher o tamanho da sua posição e controlar o risco',
+  'deal.howto.t': 'Como jogar',
+  'ui.chartlbl': 'Gráfico de {0} ({1}/USD)',
 },
 ar: {
   'stage.badge': 'المرحلة {0} من {1}',
@@ -382,6 +470,17 @@ ar: {
   'ui.liqCaption': 'التصفية عند −50% من السعر',
   'ui.close': 'إغلاق الصفقة',
   'ui.closeFrac': 'إغلاق {0}%',
+  'deal.title': 'صفقة',
+  'deal.balance': 'رصيدك',
+  'deal.settings': 'إعدادات المستوى',
+  'deal.setup': 'اضبط المستوى قبل بدء اللعبة',
+  'deal.asset': 'أصل التداول',
+  'deal.start': 'ابدأ اللعبة',
+  'deal.unlock.t': 'آلية جديدة مفتوحة!',
+  'deal.learn': 'تعلّم',
+  'deal.mech.partial.d': 'يمكنك الآن اختيار حجم صفقتك والتحكم في المخاطر',
+  'deal.howto.t': 'طريقة اللعب',
+  'ui.chartlbl': 'مخطط {0} ({1}/USD)',
 },
 };
 function gt(key) {
@@ -652,6 +751,7 @@ const G = {
   lastFrame: 0, lastDt: 1 / 60, lastCountSec: 99, melting: false,
   yMin: 0, yMax: 1, yInit: false,
   // выбор игрока (контролы)
+  asset: 'BTC',              // Deal-экран (f2055): BTC/ETH/SOL — подпись графика + сид цены
   lev: CFG.LEV_BASE,         // stage<3 — скрытый LEV_BASE; stage 3+ — выбор из LEVS
   frac: 1,                   // stage<4 — всегда 1; stage 4+ — выбор из FRACS
   // возможности ТЕКУЩЕГО раунда (фиксируются на старте; вердикт 30.07 п.23):
@@ -723,11 +823,26 @@ function hubStartBal() {
   return null;
 }
 
-// ---------- start screen: лесенка механик + стадия ----------
+// ---------- start screen: «Deal» — пред-раундовые настройки уровня (f2055) ----------
 function renderStart() {
-  const badge = $('stageBadge');
-  badge.textContent = gt('stage.badge', P.stage, MAX_STAGE);
-  badge.classList.toggle('draftable', DRAFTS_ON);
+  // баланс: онбординг/тренировка = симуляция с фикс-сидом, иначе кошелёк хаба
+  const hb = hubStartBal();
+  const sim = onboarding() || !!P.pendingPartial;
+  $('dealBal').textContent = fmtCoins(sim || hb === null ? CFG.START_BAL : hb);
+  // селектор актива
+  document.querySelectorAll('#assetChips .asset-chip').forEach(b =>
+    b.classList.toggle('on', b.dataset.asset === G.asset));
+  // баннер «новая механика»: ровно кейс макета — частичные позиции доступны к
+  // изучению (stage 3, онбординг пройден). ★draft: других механик Deal-баннер не
+  // объявляет (шорты/плечо анлочатся внутри онбординга, Deal там пропускается)
+  const showUnlock = !onboarding() && P.stage === 3;
+  $('dealUnlock').classList.toggle('hidden', !showUnlock);
+  if (showUnlock) {
+    $('duName').textContent = gt('mech.partial');
+    $('duDesc').textContent = gt('deal.mech.partial.d');
+    $('dealUnlock').classList.toggle('draftable', DRAFTS_ON);
+  }
+  // правила игры для (i)-оверлея (бывший стартовый howto-список)
   const list = $('howtoList');
   const rows = [['👆', gt('howto.1.enter')], ['📈', gt('howto.chart')], ['✋', gt('howto.1.exit')]];
   if (P.stage >= 2) rows.push(['↕️', gt('howto.short')]);
@@ -777,10 +892,18 @@ function startRound() {
     if (intro) { showIntro(intro, startRound); return; }
   }
 
-  const liveOk = Feed.ready && Feed.fresh();
-  const seed = Feed.lastPrice || (() => { try { return Number(localStorage.getItem('trade_lastprice')); } catch (e) { return 0; } })() || 63370;
+  // актив раунда (Deal-экран): BTC — живой фид Binance; ETH/SOL — генератор от
+  // типичного сида (★draft, см. ASSETS); подписи графика/тикера — от актива
+  const A = ASSETS[G.asset] || ASSETS.BTC;
+  const liveOk = A.live && Feed.ready && Feed.fresh();
+  const seed = A.live
+    ? (Feed.lastPrice || (() => { try { return Number(localStorage.getItem('trade_lastprice')); } catch (e) { return 0; } })() || A.seed)
+    : A.seed;
   G.offline = !liveOk;
-  $('offlineBadge').classList.toggle('hidden', liveOk);
+  // ⚡-бейдж — только когда живой фид ОЖИДАЛСЯ и пропал; ETH/SOL офлайновы по дизайну
+  $('offlineBadge').classList.toggle('hidden', liveOk || !A.live);
+  $('chartTag').textContent = gt('ui.chartlbl', A.name, A.ticker);
+  $('tickerAsset').textContent = A.ticker;
   G.engine = new PriceEngine(seed, liveOk);
   G.engine.prefill();
 
@@ -848,6 +971,9 @@ function startPartialTraining() {
     }
     P.pendingPartial = true;
     saveP();
+    // ★draft: заказ с Deal-экрана (кнопка Learn, f2055) — раунд ещё не начат,
+    // тренировка уедет в ближайший Start game; баланс на Deal станет сим-сидом
+    if (G.screen === 'start') { renderStart(); return; }
     if (G.over) { startRound(); return; }
     hintFloat(gt('hint.trainq'));
   });
@@ -1130,6 +1256,11 @@ function finishRound() {
     ub.classList.add('hidden');
   }
 
+  // шапка результата: актив раунда (пилюля с 3D-монетой из Deal-селектора)
+  const rA = ASSETS[G.asset] || ASSETS.BTC;
+  $('resAssetIco').src = rA.icon;
+  $('resAssetLbl').textContent = rA.ticker;
+
   // история сделок
   const tr = $('resTrades');
   tr.innerHTML = '';
@@ -1141,7 +1272,7 @@ function finishRound() {
     const levTag = G.caps.lev ? ` ×${t.lev}` : ''; // до анлока плеча скрытый буст не светим
     d.innerHTML =
       `<div class="trade-ico">${t.dir === 1 ? '📈' : '📉'}</div>` +
-      `<div class="trade-main"><div class="trade-pair">BTC/USDT${levTag}</div><div class="trade-dur">${dirTag} ${t.dur}s${t.auto ? ' · auto' : ''}</div></div>` +
+      `<div class="trade-main"><div class="trade-pair">${rA.ticker}/USD${levTag}</div><div class="trade-dur">${dirTag} ${t.dur}s${t.auto ? ' · auto' : ''}</div></div>` +
       (t.liq ? '<span class="liq-badge">LIQUIDATION</span>' : '') +
       `<div class="trade-pnl ${t.usd >= 0 ? 'win' : 'loss'}">${fmtCoins(Math.round(t.usd), true)}</div>`;
     tr.appendChild(d);
@@ -1453,6 +1584,34 @@ function bind() {
   $('btnPlay').addEventListener('click', () => { Sound.ensure(); startRound(); });
   $('btnAgain').addEventListener('click', () => { Sound.ensure(); startRound(); });
   $('btnHome').addEventListener('click', () => show('start'));
+  // Deal-экран: селектор актива (f2055)
+  $('assetChips').addEventListener('click', e => {
+    const b = e.target.closest('.asset-chip');
+    if (!b || !ASSETS[b.dataset.asset]) return;
+    G.asset = b.dataset.asset;
+    renderStart();
+  });
+  // ★draft: (i) — правила игры (контент кнопки в макете не задан)
+  $('btnInfo').addEventListener('click', () => $('infoOverlay').classList.remove('hidden'));
+  $('btnInfoOk').addEventListener('click', () => $('infoOverlay').classList.add('hidden'));
+  // ★draft: кебаб на Deal — меню в макете не задано; звук + выход в хаб
+  $('btnDealKebab').addEventListener('click', () => {
+    $('btnDealSound').textContent = Sound.on ? '🔊 Sound: on' : '🔇 Sound: off';
+    $('btnDealExit').classList.toggle('hidden', window.parent === window);
+    $('dealMenu').classList.remove('hidden');
+  });
+  $('btnDealSound').addEventListener('click', () => {
+    Sound.on = !Sound.on;
+    $('btnDealSound').textContent = Sound.on ? '🔊 Sound: on' : '🔇 Sound: off';
+    $('btnSound').textContent = $('btnDealSound').textContent;
+  });
+  $('btnDealExit').addEventListener('click', () => {
+    try { window.parent.postMessage({ type: 'hub:exit', game: 'trade' }, '*'); } catch (e) {}
+  });
+  $('btnDealMenuOk').addEventListener('click', () => $('dealMenu').classList.add('hidden'));
+  // «Изучить»/Learn на баннере механики → интро частичных позиций + заказ тренировки
+  // (тот же контур, что тап по 🔒 Size; рефанд fee платного раунда — гарды внутри)
+  $('btnLearn').addEventListener('click', () => { Sound.ensure(); startPartialTraining(); });
   $('btnLong').addEventListener('pointerdown', e => { e.preventDefault(); onAction(1); });
   $('btnShort').addEventListener('pointerdown', e => { e.preventDefault(); onAction(-1); });
   $('btnExit').addEventListener('pointerdown', e => { e.preventDefault(); onAction(); });
@@ -1511,6 +1670,10 @@ function applyGT() {
 }
 window.__trade = { G, CFG, Feed, P, saveP, targetStage, roundCaps, startRound, enterPos, exitPos, Tasks, OB_ROUNDS }; // QA hook
 applyGT();
+/* онбординг-сим из хаба (?tut=1): Deal-экран пропускается — шелл сам зовёт startRound()
+   через __trade (★draft: контент Deal прячем, чтобы он не мигал и не ловил тап Start
+   в окне ожидания фида; вне iframe класс не вешаем — прямое открытие живёт как обычно) */
+if (_qs.has('tut') && window.parent !== window) $('stage').classList.add('tutboot');
 FX.init();
 bind();
 show('start');

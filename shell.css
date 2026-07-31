@@ -1,8 +1,9 @@
 /* ============================================================
    Tap Trading Hub — shell styles.
-   Rebuilt to match Figma wireframes (file MwL2GyFM68cbkVYy4XueTY, page V1).
-   Design frame is 440×956; all values here are ×(390/440) ≈ 0.886.
-   Fonts: Inter (shell), Nunito (round-complete + tutorial, game theme).
+   TapTrade redesign (Figma row 622:*, вердикт владельца 31.07 «верстай всю версию так»):
+   единый крем-дизайн «бумага + Nunito + кобальтовые 3D-кнопки» на всю оболочку.
+   Мокапы 375-wide → фрейм 390: значения ×(390/375) ≈ 1.04; RC-мокап 440-wide → ×0.886.
+   Fonts: Nunito (весь дефолт-скин), Inter (terminal/editorial UI).
    ============================================================ */
 
 /* Local fonts (self-contained prototype — no CDN). Variable woff2, latin subset. */
@@ -11,7 +12,7 @@
   src:url('fonts/inter-var.woff2') format('woff2');
 }
 @font-face {
-  font-family:'Nunito'; font-style:normal; font-weight:600 900; font-display:swap;
+  font-family:'Nunito'; font-style:normal; font-weight:200 1000; font-display:swap;
   src:url('fonts/nunito-var.woff2') format('woff2');
 }
 /* new skins (вердикт 30.07 п.24): editorial = Crimson Pro headings, terminal = JetBrains Mono digits */
@@ -38,65 +39,76 @@ button { font-family:inherit; border:none; background:none; cursor:pointer; colo
 input { font-family:inherit; }
 
 :root {
-  /* ============ SKIN TOKEN CONTRACT v2 ============
-     Полный рескин (вердикт 30.07, DESIGN-ADDITIONS п.24): три мини-дизайн-системы Миши
-     (нода 602:10514). Defaults = skin «narodny» (вариант A, тёплый крем + зелёный);
-     body[data-skin="terminal"|"editorial"] переопределяют те же переменные ниже.
+  /* ============ SKIN TOKEN CONTRACT v3 ============
+     TapTrade-рескин (Figma 622:*, вердикт 31.07): defaults = новый единый крем-дизайн
+     (бумага #F0DFC2 + зерно, чернила #4C334A, Nunito, кобальтовые 3D-кнопки) — он же
+     язык игры/RC, теперь на всю оболочку. body[data-skin="terminal"|"editorial"]
+     остаются когортными оверрайдами тех же токенов поверх ТОГО ЖЕ скелета (п.20/24/25).
      Every surface reads ONLY these tokens.
-     Values from node dumps (_рабочее/misha-3variants/nodes-*.json), scale ×(390/375)≈1.04. */
-  --bg:#FDF8F0;          /* screen background (nodes: screen-home fill) */
-  --card:#FFFDF6;        /* elevated cards, sheets, tab bar */
-  --panel:#FFFDF6;       /* groups, pills */
-  --panel2:#FFFDF6;      /* second surface (editorial rows #F6F8FC) */
-  --accent2:#F0E7D2;     /* art placeholders (legacy screens) */
-  --line:#E5E7EB;        /* card borders, dividers */
-  --tx:#2B1D0C;          /* primary ink */
-  --tx-soft:#6B5C4C;     /* secondary ink */
-  --sb:#8C7E6E;          /* tertiary: placeholders, dim labels */
+     Values from node dumps (_рабочее/taptrade-622/spec-*.txt), scale ×(390/375)≈1.04. */
+  --bg:#F0DFC2;          /* paper base */
+  --paper:url('paper.webp');            /* бумажное зерно (15% альфа запечена), cover */
+  --card:rgba(255,255,255,.30);         /* полупрозрачные карты поверх бумаги */
+  --card-line:#FFFFFF;                  /* их 2px белый контур */
+  --panel:rgba(255,255,255,.30);
+  --panel2:rgba(255,255,255,.50);       /* вложенная светлая карта (Ends-in, badge) */
+  --accent2:#F0DFC2;     /* art placeholders (legacy screens) */
+  --line:rgba(255,255,255,.85);         /* hairlines между рядами */
+  --pill-line:rgba(101,50,0,.20);       /* тёплый контур белых пилюль (#653200 20%) */
+  --tx:#4C334A;          /* primary ink */
+  --tx-soft:rgba(76,51,74,.70);         /* secondary ink */
+  --sb:rgba(76,51,74,.60);              /* tertiary: placeholders, dim labels */
   --green:#13A86D;
-  --green-deep:#1B5E20;  /* avatar bg, active tab, «Buy» link (variant A deep green) */
-  --red:#CC0000;
-  --hot:#CC0000;
-  --blue:#4A7BD5;
-  --gold:#E8A013;        /* coin */
+  --green-deep:#13A86D;
+  --red:#F54040;
+  --hot:#EEB06A;         /* HIT badge */
+  --blue:#4068F5;
+  --gold:#FFB703;        /* контурная монета в пилюлях шапки */
+  --coin-line:#EEB06A;   /* контурная монета на кремовых картах */
   --danger:var(--red);
   --danger-bg:#FEE2E2;   /* danger icon circle */
-  --r-sheet:20.8px;      /* sheets/modals (★draft, шитов в макетах нет: ДС A «крупные блоки» 20) */
-  --toast-bg:#2B1D0C; --toast-tx:#FFFDF6;
-  --btn-bg:linear-gradient(180deg,#1E9E4A,#0F6B2E);   /* primary CTA */
+  --r-sheet:20.8px;      /* sheets/modals (★draft, шитов в макетах нет: r20 крупных карт ДС) */
+  --toast-bg:#4C334A; --toast-tx:#FFFFFF;
+  --btn-bg:#4068F5;      /* primary CTA (кобальт) */
   --btn-tx:#ffffff;
-  --btn2-bg:linear-gradient(180deg,#4A7BD5,#224192);  /* secondary (free-row actions) */
+  --btn2-bg:#13A86D;     /* secondary (free-row actions, зелёный 3D) */
   --btn2-tx:#ffffff;
-  --ghost:rgba(43,29,12,.08);
+  /* 3D-плинт кнопок (Button-компонент 622:27042): цветной плинт + мягкая тень + нижняя внутренняя */
+  --btn3d-sm:0 4px 0 #3353C4, 0 4px 2px rgba(0,0,0,.25), inset 0 -2px 2px rgba(0,0,0,.10);
+  --btn3d-lg:0 6px 0 #3353C4, 0 4px 2px rgba(0,0,0,.25), inset 0 -2px 2px rgba(0,0,0,.10);
+  --btn3d-green:0 4px 0 #108859, 0 4px 2px rgba(0,0,0,.25), inset 0 -2px 2px rgba(0,0,0,.10);
+  --btn-txsh:0 1.5px 0 rgba(0,0,0,.15); /* тень на лейблах 3D-кнопок */
+  --ghost:rgba(76,51,74,.08);
   --r-card:12.5px;       /* cards, small CTA */
-  --r-card-lg:16.6px;    /* promo card, big panels */
+  --r-card-lg:16.6px;    /* section cards, groups */
   --r-pack:12.5px;       /* shop pack cards */
   --r-btn:12.5px;
-  --r-btn-sm:8.3px;
-  --badge-bg:#FEF3C7; --badge-tx:#E8A013; --badge-line:transparent; /* PERSONAL OFFER */
-  --save-bg:#FEE2E2; --save-tx:#CC0000;                             /* SAVE 90% */
-  --offer-badge-bg:#FEE2E2; --offer-badge-tx:#CC0000;               /* home SPECIAL OFFER */
-  --expire-tx:#E8A013;   /* «Ends in 2h» on home offer */
-  --timer-tx:#CC0000;    /* shop countdown */
-  --reward-tx:#E8A013;   /* «+500 chips» reward line */
+  --r-btn-sm:12.5px;
+  --badge-bg:rgba(255,255,255,.50); --badge-tx:var(--tx-soft); --badge-line:transparent; /* PERSONAL OFFER */
+  --save-bg:#FF5F57; --save-tx:#FFFFFF;                             /* SAVE 80% */
+  --offer-badge-bg:#4C334A; --offer-badge-tx:#FFFFFF;               /* home SPECIAL OFFER */
+  --expire-tx:#FFFFFF;   /* «Ends in 2h» on home offer (белый на зелёной карте) */
+  --timer-tx:#4C334A;    /* shop countdown */
+  --reward-tx:#4C334A;   /* «+500 chips» reward line */
   --icirc-bg:transparent;/* free-row icon circle (terminal #242F41) */
-  --card-shadow:0 1px 2px #E6E1CD;
-  --cta-shadow:0 8px 18px rgba(0,0,0,.15);
-  --statusbar-tx:#2B1D0C; --statusbar-bg:transparent;
+  --card-shadow:none;
+  --hard-shadow:0 4.9px 0 rgba(0,0,0,.10); /* жёсткая тень крупных карт (home, RC band) */
+  --cta-shadow:var(--btn3d-lg);
+  --statusbar-tx:#4C334A; --statusbar-bg:transparent;
   --topbar-bg:#1B2838; --topbar-tx:#FFFFFF;  /* editorial-only navy app bar */
-  --tab-bg:#FFFDF6; --tab-line:#E5E7EB;
-  --tab-active:#1B5E20; --tab-inactive:#6B5C4C; --tab-active-bg:#F3E8D5;
-  --avatar-bg:#1B5E20; --avatar-tx:#FFFFFF;
+  --tab-bg:#F0DFC2; --tab-line:#FFFFFF;
+  --tab-active:#4C334A; --tab-inactive:#4C334A; --tab-active-bg:rgba(255,255,255,.30);
+  --avatar-bg:#FFFFFF; --avatar-tx:#4C334A;
   --homeind:#C9BCA6;
-  --font:'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font:'Nunito', 'Arial Rounded MT Bold', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-head:var(--font);
   --font-num:var(--font);
   /* typography voice per skin (casing = CSS only, verdict 29.07) */
-  --head-tx:#2B1D0C;
-  --w-head:800; --w-btn:800;
-  --hero-size:25px; --hero-lh:30px;            /* home hero title (A: Inter 800 24→25) */
-  --sec-tx:#8C7E6E; --sec-size:13.5px; --sec-w:600; --sec-case:uppercase; /* shop section titles */
-  --case-head:none; --case-hero:none; --case-btn:uppercase; --case-cta:none; --case-tab:none;
+  --head-tx:#4C334A;
+  --w-head:900; --w-btn:900;
+  --hero-size:29.1px; --hero-lh:37.4px;        /* home/page titles (Nunito 900 28/38) */
+  --sec-tx:#4C334A; --sec-size:18.7px; --sec-w:900; --sec-case:none; /* shop «Free» 18/25 900 */
+  --case-head:none; --case-hero:none; --case-btn:none; --case-cta:none; --case-tab:none;
   /* comic speech bubble (mascot onboarding) */
   --font-bubble:var(--nunito);
   --bubble-bg:#FFFDF6; --bubble-line:#2B1D0C;
@@ -117,7 +129,17 @@ input { font-family:inherit; }
 /* ============ skin «terminal» (вариант C, тёмный неон; DS = A-ds/nodes-A) ============ */
 body[data-skin="terminal"] {
   --bg:#0B0E14;
+  --paper:none;                       /* бумага — только у дефолт-скина */
+  --font:'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --card:#141A26;
+  --card-line:rgba(255,255,255,.10);
+  --pill-line:rgba(255,255,255,.10);
+  --coin-line:#F3BA2F;
+  --btn3d-sm:0 8px 16px rgba(22,199,132,.2); /* без 3D-плинтов: плоские тени ДС C */
+  --btn3d-lg:0 8px 16px rgba(22,199,132,.2);
+  --btn3d-green:none;
+  --btn-txsh:none;
+  --hard-shadow:none;
   --panel:#141A26;
   --panel2:#141A26;
   --accent2:#1B2432;
@@ -172,7 +194,17 @@ body[data-skin="terminal"] {
    DS = C-ds/nodes-C: Crimson Pro headings + Inter UI) ============ */
 body[data-skin="editorial"] {
   --bg:#FFFFFF;
+  --paper:none;                       /* бумага — только у дефолт-скина */
+  --font:'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --card:#F2F4F7;
+  --card-line:transparent;
+  --pill-line:#E4E7EC;
+  --coin-line:#D49E2F;
+  --btn3d-sm:0 4px 12px rgba(46,204,113,.2); /* без 3D-плинтов: плоские тени ДС B */
+  --btn3d-lg:0 4px 12px rgba(46,204,113,.2);
+  --btn3d-green:none;
+  --btn-txsh:none;
+  --hard-shadow:none;
   --panel:#F2F4F7;
   --panel2:#F6F8FC;
   --accent2:#E4E7EC;
@@ -229,7 +261,7 @@ body[data-skin="editorial"] {
 #frame {
   position:fixed; left:50%; top:50%;
   width:390px; height:844px;
-  background:var(--bg);
+  background:var(--paper) center/cover no-repeat, var(--bg); /* бумажное зерно поверх крема */
   overflow:hidden;
   border-radius:34px;
   box-shadow:0 0 0 10px #101319, 0 0 0 11px #2e333e, 0 30px 80px rgba(0,0,0,.55);
@@ -242,7 +274,7 @@ body[data-skin="editorial"] {
   z-index:100; pointer-events:none;
 }
 @media (max-width:430px) {
-  body { display:block; background:var(--bg); }
+  body { display:block; background:var(--paper) center/cover no-repeat fixed, var(--bg); }
   #frame { position:fixed; inset:0; left:0; top:0; width:100vw; height:100dvh; border-radius:0; box-shadow:none; margin:0; transform:none; }
   #frame::before { display:none; }
 }
@@ -252,7 +284,7 @@ body[data-skin="editorial"] {
   position:absolute; top:0; left:0; right:0; height:57px; z-index:20;
   display:flex; align-items:center; justify-content:space-between;
   padding:0 32px 0 43px;
-  font-size:15px; font-weight:600; color:var(--statusbar-tx);
+  font-size:14.6px; font-weight:800; color:var(--statusbar-tx);
   background:var(--statusbar-bg);
   user-select:none; -webkit-user-select:none;
   pointer-events:none;
@@ -320,24 +352,25 @@ body[data-skin="editorial"] .screen.has-tabbar, body[data-skin="terminal"] .scre
 }
 .sub-title { font-size:14.2px; line-height:21.3px; font-weight:500; color:var(--tx); margin:21px 0 14px; }
 
-/* ---------- buttons ---------- */
-.btn { border-radius:var(--r-btn); font-weight:var(--w-btn); text-transform:var(--case-btn); text-align:center; transition:transform .08s, opacity .15s; }
-.btn:active { transform:scale(.97); }
-.btn-primary { background:var(--btn-bg); color:var(--btn-tx); box-shadow:var(--cta-shadow); padding:14.5px 25px; font-size:14.2px; line-height:21.3px; }
-.btn-dark { background:var(--btn-bg); color:var(--btn-tx); border-radius:var(--r-btn-sm); padding:8.3px 14px; font-size:13.5px; line-height:16.6px; }
-.btn-ghost { background:var(--ghost); color:var(--tx); padding:14.5px 25px; font-size:14.2px; line-height:21.3px; }
-.btn-outline { background:var(--card); color:var(--tx); padding:13.5px 25px; font-size:13.3px; font-weight:600; box-shadow:inset 0 0 0 1.5px var(--line); border-radius:14px; }
-.btn-play { background:var(--btn-bg); color:var(--btn-tx); border-radius:var(--r-btn-sm); padding:8.3px 14px; font-size:13.5px; line-height:16.6px; box-shadow:var(--cta-shadow); }
-.btn-play.sm { padding:8.3px 14px; font-size:13.5px; }
-.btn-dark.sm { padding:8.3px 26px; }
-/* secondary free-row action (A blue gradient, B navy, C cyan) */
+/* ---------- buttons (Button-компонент 622:27042: кобальт + 3D-плинт, Nunito 900) ---------- */
+.btn { border-radius:var(--r-btn); font-weight:var(--w-btn); text-transform:var(--case-btn); text-align:center; transition:transform .08s, opacity .15s; text-shadow:var(--btn-txsh); }
+.btn:active { transform:translateY(2px); }
+.btn-primary { background:var(--btn-bg); color:var(--btn-tx); box-shadow:var(--btn3d-lg); border-radius:16.6px; padding:15.5px 18.7px; font-size:20.8px; line-height:27px; }
+.btn-dark { background:var(--btn-bg); color:var(--btn-tx); border-radius:var(--r-btn-sm); box-shadow:var(--btn3d-sm); padding:11.4px 18.7px; font-size:14.6px; line-height:19.8px; }
+.btn-ghost { background:var(--ghost); color:var(--tx); border-radius:16.6px; padding:14.5px 25px; font-size:15.6px; line-height:21.3px; text-shadow:none; }
+.btn-outline { background:var(--card); color:var(--tx); padding:13.5px 25px; font-size:14.6px; font-weight:800; box-shadow:inset 0 0 0 2px var(--card-line); border-radius:16.6px; text-shadow:none; }
+.btn-play { background:var(--btn-bg); color:var(--btn-tx); border-radius:var(--r-btn-sm); box-shadow:var(--btn3d-sm); padding:11.4px 18.7px; font-size:14.6px; line-height:19.8px; }
+.btn-play.sm { padding:11.4px 18.7px; font-size:14.6px; }
+.btn-dark.sm { padding:11.4px 26px; }
+/* secondary free-row action (622: зелёный 3D; B navy, C cyan) */
 .btn-free {
   background:var(--btn2-bg); color:var(--btn2-tx);
   border-radius:var(--r-btn-sm); font-weight:var(--w-btn); text-transform:var(--case-btn);
-  min-width:83px; padding:8.3px 14px; font-size:13.5px; line-height:16.6px; text-align:center;
+  box-shadow:var(--btn3d-green); text-shadow:var(--btn-txsh);
+  min-width:83px; padding:11.4px 18.7px; font-size:14.6px; line-height:19.8px; text-align:center;
   transition:transform .08s;
 }
-.btn-free:active { transform:scale(.97); }
+.btn-free:active { transform:translateY(2px); }
 .btn-free[disabled] { opacity:.45; pointer-events:none; }
 body[data-skin="editorial"] .btn-free { min-width:114px; padding:10.4px 14px; font-size:13.5px; }
 body[data-skin="terminal"] .btn-free { min-width:104px; padding:8.3px 12px; font-size:12.5px; }
@@ -396,27 +429,68 @@ body[data-skin="editorial"] .sub-head .back-circle {
   display:flex; align-items:center; justify-content:space-between; gap:8px;
   height:37.4px; margin:2px 0 0;
 }
-.user-id { display:flex; align-items:center; gap:8.3px; min-width:0; flex:1 1 auto; text-align:left; }
+/* 622: юзер-пилюля — белая капсула с фото-аватаром и тёплым контуром */
+.user-id {
+  display:flex; align-items:center; gap:8.3px; min-width:0; flex:0 1 auto; text-align:left;
+  height:41.6px; padding:4.2px 12.5px 4.2px 4.2px;
+  background:#fff; border-radius:83px; box-shadow:inset 0 0 0 2px var(--pill-line);
+}
+body[data-skin="terminal"] .user-id, body[data-skin="editorial"] .user-id {
+  height:auto; padding:0; background:none; box-shadow:none; flex:1 1 auto;
+}
 .avatar-ini {
-  width:37.4px; height:37.4px; border-radius:50%; flex:0 0 37.4px;
-  background:var(--avatar-bg); color:var(--avatar-tx);
+  width:33.3px; height:33.3px; border-radius:50%; flex:0 0 33.3px;
+  background:var(--avatar-bg) url('avatar-tt.webp') center/cover; /* ★draft: сэмпл-фото из макета */
+  color:transparent;
   display:flex; align-items:center; justify-content:center;
   font-size:13.5px; font-weight:800; letter-spacing:.01em;
 }
-body[data-skin="terminal"] .avatar-ini { width:33.3px; height:33.3px; flex-basis:33.3px; font-size:12.5px; }
-.user-name { font-size:14.6px; line-height:17.7px; font-weight:700; color:var(--tx); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+body[data-skin="terminal"] .avatar-ini, body[data-skin="editorial"] .avatar-ini {
+  background-image:none; color:var(--avatar-tx);
+}
+body[data-skin="editorial"] .avatar-ini { width:37.4px; height:37.4px; flex-basis:37.4px; }
+.user-name { font-size:12.5px; line-height:16.6px; font-weight:900; color:var(--tx); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+body[data-skin="terminal"] .user-name, body[data-skin="editorial"] .user-name { font-size:14.6px; line-height:17.7px; font-weight:700; }
 .head-right { display:flex; align-items:center; gap:8.3px; flex:0 0 auto; }
 .balance-pill {
   position:relative;
-  display:flex; align-items:center; gap:6.2px; height:29.1px;
-  background:var(--card); border-radius:100px; padding:6px 12.5px;
-  box-shadow:inset 0 0 0 1px var(--line);
-  font-size:13.5px; line-height:1; font-weight:700; color:var(--tx);
+  display:flex; align-items:center; gap:4.2px; height:33.3px;
+  background:#fff; border-radius:20.8px; padding:4.2px 4.2px 4.2px 10.4px;
+  box-shadow:inset 0 0 0 2px var(--pill-line);
+  font-size:12.5px; line-height:1; font-weight:900; color:var(--tx);
   font-family:var(--font-num);
   white-space:nowrap;
 }
+body[data-skin="terminal"] .balance-pill, body[data-skin="editorial"] .balance-pill {
+  background:var(--card); box-shadow:inset 0 0 0 1px var(--line);
+  height:29.1px; padding:6px 12.5px; gap:6.2px; font-weight:700; font-size:13.5px;
+}
+/* серый «+»-кружок в пилюле баланса (622-макеты) */
+.bal-plus {
+  width:20.8px; height:20.8px; flex:0 0 20.8px; border-radius:50%;
+  background:#848FA2; color:#fff; font-size:12.5px; line-height:20.8px; font-weight:900;
+  text-align:center; margin-left:4.2px;
+}
+body[data-skin="terminal"] .bal-plus, body[data-skin="editorial"] .bal-plus { display:none; }
 body[data-skin="terminal"] .balance-pill { box-shadow:none; color:var(--gold); height:30.2px; }
-.coin-dot { display:inline-block; width:12.5px; height:12.5px; border-radius:50%; background:var(--gold); flex:0 0 12.5px; vertical-align:-1px; }
+/* 622-ДС: контурная монета (глиф CoinVertical) вместо solid-точки в дефолт-скине;
+   B/C сохраняют свою solid-монету (их старые макеты) */
+.coin-dot {
+  display:inline-block; width:16.6px; height:16.6px; border-radius:50%;
+  border:2.1px solid var(--coin-line); background:none; box-sizing:border-box;
+  flex:0 0 16.6px; vertical-align:-3px; position:relative;
+}
+.coin-dot::after {
+  content:''; position:absolute; top:.5px; bottom:.5px; left:34%; width:6px;
+  transform:translateX(-50%); border:1.6px solid var(--coin-line); border-radius:50%;
+  box-sizing:border-box;
+}
+.balance-pill .coin-dot { border-color:var(--gold); }
+.balance-pill .coin-dot::after { border-color:var(--gold); }
+body[data-skin="terminal"] .coin-dot, body[data-skin="editorial"] .coin-dot {
+  border:none; background:var(--gold); width:12.5px; height:12.5px; flex-basis:12.5px; vertical-align:-1px;
+}
+body[data-skin="terminal"] .coin-dot::after, body[data-skin="editorial"] .coin-dot::after { display:none; }
 body[data-skin="terminal"] .balance-pill .coin-dot { width:14.6px; height:14.6px; flex-basis:14.6px; }
 .balance-pill.pop { animation:pillPop .45s; }
 @keyframes pillPop { 30% { transform:scale(1.09); } }
@@ -430,9 +504,13 @@ body[data-skin="terminal"] .balance-pill .coin-dot { width:14.6px; height:14.6px
 @keyframes deltaFloat { 0%{opacity:0; transform:translateY(-4px);} 15%{opacity:1;} 75%{opacity:1;} 100%{opacity:0; transform:translateY(10px);} }
 /* круглые иконки-входы (bell по макету; gift = сохранённый вход дейлика, ★draft) */
 .icon-sq {
-  position:relative; width:29.1px; height:29.1px; border-radius:50%; flex:0 0 29.1px;
-  background:var(--card); box-shadow:inset 0 0 0 1px var(--line);
-  display:flex; align-items:center; justify-content:center; color:var(--tx-soft);
+  position:relative; width:33.3px; height:33.3px; border-radius:50%; flex:0 0 33.3px;
+  background:#fff; box-shadow:inset 0 0 0 2px var(--pill-line);
+  display:flex; align-items:center; justify-content:center; color:var(--tx);
+}
+body[data-skin="terminal"] .icon-sq, body[data-skin="editorial"] .icon-sq {
+  width:29.1px; height:29.1px; flex-basis:29.1px;
+  background:var(--card); box-shadow:inset 0 0 0 1px var(--line); color:var(--tx-soft);
 }
 body[data-skin="terminal"] .icon-sq { box-shadow:none; color:#fff; }
 .icon-sq svg { width:16.6px; height:16.6px; }
@@ -477,70 +555,93 @@ body[data-skin="terminal"] .icon-sq { box-shadow:none; color:#fff; }
   display:flex; align-items:center; justify-content:center; color:var(--tx);
 }
 
-/* ---------- home body: hero-текст + спецоффер + большой Play (mockups *-home) ----------
-   A: Play сразу под оффером; B/C: Play прижат к низу (margin-top:auto). */
+/* ---------- home body (622: trade-card + зелёный стартер-оффер + маскот + Play) ---------- */
 #scr-home.active { display:flex; flex-direction:column; }
 .home-hero {
-  position:relative;
-  margin-top:var(--hero-mt, 152px);
-  display:block; text-align:left;
+  position:relative; z-index:1;
+  margin-top:12.5px;
+  display:flex; flex-direction:column; gap:12.5px; text-align:left;
 }
-body[data-skin="editorial"] .home-hero { --hero-mt:47px; }
-body[data-skin="terminal"]  .home-hero { --hero-mt:93px; }
+body[data-skin="editorial"] .home-hero { margin-top:47px; }
+body[data-skin="terminal"]  .home-hero { margin-top:20px; }
+/* карта игры: крем на креме, белый контур 2px, жёсткая тень */
+.trade-card {
+  background:var(--bg); border:2px solid var(--card-line); border-radius:25px;
+  box-shadow:var(--hard-shadow);
+  padding:9.8px 14.6px 8.5px; text-align:center;
+}
+body[data-skin="terminal"] .trade-card, body[data-skin="editorial"] .trade-card {
+  background:var(--card); border-color:var(--card-line); text-align:left; padding:16.6px;
+}
 .hero-title {
   font-size:var(--hero-size); line-height:var(--hero-lh);
   font-family:var(--font-head); font-weight:var(--w-head);
   color:var(--head-tx); text-transform:var(--case-hero);
 }
 .hero-desc {
-  font-size:13.5px; line-height:18.7px; font-weight:400;
-  color:var(--tx-soft); margin:4.2px 0 0;
+  font-size:14.6px; line-height:20.8px; font-weight:600;
+  color:var(--tx-soft); margin:2px 0 0;
 }
-body[data-skin="editorial"] .hero-desc { font-size:15.6px; line-height:21.8px; color:#8F9CAE; margin-top:8.3px; }
-body[data-skin="terminal"]  .hero-desc { font-size:14.6px; line-height:20.8px; margin-top:8.3px; }
+body[data-skin="editorial"] .hero-desc { font-size:15.6px; line-height:21.8px; font-weight:400; color:#8F9CAE; margin-top:8.3px; }
+body[data-skin="terminal"]  .hero-desc { font-size:14.6px; line-height:20.8px; font-weight:400; margin-top:8.3px; }
 
-/* спецоффер на Home — витрина СУЩЕСТВУЮЩЕГО personal offer (без новых офферов) */
+/* стартер-оффер на Home (622-мокап: зелёная карта «Спецпредложение», ★draft — витрина
+   стартер-пака п.27 со 2-й сессии, живое 2ч-окно) */
 .sp-offer {
-  display:block; width:100%; text-align:left; cursor:pointer;
-  margin-top:16.6px; padding:var(--spo-pad, 16.6px);
-  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card-lg);
-  box-shadow:0 4px 12px rgba(109,117,143,.06);
+  --spo-tx:#fff; --spo-soft:rgba(255,255,255,.70);
+  position:relative; z-index:1;
+  display:flex; flex-direction:column; gap:12.5px;
+  width:100%; text-align:left; cursor:pointer;
+  margin-top:0; padding:16.6px;
+  background:var(--green); border:2px solid var(--card-line); border-radius:25px;
+  box-shadow:none;
 }
-body[data-skin="editorial"] .sp-offer { background:var(--panel2); box-shadow:none; --spo-pad:14.6px; }
-body[data-skin="terminal"]  .sp-offer { box-shadow:none; }
+body[data-skin="editorial"] .sp-offer { --spo-tx:var(--tx); --spo-soft:#8F9CAE; background:var(--panel2); border:none; border-radius:var(--r-card-lg); padding:14.6px; }
+body[data-skin="terminal"]  .sp-offer { --spo-tx:var(--tx); --spo-soft:var(--tx-soft); background:var(--card); border:1px solid var(--line); border-radius:var(--r-card-lg); }
 .spo-top { display:flex; width:100%; align-items:center; justify-content:space-between; gap:8px; }
 .spo-badge {
   background:var(--offer-badge-bg); color:var(--offer-badge-tx);
-  border-radius:6.2px; padding:4.2px 8.3px;
-  font-size:10.4px; line-height:12.5px; font-weight:800; text-transform:uppercase;
+  border-radius:6.2px; padding:4.2px 10.4px;
+  font-size:10.4px; line-height:14.6px; font-weight:900; text-transform:uppercase;
 }
-.spo-ends { font-size:11.4px; line-height:13.5px; font-weight:600; color:var(--expire-tx); font-variant-numeric:tabular-nums; }
-body[data-skin="editorial"] .spo-ends, body[data-skin="terminal"] .spo-ends { font-size:12.5px; line-height:15.6px; font-weight:700; }
-.spo-title { display:block; font-size:16.6px; line-height:19.8px; font-weight:800; color:var(--tx); margin-top:12.5px; }
-body[data-skin="editorial"] .spo-title, body[data-skin="terminal"] .spo-title { font-size:18.7px; line-height:22.9px; }
-.spo-desc { display:block; font-size:12.5px; line-height:17.7px; font-weight:400; color:var(--tx-soft); margin-top:4.2px; }
-body[data-skin="editorial"] .spo-desc { font-size:15.6px; line-height:21.8px; color:#8F9CAE; }
-body[data-skin="terminal"]  .spo-desc { font-size:13.5px; line-height:18.7px; }
-.spo-foot { display:flex; width:100%; align-items:center; justify-content:space-between; margin-top:12.5px; }
-.spo-price { font-size:18.7px; line-height:22.9px; font-weight:800; color:var(--tx); font-variant-numeric:tabular-nums; }
-body[data-skin="editorial"] .spo-price, body[data-skin="terminal"] .spo-price { font-size:20.8px; line-height:25px; font-weight:900; }
-/* Buy: A — зелёная подчёркнутая ссылка; B — navy кнопка; C — cyan кнопка */
+.spo-ends { font-size:12.5px; line-height:16.6px; font-weight:900; color:var(--expire-tx); font-variant-numeric:tabular-nums; }
+body[data-skin="editorial"] .spo-ends, body[data-skin="terminal"] .spo-ends { font-size:12.5px; line-height:15.6px; font-weight:700; color:var(--tx-soft); }
+.spo-title { display:block; font-size:16.6px; line-height:22.9px; font-weight:700; color:var(--spo-tx); }
+body[data-skin="editorial"] .spo-title, body[data-skin="terminal"] .spo-title { font-size:18.7px; line-height:22.9px; font-weight:800; }
+.spo-desc { display:block; font-size:12.5px; line-height:16.6px; font-weight:600; color:var(--spo-soft); margin-top:4.2px; }
+body[data-skin="editorial"] .spo-desc { font-size:15.6px; line-height:21.8px; font-weight:400; }
+body[data-skin="terminal"]  .spo-desc { font-size:13.5px; line-height:18.7px; font-weight:400; }
+.spo-foot { display:flex; width:100%; align-items:center; justify-content:space-between; margin-top:0; }
+.spo-price { font-size:22.9px; line-height:31.2px; font-weight:900; color:var(--spo-tx); font-variant-numeric:tabular-nums; }
+body[data-skin="editorial"] .spo-price, body[data-skin="terminal"] .spo-price { font-size:20.8px; line-height:25px; }
+/* Buy: 622 — кобальтовая 3D-кнопка; B — navy кнопка; C — cyan кнопка */
 .spo-buy {
-  color:var(--green-deep); font-size:13.5px; line-height:16.6px; font-weight:700;
-  text-decoration:underline; text-underline-offset:3px; padding:4px 0;
+  background:var(--blue); color:#fff; text-decoration:none;
+  border-radius:12.5px; min-width:78px; padding:12.5px 18.7px; text-align:center;
+  font-size:14.6px; line-height:19.8px; font-weight:900;
+  box-shadow:var(--btn3d-sm); text-shadow:var(--btn-txsh);
 }
 body[data-skin="editorial"] .spo-buy, body[data-skin="terminal"] .spo-buy {
-  background:var(--btn2-bg); color:var(--btn2-tx); text-decoration:none;
-  border-radius:8.3px; width:83.2px; padding:8.3px 0; text-align:center; font-weight:800;
+  background:var(--btn2-bg); color:var(--btn2-tx);
+  border-radius:8.3px; min-width:83.2px; padding:8.3px 0; font-weight:800; font-size:13.5px;
+  box-shadow:none; text-shadow:none;
 }
 
-.hero-play {
-  display:block; width:100%; margin-top:16.6px;
-  height:var(--play-h, 57.2px); padding:0 25px;
-  border-radius:12.5px;
-  font-size:16.6px; line-height:19.8px; text-transform:var(--case-cta);
+/* маскот на Home (622: фотореал-рептилоид, перекрывает карты, уходит под Play/таббар) */
+.home-mascot {
+  position:absolute; left:50%; bottom:-69px; transform:translateX(-50%);
+  width:314px; height:auto; z-index:0; pointer-events:none;
 }
-body[data-skin="editorial"] .hero-play, body[data-skin="terminal"] .hero-play { --play-h:53px; margin-top:auto; }
+body[data-skin="terminal"] .home-mascot, body[data-skin="editorial"] .home-mascot { display:none; } /* ★draft: их старые макеты без маскота */
+
+.hero-play {
+  position:relative; z-index:1;
+  display:block; width:100%; margin-top:auto;
+  height:62.4px; padding:0 25px;
+  border-radius:16.6px;
+  font-size:20.8px; line-height:27px; text-transform:var(--case-cta);
+}
+body[data-skin="editorial"] .hero-play, body[data-skin="terminal"] .hero-play { height:53px; margin-top:auto; }
 .hero-stage:empty { display:none; }
 .hero-stage { margin:12.5px 0 4px; display:flex; flex-direction:column; align-items:center; gap:7px; }
 .hs-dots { display:flex; gap:7px; }
@@ -626,25 +727,23 @@ body[data-skin="terminal"]  #tabbar { --tab-h:100px; padding:12.5px 0 21px; }
    B — две отдельные карты; C — одна карта с cyan-обводкой. */
 .offer-card {
   position:relative;
-  display:flex; align-items:stretch; gap:0; cursor:pointer; text-align:left;
-  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card-lg);
-  box-shadow:var(--card-shadow);
-  padding:0; margin:4px 0 0; min-height:156px;
+  display:flex; align-items:flex-start; gap:0; cursor:pointer; text-align:left;
+  background:var(--card); border:2px solid var(--card-line); border-radius:var(--r-card-lg);
+  padding:14.6px; padding-bottom:70.7px; margin:4px 0 0; min-height:166.4px;
 }
 body[data-skin="editorial"] .offer-card {
-  background:none; border:none; box-shadow:none; gap:12.5px; min-height:141.4px;
+  background:none; border:none; gap:12.5px; min-height:141.4px; padding:0;
 }
 body[data-skin="terminal"] .offer-card {
   border:1.6px solid var(--blue); padding:16.6px; min-height:195.5px;
 }
 .offer-left {
   display:flex; flex-direction:column; align-items:flex-start;
-  flex:0 0 172.6px; margin:-1px; padding:14.6px;
-  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
-  box-shadow:var(--card-shadow);
+  flex:1 1 auto; margin:0; padding:0;
+  background:none; border:none;
 }
 body[data-skin="editorial"] .offer-left {
-  flex-basis:213.2px; margin:0; border-radius:var(--r-card-lg); padding:14.6px;
+  flex:0 0 213.2px; border-radius:var(--r-card-lg); padding:14.6px; background:var(--panel2);
   display:grid; grid-template-columns:auto auto 1fr; align-items:center;
   grid-template-areas:'amt amt amt' 'price save gap' 'buy buy buy';
   column-gap:8.3px;
@@ -652,15 +751,18 @@ body[data-skin="editorial"] .offer-left {
 body[data-skin="editorial"] .offer-left .offer-amount { grid-area:amt; align-self:start; }
 body[data-skin="editorial"] .offer-left .offer-price { grid-area:price; }
 body[data-skin="editorial"] .offer-left .save-tag { grid-area:save; justify-self:start; }
-body[data-skin="editorial"] .offer-left .btn-dark { grid-area:buy; align-self:end; }
+body[data-skin="editorial"] .offer-left .btn-dark { grid-area:buy; align-self:end; position:static; }
 body[data-skin="terminal"] .offer-left {
-  flex-basis:139.4px; margin:0; padding:0; background:none; border:none; align-items:center;
+  flex:0 0 139.4px; padding:0; background:none; border:none; align-items:center;
 }
+/* 622: Buy — во всю ширину карты, прижат к её низу */
+.offer-left .btn-dark { position:absolute; left:14.6px; right:14.6px; bottom:14.6px; margin-top:0; }
+body[data-skin="terminal"] .offer-left .btn-dark { position:static; }
 .offer-amount {
-  display:flex; align-items:center; gap:6.2px; margin-top:10.4px;
-  font-size:18.7px; line-height:22.9px; font-weight:800; color:var(--tx);
+  display:flex; align-items:center; gap:6.2px; margin-top:0;
+  font-size:18.7px; line-height:26px; font-weight:900; color:var(--tx);
 }
-.offer-amount .coin-dot { width:18.7px; height:18.7px; flex-basis:18.7px; }
+.offer-amount .coin-dot { width:20.8px; height:20.8px; flex-basis:20.8px; }
 body[data-skin="editorial"] .offer-amount { margin-top:0; font-size:22.9px; line-height:28.1px; font-weight:700; }
 body[data-skin="editorial"] .offer-amount .coin-dot { width:29.1px; height:29.1px; flex-basis:29.1px; }
 body[data-skin="terminal"] .offer-amount {
@@ -672,8 +774,8 @@ body[data-skin="terminal"] .offer-amount .coin-dot { width:41.6px; height:41.6px
 .chips-word { display:none; }
 body[data-skin="terminal"] .offer-amount .chips-word { display:inline; }
 body[data-skin="terminal"] .offer-amount > span:not(.coin-dot) { display:inline; }
-.offer-price { display:flex; align-items:baseline; gap:6.2px; margin-top:10.4px; font-weight:800; font-size:16.6px; line-height:19.8px; color:var(--tx); }
-.offer-price s { color:var(--sb); font-weight:400; font-size:12.5px; line-height:15.6px; }
+.offer-price { display:flex; align-items:baseline; gap:6.2px; margin-top:12.5px; font-weight:900; font-size:12.5px; line-height:16.6px; color:var(--tx); }
+.offer-price s { color:var(--sb); font-weight:400; font-size:12.5px; line-height:16.6px; }
 body[data-skin="editorial"] .offer-price { margin-top:10.4px; font-size:13.5px; }
 body[data-skin="editorial"] .offer-price s { font-size:13.5px; line-height:16.6px; }
 body[data-skin="terminal"] .offer-price { align-self:center; font-weight:900; font-size:15.6px; line-height:18.7px; color:var(--green); }
@@ -681,26 +783,36 @@ body[data-skin="terminal"] .offer-price { align-self:center; font-weight:900; fo
 .offer-price.big s { font-size:19.1px; opacity:.5; }
 .save-tag {
   background:var(--save-bg); color:var(--save-tx); border-radius:6.2px;
-  padding:4.2px 8.3px; font-size:9.4px; line-height:11.4px; font-weight:800;
-  text-transform:uppercase; letter-spacing:.01em;
+  padding:2.1px 6.2px; font-size:10.4px; line-height:14.6px; font-weight:900;
+  text-transform:none; letter-spacing:.01em; margin-top:6.2px;
 }
-body[data-skin="editorial"] .save-tag { text-transform:none; font-size:11.4px; line-height:13.5px; font-weight:600; }
+body[data-skin="editorial"] .save-tag { font-size:11.4px; line-height:13.5px; font-weight:600; }
 .offer-left .save-tag { flex:0 0 auto; }
 .save-tag.center { display:block; width:max-content; margin:11px auto 0; }
-.offer-left .btn-dark { margin-top:12.5px; align-self:stretch; }
 body[data-skin="terminal"] .offer-left .btn-dark { margin-top:8.3px; width:139.4px; }
-.offer-right { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12.5px; padding:8px; }
-.offer-lbl {
-  background:var(--badge-bg); color:var(--badge-tx); border-radius:6.2px;
-  padding:4.2px 8.3px; font-size:9.4px; line-height:11.4px; font-weight:800; text-transform:uppercase;
+/* 622: правая вложенная светлая карта с «Personal offer / Ends in / таймер» */
+.offer-right {
+  flex:0 0 134.2px; align-self:flex-start;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:6.2px;
+  background:var(--panel2); border-radius:16.6px; padding:5.2px 8.3px 10.4px; min-height:80.1px;
 }
-body[data-skin="editorial"] .offer-lbl { background:none; color:var(--tx); padding:0; font-size:14.6px; line-height:17.7px; font-weight:600; text-transform:none; }
-body[data-skin="terminal"] .offer-lbl { font-size:10.4px; line-height:12.5px; }
+body[data-skin="terminal"] .offer-right, body[data-skin="editorial"] .offer-right {
+  flex:1 1 auto; background:none; border-radius:0; padding:8px; justify-content:center; gap:12.5px; min-height:0;
+}
+.offer-lbl {
+  background:none; color:var(--tx-soft); border-radius:0;
+  padding:0; font-size:14.6px; line-height:19.8px; font-weight:800; text-transform:none;
+}
+body[data-skin="editorial"] .offer-lbl { color:var(--tx); font-weight:600; font-size:14.6px; line-height:17.7px; }
+body[data-skin="terminal"] .offer-lbl {
+  background:var(--badge-bg); color:var(--badge-tx); border-radius:6.2px;
+  padding:4.2px 8.3px; font-size:10.4px; line-height:12.5px; text-transform:uppercase;
+}
 .ends-card { background:none; text-align:center; }
-.ends-card span { display:block; font-size:11.4px; line-height:13.5px; font-weight:600; color:var(--sb); }
+.ends-card span { display:block; font-size:11.4px; line-height:15.6px; font-weight:400; color:var(--sb); }
 .ends-card b {
-  display:block; margin-top:4.2px;
-  font-size:16.6px; line-height:19.8px; font-weight:800; color:var(--timer-tx);
+  display:block; margin-top:2.1px;
+  font-size:18.7px; line-height:26px; font-weight:900; color:var(--timer-tx);
   font-variant-numeric:tabular-nums;
 }
 body[data-skin="editorial"] .ends-card span { font-weight:400; }
@@ -713,10 +825,12 @@ body[data-skin="terminal"] .ends-card span { font-weight:400; font-size:12.5px; 
 /* пакеты фишек */
 .packs { display:flex; gap:8.3px; align-items:stretch; margin:0; }
 .pack {
-  position:relative; flex:1; display:flex; flex-direction:column; align-items:flex-start;
-  background:var(--card); border:1px solid var(--line); border-radius:var(--r-pack);
-  box-shadow:var(--card-shadow);
-  padding:37.4px 12.5px 12.5px; min-height:132.1px; overflow:visible;
+  position:relative; flex:1; display:flex; flex-direction:column; align-items:center;
+  background:var(--card); border:2px solid var(--card-line); border-radius:var(--r-pack);
+  padding:37.4px 10.4px 10.4px; min-height:156px; overflow:visible;
+}
+body[data-skin="terminal"] .pack, body[data-skin="editorial"] .pack {
+  align-items:flex-start; border-width:1px; box-shadow:var(--card-shadow);
 }
 body[data-skin="editorial"] .pack { padding:12.5px 10.4px 10.4px; min-height:202.8px; }
 body[data-skin="terminal"]  .pack { padding:35.4px 12.5px 12.5px; min-height:142.5px; align-items:center; }
@@ -811,46 +925,34 @@ body[data-skin="terminal"] .fr-text > span { font-size:11.4px; line-height:13.5p
 .chip-pill .coin-dot { width:10.4px; height:10.4px; flex-basis:10.4px; margin-right:4.2px; }
 body[data-skin="editorial"] .chip-pill { font-weight:600; font-size:13.5px; line-height:16.6px; }
 body[data-skin="editorial"] .chip-pill .coin-dot { width:14.6px; height:14.6px; flex-basis:14.6px; }
-.cp-plus, .cp-word { display:none; }
-body[data-skin="narodny"] .cp-plus, body[data-skin="narodny"] .cp-word { display:inline; }
+.cp-plus, .cp-word { display:none; } /* 622: в free-ряду только «◑ 5 000» */
+.chip-pill { font-size:12.5px; line-height:16.6px; font-weight:900; }
+.chip-pill .coin-dot { width:14.6px; height:14.6px; flex-basis:14.6px; }
 .dev-link { display:block; margin:20px auto 0; font-size:12px; color:var(--sb); text-decoration:underline dashed; padding:6px 10px; }
 
-/* ---------- referrals (reskin W2, mockups A/B/C-referrals; nodes ×1.04) ----------
-   A: hero card + green banner tucked under it, rows = cards, reward pills.
-   B: one flat hero card (serif heading, plain green hook line), bare rows + hairlines.
-   C: centered intro + cyan outlined banner, rows inside one dark card, mono amounts. */
+/* ---------- referrals (622-мокап: одна hero-карта с разделителем; nodes ×1.04) ----------
+   B/C = палитровые оверрайды поверх нового скелета (старые структурные раскладки сняты,
+   ★draft: их макеты остались от прошлого скелета — ждут новых от Миши). */
 #scr-referrals .pg-title { margin-bottom:8.3px; }
-.ref-hero { position:relative; margin-bottom:0; }
-.ref-hero-card {
-  position:relative; z-index:2; text-align:left;
-  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
-  box-shadow:var(--card-shadow); padding:16.6px;
+.ref-hero {
+  position:relative; margin-bottom:0; text-align:center;
+  background:var(--card); border:2px solid var(--card-line); border-radius:20.8px;
+  padding:20.8px;
 }
-.ref-hero h2 { font-size:20.8px; line-height:25px; font-weight:800; color:var(--tx); }
-.ref-hero p { font-size:14.6px; line-height:17.7px; font-weight:500; color:var(--tx-soft); margin-top:4.2px; }
-.ref-banner {
-  position:relative; z-index:1;
-  background:#E8F5E9; border:1px solid var(--green-deep); border-radius:var(--r-card);
-  margin:-36.4px 0 0; padding:47.9px 12.5px 12.5px;
-  font-size:13.5px; line-height:18.7px; font-weight:600; color:var(--green-deep); text-align:center;
-}
-body[data-skin="editorial"] .ref-hero-card { background:var(--panel2); border-color:var(--line); border-radius:var(--r-card-lg); padding:20.8px; box-shadow:none; }
+body[data-skin="editorial"] .ref-hero { background:var(--panel2); border:none; border-radius:var(--r-card-lg); }
+body[data-skin="terminal"] .ref-hero { border-width:1px; }
+.ref-hero-card { position:relative; }
+.ref-hero h2 { font-size:22.9px; line-height:31.2px; font-weight:900; color:var(--tx); }
 body[data-skin="editorial"] .ref-hero h2 { font-family:var(--font-head); font-size:25px; line-height:28.1px; font-weight:700; }
-body[data-skin="editorial"] .ref-hero p { font-size:15.6px; line-height:21.8px; font-weight:400; color:var(--sb); margin-top:8.3px; }
-body[data-skin="editorial"] .ref-banner {
-  border:none; margin:0; padding:8.3px 20.8px 20.8px;
-  background:var(--panel2); border-radius:0 0 var(--r-card-lg) var(--r-card-lg);
-  text-align:left; color:#1B5E20; font-size:13.5px; line-height:18.7px; font-weight:600;
+.ref-hero p { font-size:14.6px; line-height:19.8px; font-weight:600; color:var(--sb); margin-top:8.3px; }
+.ref-banner {
+  position:relative; margin:12.5px 0 0; padding:12.5px 0 0;
+  border-top:1px solid var(--card-line);
+  font-size:14.6px; line-height:19.8px; font-weight:800; color:var(--tx); text-align:center;
 }
-body[data-skin="editorial"] .ref-hero-card { border-bottom:none; border-radius:var(--r-card-lg) var(--r-card-lg) 0 0; padding-bottom:8.3px; }
-body[data-skin="terminal"] .ref-hero-card { background:none; border:none; box-shadow:none; padding:0 0 12.5px; text-align:center; }
-body[data-skin="terminal"] .ref-hero h2 { font-size:22.9px; line-height:28.1px; }
-body[data-skin="terminal"] .ref-hero p { font-size:14.6px; line-height:17.7px; font-weight:400; color:var(--tx-soft); }
-body[data-skin="terminal"] .ref-banner {
-  background:rgba(34,211,238,.10); border:1px solid var(--blue); border-radius:12.5px;
-  margin:0; padding:12.5px; color:var(--blue); font-weight:500;
-}
-.fld-lbl { display:block; font-size:13.5px; line-height:16.6px; color:var(--tx-soft); font-weight:600; margin:25px 0 8.3px; }
+body[data-skin="editorial"] .ref-banner { border-top-color:var(--line); color:#1B5E20; }
+body[data-skin="terminal"] .ref-banner { border-top-color:var(--line); color:var(--blue); }
+.fld-lbl { display:block; font-size:14.6px; line-height:19.8px; color:var(--tx-soft); font-weight:700; margin:25px 0 8.3px; }
 body[data-skin="editorial"] .fld-lbl, body[data-skin="terminal"] .fld-lbl { text-transform:uppercase; color:var(--sb); }
 body[data-skin="terminal"] .fld-lbl { font-size:12.5px; line-height:15.6px; font-weight:700; }
 .fld {
@@ -860,157 +962,144 @@ body[data-skin="terminal"] .fld-lbl { font-size:12.5px; line-height:15.6px; font
 }
 .fld input { flex:1; border:none; outline:none; background:none; padding:0; font-size:14.2px; line-height:21.3px; color:var(--tx); min-width:0; }
 .fld input::placeholder { color:var(--sb); font-weight:400; }
-/* referral paste field: A/B — button inside the field; C — separate box + cyan button */
-.paste-fld { height:58.2px; border-radius:var(--r-card); padding:7px 8.3px 7px 12.5px; }
-body[data-skin="editorial"] .paste-fld { height:62.4px; border-radius:10.4px; background:#FFFFFF; padding-right:14.6px; }
-.paste-btn {
-  flex:0 0 auto; background:var(--btn-bg); color:var(--btn-tx);
-  border-radius:8.3px; min-width:69.9px; height:33.3px; padding:0 12.5px;
-  font-size:13.5px; line-height:16.6px; font-weight:800; text-transform:uppercase;
+/* referral paste field: 622 — белое поле, «Paste» = синий текст внутри */
+.paste-fld {
+  height:44.7px; border-radius:12.5px; padding:12.5px 16.6px;
+  background:#fff; box-shadow:inset 0 0 0 2px var(--pill-line);
 }
-body[data-skin="editorial"] .paste-btn { background:var(--btn2-bg); color:var(--btn2-tx); }
+.paste-btn {
+  flex:0 0 auto; background:none; color:var(--blue);
+  border-radius:0; min-width:0; height:auto; padding:0;
+  font-size:14.6px; line-height:19.8px; font-weight:800; text-transform:none;
+}
+body[data-skin="editorial"] .paste-fld { height:62.4px; border-radius:10.4px; background:#FFFFFF; box-shadow:inset 0 0 0 1px var(--line); padding-right:14.6px; }
+body[data-skin="editorial"] .paste-btn { background:var(--btn2-bg); color:var(--btn2-tx); border-radius:8.3px; min-width:69.9px; height:33.3px; padding:0 12.5px; }
 body[data-skin="terminal"] .paste-fld { background:none; box-shadow:none; padding:0; gap:8.3px; height:42.6px; border-radius:0; }
 body[data-skin="terminal"] .paste-fld input { background:var(--card); box-shadow:inset 0 0 0 1px var(--line); border-radius:8.3px; height:42.6px; padding:0 16.6px; align-self:stretch; }
 body[data-skin="terminal"] .paste-btn { background:var(--btn2-bg); color:var(--btn2-tx); min-width:74.9px; height:42.6px; text-transform:none; font-size:14.6px; }
 /* section label */
 #scr-referrals .sub-title.ref-sec {
-  margin:25px 0 10.4px; text-transform:uppercase;
-  font-size:13.5px; line-height:16.6px; font-weight:600; color:var(--sb);
+  margin:25px 0 8.3px; text-transform:none;
+  font-size:14.6px; line-height:19.8px; font-weight:700; color:var(--sb);
 }
-body[data-skin="terminal"] #scr-referrals .sub-title.ref-sec { font-size:14.6px; line-height:17.7px; font-weight:800; margin-bottom:12.5px; }
 .ref-count { display:none; }
 body[data-skin="editorial"] .ref-count { display:inline; }
-/* rows */
-.ref-list { background:none; border-radius:0; padding:0; margin-bottom:25px; display:flex; flex-direction:column; gap:8.3px; }
+/* rows: 622 — кремовые ряды с белыми hairlines внутри white-30 контейнера */
+.ref-list {
+  background:var(--card); border:2px solid var(--card-line); border-radius:16.6px;
+  padding:0; margin-bottom:12.5px; display:flex; flex-direction:column; gap:0; overflow:hidden;
+}
+body[data-skin="terminal"] .ref-list { border-width:1px; }
 .ref-row {
-  display:flex; align-items:center; gap:12.5px; padding:0 12.5px; height:58.2px; position:relative;
-  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
-  box-shadow:var(--card-shadow);
+  display:flex; align-items:center; gap:12.5px; padding:0 12.5px; height:62.4px; position:relative;
+  background:var(--bg); border:none; border-radius:0;
+  box-shadow:inset 0 0 0 1px var(--card-line);
+}
+body[data-skin="terminal"] .ref-row, body[data-skin="editorial"] .ref-row {
+  background:none; box-shadow:none;
+}
+body[data-skin="terminal"] .ref-row + .ref-row::before, body[data-skin="editorial"] .ref-row + .ref-row::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px; background:var(--line);
 }
 .ref-ava {
-  width:33.3px; height:33.3px; border-radius:50%; flex:0 0 33.3px;
-  background:var(--avatar-bg); color:var(--avatar-tx);
+  width:37.4px; height:37.4px; border-radius:50%; flex:0 0 37.4px;
+  background:var(--card); box-shadow:inset 0 0 0 1px var(--card-line);
+  color:var(--sb);
   display:flex; align-items:center; justify-content:center;
   font-size:12.5px; font-weight:800;
 }
-.ref-name { flex:1; font-size:14.6px; line-height:17.7px; font-weight:700; color:var(--tx); }
+.ref-name { flex:1; font-size:14.6px; line-height:19.8px; font-weight:800; color:var(--tx); }
 .ref-amt {
-  display:inline-flex; align-items:center; font-variant-numeric:tabular-nums;
-  background:#E8F5E9; border-radius:6.2px; padding:4.2px 8.3px;
-  font-size:12.5px; line-height:15.6px; font-weight:800; color:var(--green-deep);
+  display:inline-flex; align-items:center; gap:6.2px; font-variant-numeric:tabular-nums;
+  background:none; border-radius:0; padding:0;
+  font-size:14.6px; line-height:19.8px; font-weight:900; color:var(--tx);
 }
+body[data-skin="terminal"] .ref-amt { color:var(--green); font-family:var(--font-num); font-weight:700; }
+body[data-skin="editorial"] .ref-amt { color:var(--green); font-weight:700; }
 .ref-chipword { display:none; }
-body[data-skin="editorial"] .ref-list { gap:0; margin-bottom:20.8px; }
-body[data-skin="editorial"] .ref-row { background:none; border:none; border-radius:0; box-shadow:none; height:66.6px; padding:0 4.2px; }
-body[data-skin="editorial"] .ref-row + .ref-row::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:var(--line); }
-body[data-skin="editorial"] .ref-ava { background:var(--panel2); color:var(--sb); font-size:13.5px; font-weight:600; }
-body[data-skin="editorial"] .ref-name { font-size:15.6px; line-height:18.7px; font-weight:600; }
-body[data-skin="editorial"] .ref-amt { background:none; padding:0; border-radius:0; color:var(--green); font-size:14.6px; line-height:17.7px; font-weight:700; }
 body[data-skin="editorial"] .ref-chipword { display:inline; font-weight:700; }
-body[data-skin="terminal"] .ref-list { gap:0; background:var(--card); border-radius:var(--r-card-lg); padding:6.2px 16.6px; }
-body[data-skin="terminal"] .ref-row { background:none; border:none; border-radius:0; box-shadow:none; height:58.2px; padding:0; }
-body[data-skin="terminal"] .ref-row + .ref-row::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:var(--line); }
-body[data-skin="terminal"] .ref-name { font-weight:600; }
-body[data-skin="terminal"] .ref-amt {
-  background:none; padding:0; border-radius:0; color:var(--green);
-  font-family:var(--font-num); font-size:14.6px; line-height:18.7px; font-weight:700;
-}
 /* copy id + invite */
 .copy-id-row {
-  display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%;
-  height:45.8px; padding:0 12.5px; text-align:left;
-  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
-  box-shadow:var(--card-shadow);
-  font-size:14.6px; line-height:17.7px; font-weight:600; color:var(--tx-soft);
+  display:flex; align-items:center; justify-content:center; gap:8.3px; width:100%;
+  height:50px; padding:0 14.6px; text-align:center;
+  background:var(--card); border:2px solid var(--card-line); border-radius:16.6px;
+  font-size:14.6px; line-height:19.8px; font-weight:800; color:var(--tx);
 }
-.copy-id-row svg { flex:0 0 20.8px; color:var(--green-deep); }
-body[data-skin="editorial"] .copy-id-row { background:var(--panel2); border-radius:10.4px; height:46.8px; padding:0 14.6px; font-weight:400; color:var(--tx); box-shadow:none; }
+.copy-id-row svg { flex:0 0 20.8px; color:var(--tx); }
+body[data-skin="editorial"] .copy-id-row { background:var(--panel2); border:none; border-radius:10.4px; height:46.8px; font-weight:400; color:var(--tx); }
 body[data-skin="editorial"] .copy-id-row svg { color:var(--sb); }
-body[data-skin="terminal"] .copy-id-row { box-shadow:none; color:rgba(255,255,255,.6); }
+body[data-skin="terminal"] .copy-id-row { border-width:1px; color:rgba(255,255,255,.6); }
 body[data-skin="terminal"] .copy-id-row svg { color:var(--blue); }
-.ref-invite.btn-primary { margin-top:16.6px; height:47.9px; padding:0 25px; border-radius:12.5px; font-size:15.6px; line-height:18.7px; }
-body[data-skin="narodny"] .ref-invite.btn-primary { text-transform:uppercase; font-weight:800; }
+.ref-invite.btn-primary { margin-top:12.5px; height:62.4px; padding:0 25px; border-radius:16.6px; font-size:20.8px; line-height:27px; }
 body[data-skin="editorial"] .ref-invite.btn-primary { height:53px; margin-top:20.8px; font-size:16.6px; }
-body[data-skin="terminal"] .ref-invite.btn-primary { text-transform:uppercase; font-weight:800; margin-top:12.5px; }
+body[data-skin="terminal"] .ref-invite.btn-primary { text-transform:uppercase; font-weight:800; margin-top:12.5px; height:53px; font-size:16.6px; }
 
-/* ---------- achievements (reskin W2, mockups A/B/C-achievements; nodes ×1.04) ----------
-   Grid: A/B — иконка | тексты+бар | кнопка справа; C — кнопка во всю ширину под баром. */
+/* ---------- achievements (622-мокап: карта = топ-ряд + прогресс-бар + футер Play/Reward) ----------
+   Один скелет; B/C — палитровые оверрайды (их старые раскладки сняты, ★draft). */
 #scr-achievements .pg-title { margin-bottom:8.3px; }
 .ach-row {
-  display:grid; grid-template-columns:auto 1fr auto; grid-template-areas:'ico main cta';
-  align-items:center; column-gap:12.5px;
-  background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
-  padding:16.6px; margin-bottom:12.5px;
+  background:var(--card); border:2px solid var(--card-line); border-radius:16.6px;
+  padding:16.6px; margin-bottom:10.4px;
 }
-body[data-skin="editorial"] .ach-row { border-radius:var(--r-card-lg); margin-bottom:14.6px; }
-body[data-skin="terminal"] .ach-row {
-  grid-template-columns:auto 1fr; grid-template-areas:'ico main' 'cta cta';
-  border:none; border-radius:var(--r-card-lg); align-items:start;
-}
+body[data-skin="editorial"] .ach-row { border:none; }
+body[data-skin="terminal"] .ach-row { border-width:1px; }
+.ach-top { display:flex; align-items:flex-start; gap:10.4px; }
 .ach-ico {
-  grid-area:ico; width:41.6px; height:41.6px; border-radius:50%; flex:0 0 41.6px;
-  background:#E8F5E9; color:var(--green-deep);
+  width:37.4px; height:37.4px; border-radius:50%; flex:0 0 37.4px;
+  background:#fff; color:var(--sb);
   display:flex; align-items:center; justify-content:center;
 }
 body[data-skin="terminal"] .ach-ico { background:var(--icirc-bg); color:var(--blue); }
-.ach-main { grid-area:main; min-width:0; }
-.ach-top { display:flex; justify-content:space-between; align-items:flex-start; gap:8.3px; }
-.ach-texts { display:flex; flex-direction:column; min-width:0; }
-.ach-title { font-size:14.6px; line-height:17.7px; font-weight:800; color:var(--tx); }
-body[data-skin="editorial"] .ach-title { font-size:16.6px; line-height:19.8px; font-weight:700; }
-body[data-skin="terminal"] .ach-title { font-size:16.6px; line-height:19.8px; }
-.ach-desc { font-size:11.4px; line-height:14.6px; font-weight:400; color:var(--tx-soft); margin-top:2.1px; }
-body[data-skin="editorial"] .ach-desc { font-size:13.5px; line-height:16.6px; color:var(--sb); }
-body[data-skin="terminal"] .ach-desc { font-size:12.5px; line-height:15.6px; }
-.ach-reward-badge {
-  display:inline-flex; align-items:center; gap:4.2px; flex:0 0 auto; white-space:nowrap;
-  font-size:13.5px; line-height:16.6px; font-weight:700; color:var(--tx);
-  font-variant-numeric:tabular-nums; padding-top:1px;
+body[data-skin="editorial"] .ach-ico { background:var(--accent2); color:var(--sb); }
+.ach-texts { display:flex; flex-direction:column; min-width:0; flex:1 1 auto; }
+.ach-title { font-size:15.6px; line-height:20.8px; font-weight:900; color:var(--tx); }
+body[data-skin="editorial"] .ach-title { font-weight:700; }
+.ach-desc { font-size:12.5px; line-height:16.6px; font-weight:400; color:var(--sb); margin-top:2.1px; }
+.ach-count {
+  flex:0 0 auto; font-size:14.6px; line-height:19.8px; font-weight:800; color:var(--sb);
+  font-variant-numeric:tabular-nums; padding-top:8.3px;
 }
-.ach-reward-badge .coin-dot { width:12.5px; height:12.5px; flex-basis:12.5px; }
-body[data-skin="terminal"] .ach-reward-badge { color:var(--gold); font-size:12.5px; line-height:15.6px; font-weight:800; }
-.ach-bar { height:6.2px; border-radius:100px; background:var(--line); margin-top:11.4px; overflow:hidden; }
-.ach-bar i { display:block; height:100%; background:var(--green-deep); border-radius:100px; }
-body[data-skin="terminal"] .ach-bar { height:8.3px; border-radius:4.2px; background:var(--icirc-bg); }
-body[data-skin="terminal"] .ach-bar i { background:var(--blue); border-radius:4.2px; }
-.ach-count { display:block; font-size:10.4px; line-height:12.5px; font-weight:600; color:var(--sb); margin-top:4.2px; }
-body[data-skin="editorial"] .ach-count { font-size:11.4px; line-height:13.5px; }
-body[data-skin="terminal"] .ach-count { font-size:12.5px; line-height:15.6px; font-weight:700; }
-.ach-cta { grid-area:cta; display:flex; align-items:center; justify-content:flex-end; }
-.ach-cta:empty { display:none; }
-body[data-skin="terminal"] .ach-cta { margin-top:10.4px; }
+.ach-bar { height:8.3px; border-radius:100px; background:#fff; margin-top:10.4px; overflow:hidden; }
+.ach-bar i { display:block; height:100%; background:#7C7691; border-radius:100px; }
+.ach-bar.full i { background:var(--green); }
+body[data-skin="terminal"] .ach-bar { background:var(--icirc-bg); }
+body[data-skin="terminal"] .ach-bar i { background:var(--blue); }
+body[data-skin="terminal"] .ach-bar.full i { background:var(--green); }
+body[data-skin="editorial"] .ach-bar { background:var(--accent2); }
+.ach-foot { display:flex; align-items:center; justify-content:space-between; margin-top:10.4px; }
 .ach-play, .ach-claim {
-  min-width:83.2px; height:33.3px; padding:0 14px; border-radius:8.3px;
-  background:var(--btn2-bg); color:var(--btn2-tx);
-  font-size:13.5px; line-height:16.6px; font-weight:800; text-transform:uppercase;
+  min-width:72.8px; height:42.6px; padding:0 18.7px; border-radius:12.5px;
+  background:var(--btn-bg); color:var(--btn-tx);
+  box-shadow:var(--btn3d-sm); text-shadow:var(--btn-txsh);
+  font-size:14.6px; line-height:19.8px; font-weight:900; text-transform:none;
   transition:transform .08s;
 }
-.ach-play:active, .ach-claim:active { transform:scale(.97); }
-body[data-skin="editorial"] .ach-play, body[data-skin="editorial"] .ach-claim {
-  background:var(--btn-bg); color:var(--btn-tx); border-radius:10.4px;
-}
-body[data-skin="terminal"] .ach-play, body[data-skin="terminal"] .ach-claim {
-  width:100%; height:47.9px; border-radius:12.5px; font-size:15.6px; line-height:18.7px;
-}
-body[data-skin="terminal"] .ach-play { background:var(--btn2-bg); color:var(--btn2-tx); }
-body[data-skin="terminal"] .ach-claim { background:var(--green); color:#0B0E14; }
+.ach-claim { background:var(--green); box-shadow:var(--btn3d-green); }
+.ach-play:active, .ach-claim:active { transform:translateY(2px); }
+body[data-skin="terminal"] .ach-play { background:var(--btn2-bg); color:var(--btn2-tx); text-shadow:none; }
+body[data-skin="terminal"] .ach-claim { background:var(--green); color:#0B0E14; box-shadow:none; text-shadow:none; }
+body[data-skin="editorial"] .ach-play, body[data-skin="editorial"] .ach-claim { text-shadow:none; box-shadow:none; }
+body[data-skin="editorial"] .ach-claim { background:var(--green); }
 .ach-claim-amt { display:none; font-variant-numeric:tabular-nums; }
-body[data-skin="terminal"] .ach-claim-amt { display:inline; }
-/* claimed row: A/B — компакт без бара и бейджа, золотая иконка, пилюля Claimed; C — бар остаётся, текст CLAIMED */
+/* строка награды в футере: «Reward ◑ 100» */
+.ach-reward {
+  display:inline-flex; align-items:center; gap:4.2px; white-space:nowrap;
+  font-variant-numeric:tabular-nums; margin-left:auto;
+}
+.ach-reward em { font-style:normal; font-size:12.5px; line-height:16.6px; font-weight:700; color:var(--sb); margin-right:4.2px; }
+.ach-reward b { font-size:14.6px; line-height:19.8px; font-weight:900; color:var(--tx); }
+.ach-reward .coin-dot { width:14.6px; height:14.6px; flex-basis:14.6px; }
+body[data-skin="terminal"] .ach-reward b { color:var(--gold); }
+/* claimed: карта пригашена, справа «Claimed ◑ 100», без футера и без цвета в баре */
+.ach-row.claimed { opacity:.6; }
 .ach-claimed {
-  background:#E8F5E9; color:var(--green-deep); border-radius:6.2px;
-  padding:4.2px 8.3px; font-size:10.4px; line-height:12.5px; font-weight:800;
+  display:inline-flex; align-items:center; gap:4.2px; flex:0 0 auto; padding-top:8.3px;
+  background:none; border-radius:0;
+  color:var(--sb); font-size:14.6px; line-height:19.8px; font-weight:800;
 }
-.ach-row.claimed .ach-bar, .ach-row.claimed .ach-count, .ach-row.claimed .ach-reward-badge { display:none; }
-.ach-row.claimed .ach-ico { background:#FEF3C7; color:var(--gold); }
-body[data-skin="terminal"] .ach-row.claimed .ach-bar, body[data-skin="terminal"] .ach-row.claimed .ach-count,
-body[data-skin="terminal"] .ach-row.claimed .ach-reward-badge { display:block; }
-body[data-skin="terminal"] .ach-row.claimed .ach-reward-badge { display:inline-flex; }
-body[data-skin="terminal"] .ach-row.claimed .ach-ico { background:var(--icirc-bg); color:var(--blue); }
-body[data-skin="terminal"] .ach-claimed {
-  background:none; padding:0; border-radius:0;
-  color:var(--sb); font-size:13.5px; line-height:16.6px; font-weight:700; text-transform:uppercase;
-}
+.ach-claimed .coin-dot { width:14.6px; height:14.6px; flex-basis:14.6px; }
+.ach-claimed b { font-weight:900; color:var(--tx); }
+.ach-row.claimed .ach-bar i { background:#7C7691; }
 
 /* ---------- settings (reskin W2, mockups A/B/C-settings; nodes ×390/375≈1.04) ----------
    A: white cards, plain brown icons, chevrons. B: bare rows + hairlines, no icons,

@@ -26,6 +26,7 @@ const addDaysUTC = (ds, n) => {
 
 /* ---------- persistent state ---------- */
 const OFFER_CYCLE = ((14 * 60 + 24) * 60 + 32) * 1000; // 14:24:32
+const STARTER_WINDOW = 2 * 60 * 60 * 1000; // 2ч витрины стартер-пака на Home (622-мокап, ★draft)
 
 const DEF_STATE = {
   seenWelcome: false,
@@ -43,6 +44,7 @@ const DEF_STATE = {
   promoShown: false,        // home guides promo (once, after 4th session)
   savepShown: false,        // save-progress sheet auto-trigger (once, after 3rd session)
   starterShown: false,      // starter pack 1.99$ auto-sheet (once, from 2nd visit; вердикт 31.07 п.27)
+  starterEnd: 0,            // 2ч-окно витрины стартер-пака на Home (622-мокап «Истекает через 2ч», ★draft)
   visit: { n: 0, last: 0 }, // сессии-ВИЗИТЫ приложения (n) + ts последней активности (last)
   progressSaved: false,
   notifPermShown: false,
@@ -1630,6 +1632,7 @@ function showTab(name) {
   $$('#tabbar .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
   if (name === 'home') {
     renderHomeHero(); // стадия лесенки могла вырасти за раунд
+    renderStarterCard();
     // «приземление» на Home: максимум ОДИН попап, и не мгновенно, а через ~1.2s
     homePopupUsed = false;
     // приземление сразу после игры ИЛИ с экрана результатов — не «идл»:
@@ -1738,7 +1741,9 @@ function maybeAutoPopups() {
   // оплаты + intent-лог по общей схеме п.15 (см. ACT['starter-buy'])
   if (!S.starterShown && S.visit.n >= 2) {
     S.starterShown = true;
+    S.starterEnd = Date.now() + STARTER_WINDOW; // витрина на Home живёт 2ч после авто-шита
     save();
+    renderStarterCard();
     homePopupUsed = true;
     openSheet('sh-starter');
     return;
@@ -2641,34 +2646,38 @@ function claimAch(id) {
 /* reskin W2 (mockups A/B/C-achievements): один скелет — иконка-кружок, тексты + бейдж награды
    сверху, прогресс-бар со счётчиком, слот действия (A/B — кнопка справа, C — во всю ширину). */
 const ACH_ICON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10.2" r="5.4"/><path d="M12 7.9l.8 1.6 1.8.3-1.3 1.25.3 1.75-1.6-.85-1.6.85.3-1.75-1.3-1.25 1.8-.3z" fill="currentColor" stroke="none"/><path d="M8.9 14.7L7.4 20.9l4.6-2.2 4.6 2.2-1.5-6.2"/></svg>`;
+/* 622-мокап: топ-ряд (иконка+тексты+счётчик), прогресс-бар, футер (Play/Claim + «Reward ◑N»);
+   claimed-карта пригашена, справа «Claimed ◑N», футера нет */
 function renderAch() {
   const box = $('#achList');
   box.innerHTML = ACH.map(a => {
     const p = Math.min(a.prog(), a.target);
     const done = p >= a.target;
     const claimed = !!S.ach.claimed[a.id];
+    const right = claimed
+      ? `<span class="ach-claimed">${t('claimed')} <span class="coin-dot"></span><b>${fmt(a.reward)}</b></span>`
+      : `<span class="ach-count">${p}/${a.target}</span>`;
     let cta = '';
-    if (claimed) {
-      cta = `<span class="ach-claimed">${t('claimed')}</span>`;
-    } else if (done) {
+    if (!claimed && done) {
       cta = `<button class="ach-claim" data-ach="${a.id}">${t('claim')}<span class="ach-claim-amt">&nbsp;${fmt(a.reward)}</span></button>`;
-    } else if (a.play) {
+    } else if (!claimed && a.play) {
       cta = `<button class="ach-play" data-act="play" data-game="${a.play}">${t('play')}</button>`;
     }
+    const foot = claimed ? '' :
+      `<div class="ach-foot">${cta}
+        <span class="ach-reward"><em>${t('ach.reward')}</em><span class="coin-dot"></span><b>${fmt(a.reward)}</b></span>
+      </div>`;
     return `<div class="ach-row${claimed ? ' claimed' : ''}">
-      <div class="ach-ico">${ACH_ICON}</div>
-      <div class="ach-main">
-        <div class="ach-top">
-          <div class="ach-texts">
-            <span class="ach-title">${t('ach.' + a.id + '.t')}</span>
-            <span class="ach-desc">${t('ach.' + a.id + '.d')}</span>
-          </div>
-          <span class="ach-reward-badge"><span class="coin-dot"></span>${fmt(a.reward)}</span>
+      <div class="ach-top">
+        <div class="ach-ico">${ACH_ICON}</div>
+        <div class="ach-texts">
+          <span class="ach-title">${t('ach.' + a.id + '.t')}</span>
+          <span class="ach-desc">${t('ach.' + a.id + '.d')}</span>
         </div>
-        <div class="ach-bar"><i style="width:${Math.round(p / a.target * 100)}%"></i></div>
-        <span class="ach-count">${p} / ${a.target}</span>
+        ${right}
       </div>
-      <div class="ach-cta">${cta}</div>
+      <div class="ach-bar${done ? ' full' : ''}"><i style="width:${Math.round(p / a.target * 100)}%"></i></div>
+      ${foot}
     </div>`;
   }).join('');
 }
@@ -2707,6 +2716,15 @@ function finishSignupFlow() {
   if (saveReturnScreen === 'scr-profile') { renderProfile(); activate('scr-profile'); }
   else showTab(curTab);
   toast(t('t.progsaved'));
+}
+
+/* ---------- витрина стартер-пака на Home (622-мокап, ★draft) ----------
+   Видна, пока живо 2ч-окно, открытое авто-шитом со 2-й сессии (п.27), и пак не «куплен»
+   (в прототипе покупок нет — витрина гаснет по таймеру). Тап = тот же шит + intent-лог. */
+function renderStarterCard() {
+  const card = $('#spOfferHome');
+  if (!card) return;
+  card.hidden = !(S.starterShown && S.starterEnd > Date.now());
 }
 
 /* ---------- home hero (webv1: одна игра, большой Play; встреча п.1) ----------
@@ -2859,7 +2877,12 @@ function tickTimers() {
   const left = fmtHMS(S.offerEnd - now);
   $('#offerTimer').textContent = left;
   $('#offerTimer2').textContent = left;
-  $('#offerTimerHome').textContent = left;
+  // витрина стартер-пака на Home живёт по своему 2ч-окну (622-мокап), не по циклу personal offer
+  if (S.starterShown) {
+    const sLeft = S.starterEnd - now;
+    $('#offerTimerHome').textContent = fmtHMS(Math.max(0, sLeft));
+    if (sLeft <= 0) renderStarterCard();
+  }
   // daily challenge: живой отсчёт до 00:00 GMT (результат ставки)
   const cd = document.getElementById('dcCountdown');
   if (cd) {
@@ -3010,6 +3033,8 @@ const ACT = {
   /* shop; клики покупательного намерения логируются (webv1, встреча п.4).
      Вердикт 27.07: вместо тоста «покупок нет» — заглушка оплаты (см. openPayStub) */
   'open-offer': el => { logIntent('shop-offer-open', el.dataset.pack || 'offer-150k'); openSheet('sh-offer'); },
+  // витрина стартер-пака с Home (622): тот же шит п.27 + свой intent-тег источника
+  'open-starter': () => { logIntent('home-starter-open', '5k-1.99'); openSheet('sh-starter'); },
   'buy': el => {
     const pack = el.dataset.pack || null;
     logIntent(el.closest('#sh-outofchips') ? 'ooc-pack' :
@@ -3142,6 +3167,7 @@ function rerenderDynamic() {
   renderGuides($('#guideSearch').value);
   renderPracticeTasks();
   renderHomeHero();
+  renderStarterCard();
   renderProfile();
   tickTimers();
 }
@@ -3213,6 +3239,7 @@ const VISIT_GAP = 30 * 60 * 1000; // тишина ≥30 мин = новая се
     if (av) av.textContent = pn.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
   })();
   renderHomeHero();
+  renderStarterCard();
   renderAch();
   renderShopDailyStrip();
   renderGuides('');
