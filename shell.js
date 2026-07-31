@@ -55,7 +55,7 @@ const DEF_STATE = {
   dailyOffer: null,         // дата последнего авто-оффера дейлика (once per day)
   lang: 0,                  // выбранный язык в Settings (visual only)
   setFlags: { notif: true, music: true }, // editorial row toggles (mockup B; prototype-only master flags)
-  skin: 'crypto-light',     // визуальный скин (вердикт 31.07 п.32: один скелет, четыре варианта)
+  skin: 'paper',            // визуальный скин; ДЕФОЛТ = папирусный (слово Павла 31.07 поздний вечер)
   btc: null,                // кэш цен BTC {open, price, openDate, ts, live} — оффлайн-фолбэк
   peakDay: null,            // дата последнего «пикового» оффера (max 1/день; webv1 п.5)
 };
@@ -83,7 +83,7 @@ function loadState() {
   out.started = Number.isFinite(+out.started) ? +out.started : 0;
   out.lang = +out.lang || 0;
   // старые ключи скинов из прошлых сессий чинятся алиасом ниже (normSkin), здесь только тип
-  if (typeof out.skin !== 'string' || !out.skin) out.skin = 'crypto-light';
+  if (typeof out.skin !== 'string' || !out.skin) out.skin = 'paper';
   if (typeof out.btc !== 'object') out.btc = null;
   return out;
 }
@@ -116,26 +116,28 @@ const FLAPPY_MIN_TOTAL = 30;
    Реферальные +500 — только вёрстка/строки (начислений за рефералов в прототипе нет). */
 const VIDEO_REWARD = 100;
 
-/* ---------- skins (вердикт владельца 31.07 вечер: ЧЕТЫРЕ варианта, п.32) ----------
+/* ---------- skins (paper — ДЕФОЛТ, слово Павла 31.07 поздний вечер) ----------
    Скин = body[data-skin] + CSS-токены в shell.css; DOM не ветвится (п.20 в силе).
-   ЧЕТЫРЕ стиля из ноды 652 (группы 652:10785/10786/10787, у каждого полный набор
-   экранов + дизайн-система): crypto-light (светлый крипто), crypto-dark (чёрный крипто),
+   paper — папирусный рабочий прототип (Figma-ряд 639:10784, нода 622:*: бумага
+   #F0DFC2 + зерно, чернила #4C334A, Nunito, кобальт #4068F5 с 3D-плинтами) —
+   основной прототип, на нём идёт вся отладка динамичного туториала.
+   Плюс ЧЕТЫРЕ когортных стиля из ноды 652 (п.32): crypto-light, crypto-dark,
    cream (кремовый эко), corporate (белый с navy-топбаром).
-   ⚠️ Вердикт 31.07 (вечер) ОТМЕНЯЕТ п.21/24 в части «игра и онбординг не скинуются»:
-   теперь скинуются ВСЕ поверхности — оболочка, онбординг И игра (у каждого варианта
-   свои игровые экраны Trading-Buy / Active-Position / Round-Complete / Deal-Settings).
-   Поэтому ?skin= ПРОБРАСЫВАЕТСЯ в iframe игры.
+   Скинуются ВСЕ поверхности — оболочка, онбординг И игра (вердикт 31.07 вечер),
+   поэтому ?skin= ПРОБРАСЫВАЕТСЯ в iframe игры.
    Скин = разметка КОГОРТЫ, не выбор юзера (п.25): ?skin= из пролива персистится в S.skin.
-   Приоритет: ?skin= в URL > сохранённый скин > crypto-light. Строка «Style» в Settings —
+   Приоритет: ?skin= в URL > сохранённый скин > paper. Строка «Style» в Settings —
    дев-инструмент за drafts-тумблером (юзерского переключателя в проде нет). */
-const SKINS = ['crypto-light', 'crypto-dark', 'cream', 'corporate'];
-// когортные ссылки прошлой итерации не должны 404-ить по смыслу: старые ключи → новые
-const SKIN_ALIAS = { narodny: 'cream', terminal: 'crypto-dark', editorial: 'corporate', taptrade: 'cream' };
+const SKINS = ['paper', 'crypto-light', 'crypto-dark', 'cream', 'corporate'];
+/* когортные ссылки прошлых итераций не должны 404-ить по смыслу: старые ключи → новые.
+   narodny/taptrade исторически и были папирусным 622-дизайном — с возвратом paper
+   они снова ведут на него (до 31.07 временно алиасились в cream). */
+const SKIN_ALIAS = { narodny: 'paper', taptrade: 'paper', terminal: 'crypto-dark', editorial: 'corporate' };
 const normSkin = s => (SKINS.includes(s) ? s : (SKIN_ALIAS[s] || null));
 const URL_SKIN = (() => {
   try { return normSkin(new URLSearchParams(location.search).get('skin')); } catch (e) { return null; }
 })();
-let SKIN = URL_SKIN || normSkin(S.skin) || 'crypto-light';
+let SKIN = URL_SKIN || normSkin(S.skin) || 'paper';
 function applySkin(skin, opts = {}) {
   skin = normSkin(skin);
   if (!skin) return;
@@ -1695,7 +1697,7 @@ const SUBS = {
   // Figma node 440:21476 — ровно эти 8, без русского; endonyms are NOT translated
   'Language':            { type: 'list',    titleKey: 'sub.language', items: ['English', 'Español', 'Français', 'Deutsch', '日本語', '中文', 'Português', 'العربية'], checked: () => S.lang },
   // skin names stay English in all languages (same convention as course tiers Basic/Pro/Expert)
-  'Style':               { type: 'list',    titleKey: 'sub.style', items: ['Crypto light', 'Crypto dark', 'Cream', 'Corporate'], checked: () => SKINS.indexOf(SKIN), act: 'skin-pick' },
+  'Style':               { type: 'list',    titleKey: 'sub.style', items: ['Paper', 'Crypto light', 'Crypto dark', 'Cream', 'Corporate'], checked: () => SKINS.indexOf(SKIN), act: 'skin-pick' },
   'Music and vibration': { type: 'toggles', titleKey: 'sub.music', items: ['subitem.music', 'subitem.sfx', 'subitem.vibro'] },
   'Help & Support':      { type: 'text', titleKey: 'sub.help', textKey: 'sub.help.text' },
   'About app':           { type: 'text', titleKey: 'sub.about', textKey: 'sub.about.text' },
@@ -3358,7 +3360,7 @@ const ACT = {
     }
   },
   'skin-pick': el => {
-    const skin = SKINS[+el.dataset.idx || 0] || 'crypto-light';
+    const skin = SKINS[+el.dataset.idx || 0] || 'paper';
     if (skin !== SKIN) {
       applySkin(skin, { persist: true });     // мгновенно, без перезагрузки
       logIntent('skin-pick:' + skin);         // экспозиция когорт — тот же лог, что peak-view

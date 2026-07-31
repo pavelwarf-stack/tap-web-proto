@@ -1,6 +1,11 @@
 /* ============================================================
    Tap Trading Hub — shell styles.
-   ЧЕТЫРЕ полных визуальных варианта (вердикт владельца 31.07 вечер, п.32):
+   ПЯТЬ полных визуальных вариантов:
+     paper (ДЕФОЛТ)        — папирусный прототип, Figma-ряд 639:10784 / нода 622:*
+                             (бумага #F0DFC2 + зерно, чернила #4C334A, Nunito,
+                             кобальт #4068F5 c 3D-плинтами); слово Павла 31.07 (поздний
+                             вечер): «сконцентрируемся на прототипе с папирусной сеткой,
+                             на нём всё будем дебажить» — вернулся первоклассным скином.
      crypto-light  (:root)  — вариант v1, Figma 618:21106 и др., экраны на #F9FAFB
      crypto-dark            — вариант v2, Figma 584:23263 и др., ДС 584:21407
      cream                  — вариант v3, Figma 607:11115 и др., ДС 584:21749
@@ -8,8 +13,12 @@
    ОДИН скелет (п.20): DOM не ветвится, различия ТОЛЬКО в CSS-токенах и правилах скина.
    Онбординг (#scr-welcome, #tutorial) и Round Complete (#scr-roundcomplete) с 31.07
    ТОЖЕ скинуются (реверс прежнего канона «они байт-в-байт одинаковы»).
-   Мокапы 375-wide → фрейм 390: значения ×(390/375) ≈ 1.04.
-   Источник значений — дампы узлов в _рабочее/variants-4/spec-*.txt (Figma REST).
+   Мокапы 375-wide → фрейм 390: значения ×(390/375) ≈ 1.04; RC-мокап 440-wide → ×0.886.
+   Источники значений: paper — _рабочее/taptrade-622/spec-*.txt (и токен-контракт
+   251880e); четвёрка — _рабочее/variants-4/spec-*.txt (Figma REST).
+   ⚠️ :root остался = crypto-light (когортные ссылки четвёрки не трогаем);
+   paper живёт блоком body[data-skin="paper"] + компонентным слоем в конце файла,
+   а ДЕФОЛТНЫМ его делает shell.js (DEF_STATE.skin / фолбэки).
    ============================================================ */
 
 /* Local fonts (self-contained prototype — no CDN). Variable woff2, latin subset. */
@@ -17,9 +26,12 @@
   font-family:'Inter'; font-style:normal; font-weight:100 900; font-display:swap;
   src:url('fonts/inter-var.woff2') format('woff2');
 }
-/* Nunito больше не используется ни одним из четырёх вариантов: ДС v3 (cream) прямо
-   называет Inter («Шрифт: Inter · Все стили»), Nunito был у прежнего 622-скина.
-   @font-face снят, чтобы браузер не тянул лишний woff2; файл в fonts/ оставлен. */
+/* Nunito — шрифт папирусного скина paper (622-ряд); вернулся вместе со скином
+   (слово Павла 31.07 поздний вечер). Четвёрка вариантов его не использует. */
+@font-face {
+  font-family:'Nunito'; font-style:normal; font-weight:200 1000; font-display:swap;
+  src:url('fonts/nunito-var.woff2') format('woff2');
+}
 /* new skins (вердикт 30.07 п.24): editorial = Crimson Pro headings, terminal = JetBrains Mono digits */
 @font-face {
   font-family:'Crimson Pro'; font-style:normal; font-weight:200 900; font-display:swap;
@@ -170,6 +182,132 @@ input { font-family:inherit; }
   --rc-cta-link:#228BEE; --rc-cta-link-dec:none;
   --rc-tile-accent:#111827;              /* 3-я плитка: = --rc-ink варианта (v2 красит cyan);
                                             var(--rc-ink) здесь нельзя — та же ловушка */
+}
+
+/* ============================================================
+   paper — папирусный скин (ДЕФОЛТ, слово Павла 31.07 поздний вечер).
+   Значения = токен-контракт 251880e (тогдашний :root «TapTrade 622»), разложенный
+   по СЕГОДНЯШНЕМУ словарю токенов; геометрия/хексы — _рабочее/taptrade-622/spec-*.txt.
+   Язык: бумага #F0DFC2 + зерно paper.webp (15% альфа запечена), полупрозрачные белые
+   карты white-30 с 2px белым контуром, тёплый контур пилюль #653200 20%, чернила
+   #4C334A, Nunito, кобальт #4068F5 с 3D-плинтом #3353C4, зелёный #13A86D/#108859,
+   контурная монета CoinVertical, сплошная поверхность шитов #F5EAD6.
+   Компонентные отличия раскладки (не выражаются токенами) — слой
+   «PAPER component layer» в конце файла.
+   ============================================================ */
+body[data-skin="paper"] {
+  /* ---- surfaces ---- */
+  --bg:#F0DFC2;
+  --paper:url('paper.webp');
+  --card:rgba(255,255,255,.30);
+  --solid:#F5EAD6;
+  --card-line:#FFFFFF;
+  --card-bw:2px;
+  --panel:rgba(255,255,255,.30);
+  --panel2:rgba(255,255,255,.50);
+  --accent2:#F0DFC2;
+  --line:rgba(255,255,255,.85);
+  --pill-line:rgba(101,50,0,.20);
+  --tx:#4C334A;
+  --tx-soft:rgba(76,51,74,.70);
+  --sb:rgba(76,51,74,.60);
+  /* ---- accents ---- */
+  --green:#13A86D;
+  --green-deep:#13A86D;
+  --cta-grad:none;
+  --cta-grad2:none;
+  --red:#F54040;
+  --hot:#EEB06A;
+  --blue:#4068F5;
+  --gold:#FFB703;
+  --coin-line:#EEB06A;
+  --coin-fill:#FFB703;
+  --danger:#F54040;
+  --danger-bg:#FEE2E2;
+  --offer-line:#FFFFFF;
+  --offer-bw:2px;
+  /* ---- radii (622: 12 карты/кнопки, 16 группы, 20 крупные, 100 пилюли) ---- */
+  --r-card:12.5px;
+  --r-card-lg:16.6px;
+  --r-hero:20.8px;
+  --r-pack:12.5px;
+  --r-btn:12.5px;
+  --r-btn-sm:12.5px;
+  --r-sheet:20.8px;
+  /* ---- 3D-плинт кнопок (Button-компонент 622:27042) ---- */
+  --btn-bg:#4068F5; --btn-tx:#FFFFFF;
+  --btn2-bg:#13A86D; --btn2-tx:#FFFFFF;
+  --btn3d-sm:0 4px 0 #3353C4, 0 4px 2px rgba(0,0,0,.25), inset 0 -2px 2px rgba(0,0,0,.10);
+  --btn3d-lg:0 6px 0 #3353C4, 0 4px 2px rgba(0,0,0,.25), inset 0 -2px 2px rgba(0,0,0,.10);
+  --btn3d-green:0 4px 0 #108859, 0 4px 2px rgba(0,0,0,.25), inset 0 -2px 2px rgba(0,0,0,.10);
+  --btn-txsh:0 1.5px 0 rgba(0,0,0,.15);
+  --cta-shadow:0 6px 0 #3353C4, 0 4px 2px rgba(0,0,0,.25), inset 0 -2px 2px rgba(0,0,0,.10);
+  --ghost:rgba(76,51,74,.08);
+  --hard-shadow:0 4.9px 0 rgba(0,0,0,.10);
+  --card-shadow:none;
+  /* ---- badges / tags ---- */
+  --badge-bg:rgba(255,255,255,.50); --badge-tx:rgba(76,51,74,.70); --badge-line:transparent;
+  --save-bg:#FF5F57; --save-tx:#FFFFFF;
+  --offer-badge-bg:#4C334A; --offer-badge-tx:#FFFFFF;
+  --expire-tx:#FFFFFF;                   /* «Ends in» на зелёной карте Home */
+  --timer-tx:#4C334A;
+  --reward-tx:#4C334A;
+  --bar-fill:#7C7691;
+  --dq-tx:#4C334A; --dq-line:#FFFFFF;    /* «?»-свеча: линии белые (язык сетки), текст чернилами */
+  --banner-bg:transparent; --banner-tx:#4C334A; --banner-line:transparent;
+  --ref-ava-bg:rgba(255,255,255,.30); --ref-ava-tx:rgba(76,51,74,.60);
+  --ref-amt-tx:#4C334A; --ref-amt-bg:transparent;
+  --icirc-bg:#FFFFFF;
+  --icirc-tx:rgba(76,51,74,.60);
+  /* ---- chrome ---- */
+  --statusbar-tx:#4C334A; --statusbar-bg:transparent;
+  --topbar-bg:#1B2838; --topbar-tx:#FFFFFF;  /* скелет топбара: paper его не показывает */
+  --tab-bg:#F0DFC2; --tab-line:#FFFFFF;
+  --tab-active:#4C334A; --tab-inactive:#4C334A; --tab-active-bg:rgba(255,255,255,.30);
+  --tab-shadow:0 -8px 28px rgba(109,117,143,.16);
+  --avatar-bg:#FFFFFF; --avatar-tx:#4C334A;
+  --avatar-img:url('avatar-tt.webp');
+  --homeind:#C9BCA6;
+  --toast-bg:#4C334A; --toast-tx:#FFFFFF;
+  /* ---- typography ---- */
+  --font:'Nunito', 'Arial Rounded MT Bold', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-head:var(--font);
+  --font-num:var(--font);
+  --head-tx:#4C334A;
+  --w-head:900; --w-btn:900;
+  --hero-size:29.1px; --hero-lh:37.4px;        /* Nunito 900 28/38 */
+  --sec-tx:#4C334A; --sec-size:18.7px; --sec-w:900; --sec-case:none; /* shop «Free» 18/25 900 */
+  --case-head:none; --case-hero:none;
+  --case-btn:none; --case-cta:none; --case-ach:none; --case-tab:none; --case-lbl:none;
+  /* ---- onboarding (welcome + баблы туториала): папирусная производная ----
+     бабл = белая карта, чернильный текст, кобальтовый Next (язык 622) */
+  --wl-bg:#F0DFC2; --wl-card:rgba(255,255,255,.30); --wl-h1:#4C334A; --wl-soft:rgba(76,51,74,.70);
+  --wl-btn:#4068F5; --wl-btn-tx:#FFFFFF; --wl-r:20.8px;
+  --tut-bg:#FFFFFF; --tut-line:#FFFFFF; --tut-tx:#4C334A;
+  --tut-cta:#4068F5; --tut-cta-tx:#FFFFFF; --tut-link:#4068F5;
+  --tut-3d:none; --tut-txsh:none;
+  --tut-band:rgba(34,197,94,.30); --tut-band-line:#FFFFFF; /* Rectangle 7271: #22C55E 30% + 1px white */
+  /* ---- round complete (spec-round-complete.txt / f2056; мокап 440 → ×0.886) ---- */
+  --rc-bg:#F0DFC2;
+  --rc-ink:#4C334A;
+  --rc-soft:rgba(76,51,74,.70);
+  --rc-card:#F0DFC2;
+  --rc-line:#FFFFFF;
+  --rc-bw:2.1px;
+  --rc-pill:rgba(255,255,255,.30);
+  --rc-pill-line:transparent;            /* пилюли RC — white-30 без контура */
+  --rc-r:17.7px;
+  --rc-r-tile:16.6px;
+  --rc-title-size:33.3px; --rc-title-lh:49.9px; --rc-title-w:900; --rc-title-case:uppercase;
+  --rc-unlock-accent:#13A86D;            /* замочек в заголовке анлока */
+  --rc-unlock-badge-bg:transparent;
+  --rc-unlock-tx:#19213D;
+  --rc-unlock-soft:#7D676F;
+  --rc-fw-bg:#13A86D; --rc-fw-tx:#FFFFFF; --rc-fw-r:17.7px;
+  --rc-cta:#4068F5; --rc-cta-tx:#FFFFFF; --rc-cta-r:16.6px;
+  --rc-cta-shadow:0 6px 0 #3353C4, 0 4px 2px rgba(0,0,0,.25), inset 0 -2px 2px rgba(0,0,0,.10);
+  --rc-cta-link:#4068F5; --rc-cta-link-dec:none;
+  --rc-tile-accent:#4C334A;
 }
 
 /* ============================================================
@@ -2481,3 +2619,284 @@ body[data-skin="crypto-dark"] .shop-balance .coin-dot { width:16.6px; height:16.
 .logout-row, .peak-opt, .ref-course, #practiceTasks {
   box-shadow:var(--card-shadow);
 }
+
+/* ============================================================
+   PAPER component layer — раскладочные отличия папирусного скина,
+   которые не выражаются токенами (восстановлены из 251880e и сверены
+   с _рабочее/taptrade-622/spec-*.txt + рендерами home/shop/…/f2056).
+   Слой ЖИВЁТ ОТДЕЛЬНО в конце файла и не трогает правила четвёрки 652.
+   ============================================================ */
+
+/* --- зерно бумаги на full-bleed экранах (welcome/RC перекрывают фон фрейма) --- */
+body[data-skin="paper"] #frame:has(#scr-welcome.active) {
+  background:var(--paper) center/cover no-repeat, var(--wl-bg);
+}
+body[data-skin="paper"] #frame:has(.rc.active) {
+  background:var(--paper) center/cover no-repeat, var(--rc-bg);
+}
+body[data-skin="paper"] .wl-card { box-shadow:inset 0 0 0 var(--card-bw) var(--card-line); }
+
+/* --- контурная монета CoinVertical (622-ДС) вместо solid-точки --- */
+body[data-skin="paper"] .coin-dot {
+  width:16.6px; height:16.6px; flex-basis:16.6px; vertical-align:-3px;
+  border:2.1px solid var(--coin-line); background:none;
+}
+body[data-skin="paper"] .coin-dot::after {
+  content:''; position:absolute; top:.5px; bottom:.5px; left:34%; width:6px;
+  transform:translateX(-50%); border:1.6px solid var(--coin-line); border-radius:50%;
+  box-sizing:border-box;
+}
+body[data-skin="paper"] .balance-pill .coin-dot { width:16.6px; height:16.6px; flex-basis:16.6px; border-color:var(--gold); }
+body[data-skin="paper"] .balance-pill .coin-dot::after { border-color:var(--gold); }
+
+/* --- шапка Home: белая юзер-пилюля с фото-аватаром, пилюля баланса с «+», белые кружки --- */
+body[data-skin="paper"] .user-id {
+  flex:0 1 auto; height:41.6px; padding:4.2px 12.5px 4.2px 4.2px;
+  background:#fff; border-radius:83px; box-shadow:inset 0 0 0 2px var(--pill-line);
+}
+body[data-skin="paper"] .avatar-ini {
+  background:var(--avatar-bg) var(--avatar-img) center/cover; color:transparent;
+}
+body[data-skin="paper"] .user-name { font-size:12.5px; line-height:16.6px; font-weight:900; }
+body[data-skin="paper"] .balance-pill {
+  height:33.3px; gap:4.2px; padding:4.2px 4.2px 4.2px 10.4px;
+  background:#fff; border-radius:20.8px; box-shadow:inset 0 0 0 2px var(--pill-line);
+  font-size:12.5px; font-weight:900; color:var(--tx);
+}
+body[data-skin="paper"] .bal-plus {
+  display:block; width:20.8px; height:20.8px; flex:0 0 20.8px; border-radius:50%;
+  background:#848FA2; color:#fff; font-size:12.5px; line-height:20.8px; font-weight:900;
+  text-align:center; margin-left:4.2px;
+}
+body[data-skin="paper"] .icon-sq {
+  width:33.3px; height:33.3px; flex-basis:33.3px;
+  background:#fff; box-shadow:inset 0 0 0 2px var(--pill-line); color:var(--tx);
+}
+
+/* --- Home: карта игры (крем на креме, белый 2px контур, жёсткая тень) + зелёный оффер --- */
+body[data-skin="paper"] .home-hero { gap:12.5px; }
+body[data-skin="paper"] .trade-card {
+  background:var(--bg); border:2px solid var(--card-line); border-radius:25px;
+  box-shadow:var(--hard-shadow);
+  padding:9.8px 14.6px 8.5px; text-align:center;
+}
+body[data-skin="paper"] .hero-desc { font-weight:600; margin-top:2px; }
+body[data-skin="paper"] .sp-offer {
+  --spo-tx:#fff; --spo-soft:rgba(255,255,255,.70);
+  background:var(--green); border:2px solid var(--card-line); border-radius:25px;
+  box-shadow:none;
+}
+body[data-skin="paper"] .spo-badge { padding:4.2px 10.4px; line-height:14.6px; font-weight:900; }
+body[data-skin="paper"] .spo-ends { line-height:16.6px; font-weight:900; }
+body[data-skin="paper"] .spo-title { font-size:16.6px; font-weight:700; }
+body[data-skin="paper"] .spo-desc { font-size:12.5px; line-height:16.6px; font-weight:600; }
+body[data-skin="paper"] .spo-price { font-size:22.9px; line-height:31.2px; }
+body[data-skin="paper"] .spo-buy {
+  background:var(--blue); color:#fff; border-radius:12.5px;
+  min-width:78px; padding:12.5px 18.7px; font-size:14.6px; line-height:19.8px; font-weight:900;
+  box-shadow:var(--btn3d-sm); text-shadow:var(--btn-txsh);
+}
+body[data-skin="paper"] .hero-play { height:62.4px; border-radius:16.6px; font-size:20.8px; line-height:27px; }
+body[data-skin="paper"] #tabbar { --tab-h:104px; padding:12.5px 8.3px 25px; }
+@media (max-width:375px) {
+  body[data-skin="paper"] #tabbar { padding-left:4.2px; padding-right:4.2px; gap:2px; }
+}
+
+/* --- Shop: составная карта оффера 622 (Buy во всю ширину прижат к низу,
+   вложенная светлая карта «Personal offer» справа сверху; маскота в 622-карте нет) --- */
+body[data-skin="paper"] .offer-mascot { display:none; }
+body[data-skin="paper"] .offer-card { padding:14.6px; padding-bottom:70.7px; min-height:166.4px; }
+/* position:static — Buy якорится к САМОЙ карте (position:relative на .offer-left
+   нужен четвёрке для маскота, у paper маскота в карте нет) */
+body[data-skin="paper"] .offer-left { flex:1 1 auto; align-items:flex-start; position:static; }
+body[data-skin="paper"] .offer-left .btn-dark {
+  position:absolute; left:14.6px; right:14.6px; bottom:14.6px; width:auto; margin-top:0;
+}
+body[data-skin="paper"] .offer-amount {
+  display:flex; align-items:center; gap:6.2px; font-size:18.7px; line-height:26px;
+}
+body[data-skin="paper"] .offer-amount .coin-dot { width:20.8px; height:20.8px; flex-basis:20.8px; }
+body[data-skin="paper"] .chips-word { display:none; }
+body[data-skin="paper"] .offer-price { margin-top:12.5px; font-size:12.5px; line-height:16.6px; color:var(--tx); }
+body[data-skin="paper"] .offer-price s { font-size:12.5px; line-height:16.6px; }
+body[data-skin="paper"] .offer-left .save-tag {
+  order:0; align-self:flex-start; margin:6.2px 0 0;
+  padding:2.1px 6.2px; line-height:14.6px; font-weight:900; text-transform:none;
+}
+body[data-skin="paper"] .offer-right {
+  position:relative; right:auto; bottom:auto; width:auto;
+  flex:0 0 134.2px; align-self:flex-start; justify-content:flex-start; gap:6.2px;
+  background:var(--panel2); border-radius:16.6px; padding:5.2px 8.3px 10.4px; min-height:80.1px;
+  box-shadow:none;
+}
+body[data-skin="paper"] .offer-lbl {
+  background:none; color:var(--tx-soft); border-radius:0; padding:0;
+  font-size:14.6px; line-height:19.8px; font-weight:800; text-transform:none;
+}
+body[data-skin="paper"] .ends-card span { line-height:15.6px; color:var(--sb); }
+body[data-skin="paper"] .ends-card b { font-size:18.7px; line-height:26px; font-weight:900; }
+/* пакеты: экономия — серой пилюлей под ценой, цена отдельной строкой, в кнопке «Buy» */
+body[data-skin="paper"] .pack { padding:37.4px 10.4px 10.4px; min-height:156px; }
+body[data-skin="paper"] .pack-save { display:none; }
+body[data-skin="paper"] .pack-amt { margin-top:0; gap:12.5px; font-size:14.6px; line-height:19.8px; font-weight:900; }
+body[data-skin="paper"] .pack-amt .coin-dot { width:33.3px; height:33.3px; flex-basis:33.3px; border-width:2.8px; }
+body[data-skin="paper"] .pack-amt .coin-dot::after { width:11px; border-width:2.2px; }
+body[data-skin="paper"] .pack-price {
+  display:block; font-size:12.5px; line-height:16.6px; font-weight:400;
+  color:var(--sb); margin-top:2.1px; align-self:center;
+}
+body[data-skin="paper"] .pack-save2 {
+  display:block; align-self:center; margin-top:4.2px;
+  background:#7C7691; color:#fff; border-radius:4.2px; padding:1px 4.2px;
+}
+body[data-skin="paper"] .pack .bp-price { display:none; }
+body[data-skin="paper"] .pack .bp-word { display:inline; }
+body[data-skin="paper"] .pack .btn-play { border-radius:12.5px; padding:8.3px; font-size:13.5px; line-height:16.6px; }
+body[data-skin="paper"] .hot-tag {
+  color:var(--tx); border-radius:6.2px; padding:2.1px 6.2px;
+  font-size:10.4px; line-height:11.4px;
+}
+
+/* --- Referrals: hero r20.8, банда = hairline внутри карты, белые поля,
+   Paste — синий текст в белом поле, ряды кремовые внутри white-30 контейнера --- */
+body[data-skin="paper"] .ref-hero { border-radius:20.8px; padding:20.8px; }
+body[data-skin="paper"] .ref-hero h2 { font-size:22.9px; line-height:31.2px; font-weight:900; }
+body[data-skin="paper"] .ref-hero p { font-size:14.6px; line-height:19.8px; font-weight:600; color:var(--sb); margin-top:8.3px; }
+body[data-skin="paper"] .ref-banner {
+  margin:12.5px 0 0; padding:12.5px 0 0;
+  background:none; border:none; border-top:1px solid var(--card-line); border-radius:0;
+  font-size:14.6px; line-height:19.8px; font-weight:800; text-align:center;
+}
+body[data-skin="paper"] .fld-lbl { font-size:14.6px; line-height:19.8px; font-weight:700; text-transform:none; }
+body[data-skin="paper"] .fld {
+  height:54.1px; background:#fff; border-radius:16.6px;
+  box-shadow:inset 0 0 0 2px var(--pill-line);
+}
+body[data-skin="paper"] .fld input { font-size:15.6px; font-weight:600; }
+body[data-skin="paper"] .fld input::placeholder { color:var(--tx-soft); font-weight:600; }
+body[data-skin="paper"] .paste-fld { height:44.7px; border-radius:12.5px; padding:12.5px 16.6px; background:#fff; }
+body[data-skin="paper"] .paste-btn {
+  background:none; color:var(--blue); border-radius:0; min-width:0; height:auto; padding:0;
+  font-size:14.6px; line-height:19.8px; font-weight:800; text-transform:none;
+}
+body[data-skin="paper"] #scr-referrals .sub-title.ref-sec {
+  margin:25px 0 8.3px; text-transform:none; font-size:14.6px; line-height:19.8px; font-weight:700;
+}
+body[data-skin="paper"] .ref-list { border-radius:16.6px; padding:0; }
+body[data-skin="paper"] .ref-row {
+  background:var(--bg); box-shadow:inset 0 0 0 1px var(--card-line);
+  padding:0 12.5px; height:62.4px;
+}
+body[data-skin="paper"] .ref-row + .ref-row::before { content:none; }
+body[data-skin="paper"] .ref-ava {
+  width:37.4px; height:37.4px; flex-basis:37.4px;
+  box-shadow:inset 0 0 0 1px var(--card-line);
+}
+body[data-skin="paper"] .ref-name { font-weight:800; line-height:19.8px; }
+body[data-skin="paper"] .ref-amt { gap:6.2px; font-weight:900; }
+/* 622-сверка (251880e): контурная монета есть и в рядах рефералов */
+body[data-skin="paper"] .ref-amt .coin-dot { display:inline-block; width:14.6px; height:14.6px; flex-basis:14.6px; border-width:1.8px; }
+body[data-skin="paper"] .copy-id-row { border-radius:16.6px; font-weight:800; }
+body[data-skin="paper"] .copy-id-row svg { color:var(--tx); }
+body[data-skin="paper"] .ref-invite.btn-primary { margin-top:12.5px; height:62.4px; border-radius:16.6px; font-size:20.8px; line-height:27px; }
+
+/* --- Achievements: счётчик в топ-ряду, футер Play (кобальт) + «Reward ◑N» --- */
+body[data-skin="paper"] .ach-row {
+  border-radius:16.6px;
+  grid-template-areas:
+    'ico texts cnt'
+    'bar bar   bar'
+    'act act   reward';
+}
+body[data-skin="paper"] .ach-title { font-weight:900; }
+body[data-skin="paper"] .ach-desc { color:var(--sb); }
+body[data-skin="paper"] .ach-count {
+  grid-area:cnt; justify-self:end; align-self:start; padding-top:8.3px;
+  font-size:14.6px; line-height:19.8px; font-weight:800; color:var(--sb);
+}
+body[data-skin="paper"] .ach-bar { height:8.3px; background:#fff; }
+body[data-skin="paper"] .ach-play, body[data-skin="paper"] .ach-claim {
+  grid-area:act; justify-self:start; border-radius:12.5px;
+}
+body[data-skin="paper"] .ach-play { background:var(--btn-bg); color:var(--btn-tx); }
+body[data-skin="paper"] .ach-claim { background:var(--green); color:#fff; box-shadow:var(--btn3d-green); }
+body[data-skin="paper"] .ach-reward { grid-area:reward; justify-self:end; align-self:center; }
+body[data-skin="paper"] .ach-reward em {
+  display:inline; font-style:normal; font-size:12.5px; line-height:16.6px; font-weight:700;
+  color:var(--sb); margin-right:4.2px;
+}
+body[data-skin="paper"] .ach-reward b { font-size:14.6px; line-height:19.8px; font-weight:900; color:var(--tx); }
+body[data-skin="paper"] .ach-row.claimed { opacity:.6; }
+body[data-skin="paper"] .ach-claimed { color:var(--sb); font-size:14.6px; line-height:19.8px; }
+
+/* --- Sign up / verify: крупные CTA 62.4/r16.6, центрованная ошибка кода #FF5F57 --- */
+body[data-skin="paper"] #scr-signup .fld-lbl { font-weight:900; }
+body[data-skin="paper"] .su-cta.btn-primary, body[data-skin="paper"] .vf-cta.btn-primary {
+  height:62.4px; border-radius:16.6px; font-size:20.8px; line-height:27px;
+}
+body[data-skin="paper"] .social-row { gap:12.5px; margin-top:33.3px; }
+body[data-skin="paper"] .legal { font-weight:600; color:var(--tx-soft); margin-top:33.3px; }
+body[data-skin="paper"] .verify-error { text-align:center; margin-top:24px; color:#FF5F57; font-weight:900; }
+body[data-skin="paper"] #scr-verify.vf-error .code-box { box-shadow:inset 0 0 0 2px #FF5F57; color:#FF5F57; }
+
+/* --- Round Complete (spec-round-complete.txt / f2056; ×0.886) --- */
+body[data-skin="paper"] .rc-menu, body[data-skin="paper"] .rc-home {
+  top:-1px; width:41.6px; height:41.6px; border-radius:12.5px;
+  background:var(--rc-bg);
+  box-shadow:inset 0 0 0 2.1px var(--rc-line), 0 4.2px 0 rgba(0,0,0,.10);
+}
+body[data-skin="paper"] .rc-top { padding:18px 0 0; }
+body[data-skin="paper"] .rc-btc { gap:2px; padding:6px 8px; font-size:14.6px; line-height:21.8px; font-weight:600; }
+body[data-skin="paper"] .rc-earn-band {
+  margin:17.7px 0 0; background:var(--rc-bg);
+  border-top:2.1px solid var(--rc-line); border-bottom:2.1px solid var(--rc-line);
+  box-shadow:0 4px 0 rgba(0,0,0,.06);
+  padding:21.3px 16.8px; min-height:131px; gap:10.6px;
+}
+body[data-skin="paper"] .rc-earn-lbl { font-weight:600; line-height:18.7px; }
+body[data-skin="paper"] .rc-earn-val { font-size:33.3px; line-height:49.9px; margin:-10.6px 0; }
+body[data-skin="paper"] .rc-earn-val .coin-ico { width:27px; height:27px; border-width:2px; background:none; }
+body[data-skin="paper"] .rc-earn-val .coin-ico::after { content:''; width:9px; border-width:1.8px; }
+body[data-skin="paper"] .rc-fw {
+  flex-direction:column; gap:4px; margin-top:4px;
+  border:1.8px solid var(--rc-line); box-shadow:0 3.5px 0 rgba(0,0,0,.10);
+  padding:10.6px 14.2px;
+}
+body[data-skin="paper"] .rc-fw-lbl { font-size:14.2px; line-height:18.4px; font-weight:600; color:rgba(255,255,255,.75); }
+body[data-skin="paper"] .rc-fw-amt { font-size:14.8px; line-height:22.2px; font-weight:600; }
+body[data-skin="paper"] .rc-bal-pill {
+  background:var(--rc-pill); border-radius:999px; padding:6.3px 8.5px; margin-top:2px;
+  font-size:14.8px; line-height:22.2px; font-weight:600; color:var(--rc-ink);
+}
+body[data-skin="paper"] .rc-bal-pill .coin-ico { border-width:1.5px; background:none; }
+body[data-skin="paper"] .rc-bal-pill .coin-ico::after { content:''; }
+body[data-skin="paper"] .rc-tiles { margin:17.7px 16.8px 0; }
+body[data-skin="paper"] .rc-tile {
+  background:var(--rc-bg);
+  box-shadow:inset 0 0 0 2.1px var(--rc-line), 0 4px 0 rgba(0,0,0,.06);
+  padding:8.3px 6px; min-height:76px;
+}
+body[data-skin="paper"] .rc-tile span { font-size:12.5px; line-height:18.7px; font-weight:600; margin-bottom:2px; }
+body[data-skin="paper"] .rc-tile b { font-size:20.8px; line-height:31.2px; }
+body[data-skin="paper"] .rc-unlock {
+  margin:24px 14.2px 0; padding:14.2px 16px 15px;
+  background:var(--rc-bg); box-shadow:inset 0 0 0 1px var(--rc-line); border-radius:17.7px;
+}
+body[data-skin="paper"] .rc-unlock-head b {
+  font-size:13.3px; line-height:18.1px; font-weight:700;
+  color:var(--rc-unlock-tx); text-transform:none;
+}
+body[data-skin="paper"] .rc-unlock-name { font-size:16px; line-height:21.8px; font-weight:700; margin-top:9px; }
+body[data-skin="paper"] .rc-unlock-desc { font-size:10.6px; line-height:14.2px; font-weight:500; margin-top:3.5px; max-width:186px; }
+/* ликующий фотореал-маскот живёт в анлок-карте и у paper (622-мокап f2056) */
+body[data-skin="paper"] .rc-unlock-mascot {
+  display:block; position:absolute; top:-30px; bottom:0; right:2px; width:175px;
+  overflow:hidden; border-radius:0 0 17.7px 0; pointer-events:none;
+}
+body[data-skin="paper"] .rc-unlock-mascot img { display:block; height:250px; width:auto; margin:0 auto; }
+body[data-skin="paper"] .rc-actions { margin:43px 14.2px 0; }
+body[data-skin="paper"] .rc-next { height:62px; font-size:18.7px; font-weight:900; text-shadow:var(--btn-txsh); }
+body[data-skin="paper"] .rc-repeat { font-size:17.7px; line-height:26.6px; font-weight:900; }
+
+/* --- туториал: кобальтовый Next c 3D-плинтом (язык 622), Skip кобальтом --- */
+body[data-skin="paper"] .tut-next { box-shadow:var(--btn3d-sm); text-shadow:var(--btn-txsh); }

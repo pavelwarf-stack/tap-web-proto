@@ -177,11 +177,12 @@ const Tasks = {
         перекрашиваем ЖИВУЮ игру без перезагрузки.
    Скин = ТОЛЬКО набор CSS-токенов на html[data-skin] (+ цвета канваса читаются из тех же
    переменных). DOM и раскладка не ветвятся (п.20 в силе). */
-const SKINS = ['crypto-light', 'crypto-dark', 'cream', 'corporate'];
-// когортные ссылки прошлой итерации не должны ломаться (те же алиасы, что в shell.js)
-const SKIN_ALIAS = { narodny: 'cream', terminal: 'crypto-dark', editorial: 'corporate', taptrade: 'cream' };
+const SKINS = ['paper', 'crypto-light', 'crypto-dark', 'cream', 'corporate'];
+// когортные ссылки прошлой итерации не должны ломаться (те же алиасы, что в shell.js;
+// narodny/taptrade исторически = папирусный 622-дизайн → снова ведут на paper)
+const SKIN_ALIAS = { narodny: 'paper', taptrade: 'paper', terminal: 'crypto-dark', editorial: 'corporate' };
 const normSkin = s => (SKINS.includes(s) ? s : (SKIN_ALIAS[s] || null));
-let SKIN = 'crypto-light';
+let SKIN = 'paper'; // дефолт = папирусный рабочий прототип (слово Павла 31.07 поздний вечер)
 function applySkin(s) {
   const k = normSkin(s);
   if (!k) return false;
@@ -189,7 +190,9 @@ function applySkin(s) {
   document.documentElement.dataset.skin = k;
   return true;
 }
-try { applySkin(new URLSearchParams(location.search).get('skin')); } catch (e) {}
+// без ?skin= применяем ДЕФОЛТ явно: иначе жёсткий data-skin из разметки оставался
+// на DOM и standalone-игра открывалась не папирусом (JS-переменная и атрибут расходились)
+try { applySkin(new URLSearchParams(location.search).get('skin') || SKIN); } catch (e) { applySkin(SKIN); }
 
 // ============================== GAME I18N (новые строки — 8 языков) ==============================
 /* Язык берём из настроек хаба (hub.state.lang). Торговые термины (Long/Short/

@@ -1,9 +1,11 @@
-/* «Trade» — ОДИН скелет, ЧЕТЫРЕ скина (вердикт владельца 31.07 вечер, п.32).
+/* «Trade» — ОДИН скелет, ПЯТЬ скинов.
    Скин приходит из хаба: ?skin=<key> в URL айфрейма + postMessage {type:'hub:skin'}.
-   Ключи: crypto-light (дефолт) / crypto-dark / cream / corporate.
+   Ключи: paper (ДЕФОЛТ, папирусный рабочий прототип — слово Павла 31.07 поздний вечер)
+   / crypto-light / crypto-dark / cream / corporate.
    DOM и раскладка НЕ ветвятся: отличаются только токены ниже + видимость
    декоративных элементов (--gtop-h, --chprice-display, --ch-flag).
    Геометрия/хексы — из Figma REST (файл MwL2GyFM68cbkVYy4XueTY):
+     paper        = ноды f2055/2057/2058 ряда 639:10784 (_рабочее/taptrade-622/spec-game-*.txt)
      crypto-light = ноды 622:32349 / 32416 / 32513  (ДС-листа нет — выведено из экранов)
      crypto-dark  = ноды 622:32566 / 32678 / 32832  (+ ДС 584:21407)
      cream        = ноды 622:32881 / 32954 / 33063  (+ ДС 584:21749)
@@ -19,6 +21,10 @@ html,body { height:100%; overflow:hidden; }
 @font-face {
   font-family:'JetBrains Mono'; font-style:normal; font-weight:100 800; font-display:swap;
   src:url('../../fonts/jetbrains-mono-var.woff2') format('woff2');
+}
+@font-face {
+  font-family:'Nunito'; font-style:normal; font-weight:200 1000; font-display:swap;
+  src:url('../../fonts/nunito-var.woff2') format('woff2');
 }
 
 /* ============================================================================
@@ -156,6 +162,116 @@ html,body { height:100%; overflow:hidden; }
   --ghost-bg:#F1F3F6; --ghost-tx:#111827;
   --heart-on:#EA3943; --heart-off:#D7DBE0;
   --home-bg:#111827; --home-tx:#FFFFFF;
+}
+
+/* ------------------------------------ paper --------------------------------
+   Папирусный игровой стиль (ДЕФОЛТ): бумага #F0DFC2 + зерно, Nunito, круговой
+   таймер 76×76 с кобальтовой дугой, белая пунктирная сетка графика, свечи
+   #13A86D/#F54040, кобальтовый флаг цены С линией, 3D-плинты кнопок.
+   Значения — spec-game-round.txt / spec-game-position.txt (f2057/f2058). */
+html[data-skin="paper"] {
+  --font-ui:'Nunito', 'Arial Rounded MT Bold', ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
+  --font-num:var(--font-ui);
+  --font-bal:var(--font-ui);
+  --bg:#F0DFC2; --card:#F0DFC2; --card2:rgba(255,255,255,.30);
+  --line:#FFFFFF; --line-w:2px;
+  --tx:#4C334A; --tx-soft:rgba(76,51,74,.70); --tx-tert:#7D6972;
+  --green:#13A86D; --red:#F54040; --accent:#4068F5; --warn:#DE8225;
+  --coin:#4C334A; --coin-pnl:#13A86D; --tint:rgba(255,255,255,.30);
+  --dot-btc:#FFB703; --dot-eth:#809CFF; --dot-sol:#A24FFF;
+  --r-card:16px; --r-chip:12px; --r-cta:16px;
+
+  --top-pt:24px; --top-h:84px;
+  --sq:40px; --sq-r:12px; --sq-bg:#F0DFC2; --sq-line:#FFFFFF; --sq-lw:2px; --sq-ico:#4C334A;
+
+  /* круговой таймер (спека: Ellipse 76×76, белый 50% диск + кобальтовая дуга) */
+  --timer-w:76px; --timer-h:76px; --timer-r:38px;
+  --timer-bg:rgba(255,255,255,.50); --timer-track:rgba(255,255,255,.55); --timer-arc:#4068F5; --timer-rw:6px;
+  --timer-tx:#4C334A; --timer-fs:18px; --timer-fw:900; --timer-font:var(--font-ui);
+
+  /* полоса баланса: белые кромки на всю ширину, внутри white-30 пилюля (Frame 152) */
+  --bal-mt:0px;
+  --balrow-bg:transparent; --balrow-line:transparent; --balrow-lw:0px; --balrow-r:37px;
+  --balrow-pad:0; --balrow-gap:6px;
+  --balpill-bg:rgba(255,255,255,.30); --balpill-line:transparent; --balpill-pad:2px 8px; --balpill-gap:3px;
+  --ballbl-tx:rgba(76,51,74,.70); --ballbl-fs:12px; --ballbl-fw:600; --ballbl-case:none;
+  --balval-tx:#4C334A; --balval-fs:16px; --balval-fw:900;
+  --coin-sz:16px;
+
+  /* график full-bleed: карточки нет, плашка-тег слева на самом графике */
+  --chart-mt:0px; --chart-h:303px;
+  --chcard-bg:transparent; --chcard-line:transparent; --chcard-lw:0px; --chcard-r:0px;
+  --chcard-pad:0px; --chcard-gap:0px;
+  --chtag-bg:rgba(255,255,255,.30); --chtag-tx:rgba(76,51,74,.70); --chtag-fs:14px; --chtag-fw:600;
+  --chtag-case:uppercase; --chtag-pad:8px 12px; --chtag-r:0;
+  --chprice-display:none;
+
+  /* канвас: белая пунктирная сетка, чернильные подписи оси, кобальтовый флаг С линией */
+  --ch-grid:rgba(255,255,255,.50); --ch-dash:6 6; --ch-lines:5;
+  --ch-axis:rgba(76,51,74,.70); --ch-axis-fs:13; --ch-axis-fw:600; --ch-axis-font:ui;
+  --ch-up:#13A86D; --ch-down:#F54040; --ch-body:0.70; --ch-wick:1; --ch-brad:1;
+  --ch-zone:rgba(34,197,94,.30); --ch-zone-line:rgba(255,255,255,1);
+  --ch-liq:rgba(245,64,64,.85);
+  --ch-flag:1; --ch-flag-bg:#4068F5; --ch-flag-tx:#FFFFFF; --ch-flag-r:8;
+  --ch-flag-fs:13; --ch-flag-fw:600; --ch-flagline:1;
+
+  /* инфо-карточка (Frame 120: крем, белый 2px контур, r16) */
+  --info-mt:8px; --info-h:79px; --info-h-pos:247px;
+  --info-bg:#F0DFC2; --info-line:#FFFFFF; --info-lw:2px; --info-r:16px; --info-pad:14px;
+  --info-shadow:none;
+  --lbl2-fs:12px; --lbl2-fw:600;
+  --pnl-fs:24px; --pnl-fw:900; --pnl-pct-fs:14px; --pnl-pct-fw:600; --pnl-pct-font:var(--font-ui);
+  --pnl-coin-sz:24px;
+  --box-bg:rgba(255,255,255,.30); --box-line:transparent; --box-lw:0px; --box-r:12px; --box-align:center;
+  --box-lbl-fs:10px; --box-lbl-fw:600; --box-val-fs:12px; --box-val-fw:900;
+  --box-val-font:var(--font-ui);
+
+  /* контролы Leverage / Trade size (пилюли 48px с плинтами, замок #DE8225) */
+  --ctl-mt:8px; --ctl-gap:8px;
+  --lbl-tx:#4C334A; --lbl-fs:14px; --lbl-fw:700; --lbl-case:none; --lbl-gap:8px;
+  --lock-tx:#DE8225;
+  --chip-h:48px; --chip-gap:8px; --chip-mt:8px;
+  --chip-bg:#F0DFC2; --chip-line:transparent; --chip-lw:0px; --chip-tx:#4C334A;
+  --chip-fs:20px; --chip-fw:900;
+  --chip-on-bg:#4068F5; --chip-on-line:#4068F5; --chip-on-tx:#FFFFFF; --chip-on-fw:900;
+  --chip-lock-bg:#4068F5; --chip-lock-line:#4068F5; --chip-lock-tx:#FFFFFF;
+  --chip-lock-op:.30;
+
+  /* CTA — Button component 622: тело 60, r16, цветной плинт (пер-цветные тени ниже) */
+  --cta-h:60px; --cta-r:16px; --cta-gap:9px; --cta-pb:24px;
+  --cta-fs:20px; --cta-fw:900; --cta-case:none; --cta-ls:0;
+  --cta-tx:#FFFFFF; --cta-shadow:none; --cta-lw:0px;
+  --btn-green:#13A86D; --btn-green-line:transparent;
+  --btn-red:#F54040;   --btn-red-line:transparent;
+  --btn-blue:#4068F5;  --btn-blue-line:transparent;
+  --btn-learn-bg:#4068F5; --btn-learn-tx:#FFFFFF; --btn-learn-r:12px;
+  --btn-learn-h:42px; --btn-learn-fs:16.5px; --btn-learn-fw:900; --btn-learn-case:none;
+  --btn-learn-shadow:0 4px 0 #3353C4, 0 7px 3px rgba(0,0,0,.15), inset 0 5px 0 rgba(255,255,255,.25), inset 0 -2px 2px rgba(0,0,0,.10);
+
+  /* Deal-экран убран из флоу (решение Павла 31.07) — токены на случай прямого захода */
+  --deal-pt:16px; --deal-g-title:28px; --deal-g-bal:78px; --deal-g-head:16px;
+  --deal-g-asset:16px; --deal-g-card:16px;
+  --deal-title-fs:24px; --deal-title-fw:900; --deal-title-align:left;
+  --dealh-fs:24px; --dealh-fw:900; --dealsub-fs:14px; --dealsub-fw:600;
+  --sq2:40px; --sq2-r:12px;
+  --dbb-dir:column; --dbb-align:center; --dbb-case:none; --dbb-fs:14px;
+  --asset-h:48px; --asset-r:16px; --asset-gap:8px; --asset-dot:32px;
+  --asset-bg:#F0DFC2; --asset-line:#FFFFFF; --asset-lw:2px; --asset-tx:#4C334A;
+  --asset-fs:14px; --asset-fw:600;
+  --asset-on-bg:#F0DFC2; --asset-on-line:#13A86D; --asset-on-lw:2px; --asset-on-tx:#4C334A;
+  --unlock-bg:#F0DFC2; --unlock-line:#FFFFFF; --unlock-lw:1px; --unlock-r:20px;
+  --unlock-pad:16px 18px; --unlock-shadow:none;
+  --du-tag-tx:#19213D; --du-tag-fs:15px; --du-tag-fw:600; --du-tag-case:none;
+  --du-tag-bg:transparent; --du-tag-pad:0; --du-tag-r:0;
+  --duico-bg:transparent; --duico-sz:20px; --duico-r:0;
+  --du-name-fs:18px; --du-name-fw:600;
+  --du-desc-fs:12px; --du-desc-fw:600; --du-desc-lh:16px;
+
+  /* оверлеи */
+  --ov-bg:rgba(60,40,20,.5); --ov-card:#F0DFC2; --ov-line:#FFFFFF; --ov-lw:3px; --ov-r:26px;
+  --ghost-bg:#e6d5b4; --ghost-tx:#4C334A;
+  --heart-on:#f04f4f; --heart-off:#d9c9a4;
+  --home-bg:#3c2b33; --home-tx:#FFFFFF;
 }
 
 /* ---------------------------------- crypto-dark ---------------------------- */
@@ -435,6 +551,7 @@ body {
   font-size:var(--gtop-fs); font-weight:var(--gtop-fw);
   pointer-events:none;
 }
+html[data-skin="paper"] #gtopbar,
 html[data-skin="crypto-light"] #gtopbar,
 html[data-skin="crypto-dark"] #gtopbar,
 html[data-skin="cream"] #gtopbar { display:none; }
@@ -963,3 +1080,69 @@ html[data-skin="corporate"] .du-ico { width:32px; height:32px; }
   background:#f0a92e; color:#fff; font-size:10px; font-weight:800;
   padding:2px 8px; border-radius:9px; letter-spacing:.3px;
 }
+
+/* ============================================================================
+   PAPER component layer — папирусные отличия, не выражаемые токенами
+   (spec-game-round/position.txt, f2057/f2058; язык 251880e).
+   ============================================================================ */
+/* бумажная фактура Paper_02 (15% альфа вшита в webp) поверх фона стейджа */
+html[data-skin="paper"] #stage::before {
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
+  background:url('../../paper.webp') center / cover no-repeat;
+}
+/* верхняя строка по спеке f2057: pause/кебаб прижаты к верху (y24), таймер выше (y12).
+   ⚠️ align-items:center здесь НЕЛЬЗЯ: ряд высотой 84 спускал pause на y46 — ровно под
+   плавающую кнопку «назад» шелла (#gameBack, y64..102), тап по паузе выкидывал в хаб */
+html[data-skin="paper"] #topbar { align-items:start; }
+html[data-skin="paper"] #timerCircle { margin-top:-12px; }
+/* верхние квадратные кнопки: белый 2px контур + жёсткая тень (DROP 0,4 10%) */
+html[data-skin="paper"] .squarebtn { box-shadow:0 4px 0 rgba(0,0,0,.10); }
+html[data-skin="paper"] .squarebtn:active { transform:translateY(3px); box-shadow:0 1px 0 rgba(0,0,0,.10); }
+html[data-skin="paper"] .squarebtn.dark { box-shadow:0 7px 0 #241a1f; }
+html[data-skin="paper"] .squarebtn.dark:active { box-shadow:0 2px 0 #241a1f; }
+/* полоса баланса: белые кромки на всю ширину + жёсткая тень (Frame 152) */
+html[data-skin="paper"] #balanceBand {
+  background:var(--bg);
+  border-top:2px solid #fff; border-bottom:2px solid #fff;
+  box-shadow:0 4px 0 rgba(0,0,0,.06);
+  padding:8px 12px;
+}
+/* плашка «BITCOIN CHART (BTC/USD)»: прижата к левому краю, скругление только справа */
+html[data-skin="paper"] #chartTag { border-radius:0 12px 12px 0; align-self:flex-start; }
+html[data-skin="paper"] #chartWrap { margin-left:0; margin-right:0; }
+html[data-skin="paper"] .chart-head { position:relative; z-index:2; }
+/* контурная монета CoinVertical вместо solid-точки */
+html[data-skin="paper"] .coin-dot {
+  background:none; border:1.6px solid var(--coin); position:relative;
+}
+html[data-skin="paper"] .coin-dot::after {
+  content:''; position:absolute; top:0; bottom:0; left:30%; width:44%;
+  transform:translateX(-50%); border:1.3px solid var(--coin); border-radius:50%;
+  box-sizing:border-box;
+}
+html[data-skin="paper"] .coin-dot[data-coin="BTC"] { background:none; border-color:var(--dot-btc); }
+html[data-skin="paper"] .coin-dot[data-coin="BTC"]::after { border-color:var(--dot-btc); }
+html[data-skin="paper"] .coin-dot[data-coin="ETH"] { background:none; border-color:var(--dot-eth); }
+html[data-skin="paper"] .coin-dot[data-coin="ETH"]::after { border-color:var(--dot-eth); }
+html[data-skin="paper"] .coin-dot[data-coin="SOL"] { background:none; border-color:var(--dot-sol); }
+html[data-skin="paper"] .coin-dot[data-coin="SOL"]::after { border-color:var(--dot-sol); }
+html[data-skin="paper"] .pnl-coin { background:none; border-color:var(--coin-pnl); }
+html[data-skin="paper"] .pnl-coin::after { border-color:var(--coin-pnl); }
+/* CTA: 3D-плинт цветом кнопки (Button component 622) + тень лейбла */
+html[data-skin="paper"] .bigbtn.green { box-shadow:0 6px 0 #108859, 0 10px 4px rgba(0,0,0,.18), inset 0 6px 0 rgba(255,255,255,.25), inset 0 -2px 2px rgba(0,0,0,.10); }
+html[data-skin="paper"] .bigbtn.red   { box-shadow:0 6px 0 #C02F2F, 0 10px 4px rgba(0,0,0,.18), inset 0 6px 0 rgba(255,255,255,.25), inset 0 -2px 2px rgba(0,0,0,.10); }
+html[data-skin="paper"] .bigbtn.blue  { box-shadow:0 6px 0 #3353C4, 0 10px 4px rgba(0,0,0,.18), inset 0 6px 0 rgba(255,255,255,.25), inset 0 -2px 2px rgba(0,0,0,.10); }
+html[data-skin="paper"] .bigbtn .btn-label { text-shadow:0 2px 0 rgba(0,0,0,.15); }
+html[data-skin="paper"] .bigbtn:active, html[data-skin="paper"] .bigbtn.pressed { transform:translateY(4px); }
+html[data-skin="paper"] .bigbtn.green:active { box-shadow:0 2px 0 #108859, inset 0 6px 0 rgba(255,255,255,.25); }
+html[data-skin="paper"] .bigbtn.red:active   { box-shadow:0 2px 0 #C02F2F, inset 0 6px 0 rgba(255,255,255,.25); }
+html[data-skin="paper"] .bigbtn.blue:active  { box-shadow:0 2px 0 #3353C4, inset 0 6px 0 rgba(255,255,255,.25); }
+/* пилюли контролов: плинт-тень (Box DROP 0,10 20% в спеке ≈ 5px цоколь) */
+html[data-skin="paper"] .pills button {
+  box-shadow:0 5px 0 rgba(0,0,0,.20), 0 6px 3px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.55);
+}
+html[data-skin="paper"] .pills button:active { transform:translateY(3px); box-shadow:0 2px 0 rgba(0,0,0,.20); }
+html[data-skin="paper"] .pills button.on { box-shadow:0 5px 0 #3353C4, 0 6px 3px rgba(0,0,0,.10); }
+html[data-skin="paper"] .pills button.unlock { box-shadow:0 5px 0 rgba(0,0,0,.25); }
+/* сердца в тонкой белой обводке (язык 251880e) */
+html[data-skin="paper"] .heart { filter:drop-shadow(0 2px 0 #fff); }
