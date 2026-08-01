@@ -1832,7 +1832,18 @@ body[data-skin="corporate"] .legal { font-size:12.5px; line-height:18.7px; margi
 body[data-skin="crypto-dark"] .legal { font-size:12.5px; line-height:18.7px; margin-top:50px; }
 /* ----- verify ----- */
 #scr-verify .signup-body { padding-bottom:41.6px; }
-.vf-back { display:none; } /* terminal-only back circle (mockup C) */
+.vf-back { display:none; } /* back-circle: paper (мокап 622 header-back) + crypto-dark (мокап C) */
+/* paper: белый-30 круг со стрелкой сверху слева (622-мокапы auth-code-input/error, header-back
+   40×40 white-30 r20 на (16,51) 375-фрейма → ×1.04, минус statusbar) — заменяет крестик;
+   на sign-up мокап выхода не рисует вовсе — тот же кружок как единый язык (★draft) */
+body[data-skin="paper"] #scr-verify .xbtn { display:none !important; }
+body[data-skin="paper"] .vf-back {
+  display:flex; align-items:center; justify-content:center;
+  position:absolute; top:8.3px; left:16.6px; z-index:6;
+  width:41.6px; height:41.6px; border-radius:50%;
+  background:var(--card); color:var(--tx); box-shadow:none;
+}
+
 body[data-skin="crypto-dark"] .vf-back {
   display:flex; align-items:center; justify-content:center; align-self:flex-start;
   width:37.4px; height:37.4px; border-radius:50%; margin-bottom:25px;
