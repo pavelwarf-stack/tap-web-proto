@@ -167,7 +167,7 @@ let LANG = 'en';
 const I18N = {
 en: {
   /* webv1: одна игра + лестница механик (решения встречи 24.07) */
-  'game.trade.desc': 'Buy and sell Bitcoin on the live chart',
+  'game.trade.desc': 'Full trading cycle – take your profit. Live action on the chart in real time.', // ★draft EN wording (мокап 622: «Полный торговый цикл, забери прибыль…»)
   'home.stage': 'Stage {0} of {1}', 'home.next': 'Next unlock: {0}', 'home.max': 'All mechanics unlocked',
   'stage.1': 'Buy & sell', 'stage.2': 'Shorts', 'stage.3': 'Leverage ×2–×5', 'stage.4': 'Partial positions',
   'prof.intents': 'Purchase intents',
@@ -221,6 +221,8 @@ en: {
   'rc.next': 'Next round', 'rc.repeat': 'Repeat round', 'rc.unlock': 'New mechanic unlocked!', 'rc.fwbonus': 'First win bonus',
   'mech.short': 'Short selling', 'mech.short.d': 'Now you can open short positions and bet on the price falling',
   'mech.lev': 'Leverage', 'mech.lev.d': 'Now you can multiply your entry with ×2–×5 leverage',
+  // ★draft: партиал-карточка после онбординга r3 — копирайт мой (слово Павла 31.07, макета нет)
+  'mech.partial': 'Partial positions', 'mech.partial.d': 'Enter with 25/50/75% of your balance while the rest waits in cash – unlock via the lock on the Trade size row',
   'play': 'Play', 'diff.easy': 'Easy', 'diff.medium': 'Medium', 'diff.hard': 'Hard',
   'game.prognoz.desc': 'Guess the next candle direction',
   'game.sdelka.desc': 'Full trade cycle, take your profit',
@@ -336,7 +338,7 @@ en: {
   't.stats': 'Statistics: {0}', 't.sharestats': 'My Tap Trading stats: {0} games, best win {1} chips, favorite — {2}.',
 },
 es: {
-  'game.trade.desc': 'Compra y vende Bitcoin en el gráfico en vivo',
+  'game.trade.desc': 'Ciclo completo de trading – llévate tu ganancia. Acción en vivo en el gráfico en tiempo real.',
   'home.stage': 'Etapa {0} de {1}', 'home.next': 'Próximo desbloqueo: {0}', 'home.max': 'Todas las mecánicas desbloqueadas',
   'stage.1': 'Comprar y vender', 'stage.2': 'Shorts', 'stage.3': 'Apalancamiento ×2–×5', 'stage.4': 'Posiciones parciales',
   'prof.intents': 'Intenciones de compra',
@@ -387,6 +389,7 @@ es: {
   'rc.next': 'Siguiente ronda', 'rc.repeat': 'Repetir ronda', 'rc.unlock': '¡Nueva mecánica desbloqueada!', 'rc.fwbonus': 'Bono por primera victoria',
   'mech.short': 'Venta Short', 'mech.short.d': 'Ahora puedes abrir posiciones Short y apostar a la caída del precio',
   'mech.lev': 'Apalancamiento', 'mech.lev.d': 'Ahora puedes multiplicar tu entrada con apalancamiento ×2–×5',
+  'mech.partial': 'Posiciones parciales', 'mech.partial.d': 'Entra con el 25/50/75% de tu saldo y el resto espera en efectivo – se abre con el candado de la fila Trade size',
   'play': 'Jugar', 'diff.easy': 'Fácil', 'diff.medium': 'Media', 'diff.hard': 'Difícil',
   'game.prognoz.desc': 'Adivina la dirección de la próxima vela',
   'game.sdelka.desc': 'Ciclo completo de trade, toma tu ganancia',
@@ -501,7 +504,7 @@ es: {
   't.stats': 'Estadísticas: {0}', 't.sharestats': 'Mis stats de Tap Trading: {0} partidas, mejor premio {1} fichas, favorito — {2}.',
 },
 fr: {
-  'game.trade.desc': 'Achète et vends du Bitcoin sur le graphique en direct',
+  'game.trade.desc': 'Cycle de trading complet – prends ton profit. Action en direct sur le graphique en temps réel.',
   'home.stage': 'Étape {0} sur {1}', 'home.next': 'Prochain déblocage : {0}', 'home.max': 'Toutes les mécaniques débloquées',
   'stage.1': 'Acheter et vendre', 'stage.2': 'Shorts', 'stage.3': 'Levier ×2–×5', 'stage.4': 'Positions partielles',
   'prof.intents': 'Intentions d’achat',
@@ -552,6 +555,7 @@ fr: {
   'rc.next': 'Manche suivante', 'rc.repeat': 'Rejouer la manche', 'rc.unlock': 'Nouvelle mécanique débloquée !', 'rc.fwbonus': 'Bonus de première victoire',
   'mech.short': 'Vente Short', 'mech.short.d': 'Tu peux désormais ouvrir des positions Short et parier sur la baisse du prix',
   'mech.lev': 'Levier', 'mech.lev.d': 'Tu peux désormais multiplier ton entrée avec un levier ×2–×5',
+  'mech.partial': 'Positions partielles', 'mech.partial.d': 'Entre avec 25/50/75% de ton solde, le reste attend en cash – à débloquer via le cadenas de la ligne Trade size',
   'play': 'Jouer', 'diff.easy': 'Facile', 'diff.medium': 'Moyen', 'diff.hard': 'Difficile',
   'game.prognoz.desc': 'Devine la direction de la prochaine bougie',
   'game.sdelka.desc': 'Cycle de trade complet, prends ton profit',
@@ -666,7 +670,7 @@ fr: {
   't.stats': 'Statistiques : {0}', 't.sharestats': 'Mes stats Tap Trading : {0} parties, meilleur gain {1} jetons, préféré — {2}.',
 },
 de: {
-  'game.trade.desc': 'Kaufe und verkaufe Bitcoin am Live-Chart',
+  'game.trade.desc': 'Voller Trading-Zyklus – hol dir deinen Gewinn. Live-Action auf dem Chart in Echtzeit.',
   'home.stage': 'Stufe {0} von {1}', 'home.next': 'Nächste Freischaltung: {0}', 'home.max': 'Alle Mechaniken freigeschaltet',
   'stage.1': 'Kaufen & verkaufen', 'stage.2': 'Shorts', 'stage.3': 'Hebel ×2–×5', 'stage.4': 'Teilpositionen',
   'prof.intents': 'Kaufabsichten',
@@ -717,6 +721,7 @@ de: {
   'rc.next': 'Nächste Runde', 'rc.repeat': 'Runde wiederholen', 'rc.unlock': 'Neue Mechanik freigeschaltet!', 'rc.fwbonus': 'Bonus für den ersten Sieg',
   'mech.short': 'Short-Verkauf', 'mech.short.d': 'Jetzt kannst du Short-Positionen eröffnen und auf fallende Preise setzen',
   'mech.lev': 'Hebel', 'mech.lev.d': 'Jetzt kannst du deinen Einstieg mit ×2–×5-Hebel vervielfachen',
+  'mech.partial': 'Teilpositionen', 'mech.partial.d': 'Steig mit 25/50/75% deines Guthabens ein, der Rest wartet im Cash – freigeschaltet über das Schloss in der Trade-size-Zeile',
   'play': 'Spielen', 'diff.easy': 'Leicht', 'diff.medium': 'Mittel', 'diff.hard': 'Schwer',
   'game.prognoz.desc': 'Errate die Richtung der nächsten Kerze',
   'game.sdelka.desc': 'Kompletter Trade-Zyklus, nimm deinen Gewinn mit',
@@ -831,7 +836,7 @@ de: {
   't.stats': 'Statistik: {0}', 't.sharestats': 'Meine Tap-Trading-Stats: {0} Runden, bester Gewinn {1} Chips, Favorit — {2}.',
 },
 ja: {
-  'game.trade.desc': 'ライブチャートでビットコインを売買しよう',
+  'game.trade.desc': 'フルの取引サイクル – 利益を確定しよう。リアルタイムのチャートでライブの値動きを。',
   'home.stage': 'ステージ {0} / {1}', 'home.next': '次の解放: {0}', 'home.max': '全メカニクス解放済み',
   'stage.1': '売買', 'stage.2': 'ショート', 'stage.3': 'レバレッジ ×2–×5', 'stage.4': '部分ポジション',
   'prof.intents': '購入意向',
@@ -882,6 +887,7 @@ ja: {
   'rc.next': '次のラウンド', 'rc.repeat': 'ラウンドをやり直す', 'rc.unlock': '新メカニクス解放！', 'rc.fwbonus': '初勝利ボーナス',
   'mech.short': 'Short（空売り）', 'mech.short.d': 'Shortポジションを開いて価格の下落に賭けられるようになった',
   'mech.lev': 'レバレッジ', 'mech.lev.d': '×2–×5のレバレッジでエントリー額を増やせるようになった',
+  'mech.partial': '部分ポジション', 'mech.partial.d': '残高の25/50/75%でエントリーし、残りは現金で待機 – Trade size行のロックから解放できる',
   'play': 'プレイ', 'diff.easy': '初級', 'diff.medium': '中級', 'diff.hard': '上級',
   'game.prognoz.desc': '次のローソクの方向を当てよう',
   'game.sdelka.desc': '取引の全サイクルで利益を狙おう',
@@ -996,7 +1002,7 @@ ja: {
   't.stats': '統計: {0}', 't.sharestats': '私のTap Trading統計: {0}回プレイ、最高勝利{1}チップ、お気に入り — {2}。',
 },
 zh: {
-  'game.trade.desc': '在实时图表上买卖比特币',
+  'game.trade.desc': '完整交易周期 – 拿走你的利润。实时图表上的实况行情。',
   'home.stage': '第 {0} 阶段，共 {1} 阶段', 'home.next': '下一个解锁: {0}', 'home.max': '所有机制已解锁',
   'stage.1': '买入卖出', 'stage.2': '做空', 'stage.3': '杠杆 ×2–×5', 'stage.4': '部分仓位',
   'prof.intents': '购买意向',
@@ -1047,6 +1053,7 @@ zh: {
   'rc.next': '下一局', 'rc.repeat': '重玩本局', 'rc.unlock': '解锁新机制！', 'rc.fwbonus': '首胜奖励',
   'mech.short': 'Short 卖空', 'mech.short.d': '现在你可以开 Short 仓位，押注价格下跌',
   'mech.lev': '杠杆', 'mech.lev.d': '现在你可以用 ×2–×5 杠杆放大入场金额',
+  'mech.partial': '部分仓位', 'mech.partial.d': '用余额的25/50/75%入场，其余留作现金 – 通过 Trade size 行的锁解锁',
   'play': '开始', 'diff.easy': '简单', 'diff.medium': '中等', 'diff.hard': '困难',
   'game.prognoz.desc': '猜下一根K线的方向',
   'game.sdelka.desc': '完整交易周期，拿走你的利润',
@@ -1161,7 +1168,7 @@ zh: {
   't.stats': '统计: {0}', 't.sharestats': '我的Tap Trading统计: {0}局，最高赢利{1}筹码，最爱 — {2}。',
 },
 pt: {
-  'game.trade.desc': 'Compre e venda Bitcoin no gráfico ao vivo',
+  'game.trade.desc': 'Ciclo completo de trading – pegue seu lucro. Ação ao vivo no gráfico em tempo real.',
   'home.stage': 'Fase {0} de {1}', 'home.next': 'Próximo desbloqueio: {0}', 'home.max': 'Todas as mecânicas desbloqueadas',
   'stage.1': 'Comprar e vender', 'stage.2': 'Shorts', 'stage.3': 'Alavancagem ×2–×5', 'stage.4': 'Posições parciais',
   'prof.intents': 'Intenções de compra',
@@ -1212,6 +1219,7 @@ pt: {
   'rc.next': 'Próxima rodada', 'rc.repeat': 'Repetir rodada', 'rc.unlock': 'Nova mecânica desbloqueada!', 'rc.fwbonus': 'Bônus da primeira vitória',
   'mech.short': 'Venda Short', 'mech.short.d': 'Agora você pode abrir posições Short e apostar na queda do preço',
   'mech.lev': 'Alavancagem', 'mech.lev.d': 'Agora você pode multiplicar sua entrada com alavancagem ×2–×5',
+  'mech.partial': 'Posições parciais', 'mech.partial.d': 'Entre com 25/50/75% do saldo enquanto o resto espera em caixa – desbloqueie pelo cadeado na linha Trade size',
   'play': 'Jogar', 'diff.easy': 'Fácil', 'diff.medium': 'Médio', 'diff.hard': 'Difícil',
   'game.prognoz.desc': 'Adivinhe a direção da próxima vela',
   'game.sdelka.desc': 'Ciclo completo de trade, garanta seu lucro',
@@ -1326,7 +1334,7 @@ pt: {
   't.stats': 'Estatísticas: {0}', 't.sharestats': 'Minhas estatísticas do Tap Trading: {0} partidas, maior prêmio {1} fichas, favorito — {2}.',
 },
 ar: {
-  'game.trade.desc': 'اشترِ وبِع البيتكوين على الرسم البياني المباشر',
+  'game.trade.desc': 'دورة تداول كاملة – خذ ربحك. حركة مباشرة على الرسم البياني في الوقت الفعلي.',
   'home.stage': 'المرحلة {0} من {1}', 'home.next': 'الفتح التالي: {0}', 'home.max': 'كل الآليات مفتوحة',
   'stage.1': 'شراء وبيع', 'stage.2': 'شورت', 'stage.3': 'رافعة ×2–×5', 'stage.4': 'صفقات جزئية',
   'prof.intents': 'نوايا الشراء',
@@ -1377,6 +1385,7 @@ ar: {
   'rc.next': 'الجولة التالية', 'rc.repeat': 'إعادة الجولة', 'rc.unlock': 'فُتحت آلية جديدة!', 'rc.fwbonus': 'مكافأة الفوز الأول',
   'mech.short': 'بيع Short', 'mech.short.d': 'يمكنك الآن فتح صفقات Short والمراهنة على هبوط السعر',
   'mech.lev': 'الرافعة المالية', 'mech.lev.d': 'يمكنك الآن مضاعفة دخولك برافعة ×2–×5',
+  'mech.partial': 'صفقات جزئية', 'mech.partial.d': 'ادخل بـ 25/50/75% من رصيدك والباقي ينتظر نقدًا – يُفتح عبر القفل في صف Trade size',
   'play': 'العب', 'diff.easy': 'سهل', 'diff.medium': 'متوسط', 'diff.hard': 'صعب',
   'game.prognoz.desc': 'خمّن اتجاه الشمعة التالية',
   'game.sdelka.desc': 'دورة تداول كاملة، خذ ربحك',
@@ -2174,7 +2183,7 @@ window.addEventListener('message', e => {
   // «пик» (вердикт 25.07): ЕДИНСТВЕННЫЙ триггер — 3 выигранных раунда подряд с PnL ≥ +30%
   // (флаг считает игра и передаёт в roundEnd; «на деле будет позже» — примечание владельца)
   if (d.peak) maybeTriggerPeak('streak30');
-  handleRoundEnd(d.game, earned, { sim: !!d.sim, stage: +d.stage || 0, stagedUp: !!d.stagedUp });
+  handleRoundEnd(d.game, earned, { sim: !!d.sim, stage: +d.stage || 0, stagedUp: !!d.stagedUp, obRound: +d.obRound || 0 });
 });
 
 function extractTiles(g) {
@@ -2228,10 +2237,13 @@ function handleRoundEnd(g, earned, opts = {}) {
   if (first) S.firstWin = true;
 
   // анлок-карточка на Round Complete (mockup onb1-6): сим-раунд 1 → «Short selling»,
-  // сим-раунд 2 → «Leverage» (★ draft — макета нет, тот же паттерн); после сим-раунда 3
-  // и обучения 4-й механики карточки нет (реальные раунды/прежний флоу)
+  // сим-раунд 2 → «Leverage», сим-раунд 3 → «Partial positions» (анонс: сама механика
+  // открывается замком на Trade size; слово Павла 31.07 «после всего онбординга показать
+  // частичные»). lev/partial ★draft — макета нет, паттерн карточки Short selling.
+  // После тренировки частичных (sim без obRound) карточки нет — реальные раунды/прежний флоу
   const unlock = (opts.sim && opts.stagedUp && opts.stage === 2) ? 'short' :
-    (opts.sim && opts.stagedUp && opts.stage === 3) ? 'lev' : null;
+    (opts.sim && opts.stagedUp && opts.stage === 3) ? 'lev' :
+    (opts.sim && opts.obRound === 3) ? 'partial' : null;
   lastRound = { game: g, earned: chips, rawDelta, tiles: extractTiles(g), sim: !!opts.sim, first, unlock };
 
   sessionTriggers();
@@ -2268,8 +2280,9 @@ function showRoundComplete() {
   if (r.unlock) {
     $('#rcUnlockName').textContent = t('mech.' + r.unlock);
     $('#rcUnlockDesc').textContent = t('mech.' + r.unlock + '.d');
-    un.classList.toggle('draft', r.unlock === 'lev'); // «Leverage» card — no mockup, mine
-    un.dataset.draft = r.unlock === 'lev' ? 'Leverage unlock card: same pattern as mockup Short selling — no own mockup' : '';
+    un.classList.toggle('draft', r.unlock !== 'short'); // only Short selling has a mockup
+    un.dataset.draft = r.unlock === 'lev' ? 'Leverage unlock card: same pattern as mockup Short selling — no own mockup' :
+      r.unlock === 'partial' ? 'Partial positions card after onboarding r3 (owner 31.07): same pattern, copy is mine' : '';
   }
   $('#rcFw').hidden = !r.first;
   const tiles = $('#rcTiles');
@@ -2299,8 +2312,9 @@ function showRoundComplete() {
    события; каждый сим-раунд = свой iframe-запуск через openGame.
    Формат шага:
      key   — строка словаря (жирные акценты — <b> в самой строке);
-     win   — окна в затемнении (строка/массив), dim — патч-затемнение соседа,
-             arrow — белая стрелка [селектор, UL|DL|DR], top — CSS-позиция бабла;
+     win   — светлые окна в скриме (строка/массив селекторов игры); всё вне окон
+             затемнено И глотает тапы — отдельный dim-патч соседа больше не нужен;
+     arrow — белая стрелка [селектор, UL|DL|DR], top — CSS-позиция бабла;
      on    — шаг ЖДЁТ события: баблы прячутся, игра живёт (таймер идёт), бабл
              выстреливает при событии (или сразу, если событие уже случилось);
      wait  — шаг закрывается НЕ Некстом, а реальным тапом: 'enter'/'enter:1'/
@@ -2321,8 +2335,8 @@ const OB_TUT = [
   ],
   [ // round 2 — short: интро → рост → разворот (Short!) → падение → дно (Close!)
     { key: 'ob2.1' },
-    { key: 'ob2.2', win: ['#chartWrap', '#btnShort'], dim: '#btnLong' },
-    { key: 'ob2.3', on: 'phase:turn', wait: 'enter:-1', win: ['#chartWrap', '#btnShort'], dim: '#btnLong', arrow: ['#btnShort', 'DR'] },
+    { key: 'ob2.2', win: ['#chartWrap', '#btnShort'] },
+    { key: 'ob2.3', on: 'phase:turn', wait: 'enter:-1', win: ['#chartWrap', '#btnShort'], arrow: ['#btnShort', 'DR'] },
     { key: 'ob2.4', win: ['#chartWrap', '#infoCard'] },
     { key: 'ob2.5', on: 'phase:bottom', wait: 'exit', win: ['#chartWrap', '#btnExit'], arrow: ['#btnExit', 'DL'] },
     { key: 'ob2.6' },
@@ -2331,7 +2345,7 @@ const OB_TUT = [
     { key: 'ob3.1' },
     { key: 'ob3.2', win: '#levCtl', arrow: ['#levCtl', 'DL'] },
     { key: 'ob3.3' },
-    { key: 'ob3.4', on: 'phase:rebound', wait: 'enter:1', win: ['#chartWrap', '#ctlBar', '#btnLong'], dim: '#btnShort', arrow: ['#btnLong', 'DL'] },
+    { key: 'ob3.4', on: 'phase:rebound', wait: 'enter:1', win: ['#chartWrap', '#ctlBar', '#btnLong'], arrow: ['#btnLong', 'DL'] },
     { key: 'ob3.5', win: ['#chartWrap', '#liqBlock'], arrow: ['#liqBlock', 'DL'] },
     { key: 'ob3.6', on: 'phase:stall', wait: 'exit', win: ['#chartWrap', '#btnExit'], arrow: ['#btnExit', 'DL'] },
     { key: 'ob3.7' },
@@ -2343,7 +2357,7 @@ const OB_TUT = [
 const PARTIAL_TUT = [
   { key: 'obp.1', win: ['#chartWrap', '#fracCtl'], arrow: ['#fracCtl', 'DL'] },
   { key: 'obp.2', wait: 'frac', win: ['#chartWrap', '#fracCtl'], arrow: ['#fracCtl', 'DL'] },
-  { key: 'obp.3', on: 'phase:rebound', wait: 'enter', win: ['#chartWrap', '#fracCtl', '#btnLong'], dim: '#btnShort', arrow: ['#btnLong', 'DL'] },
+  { key: 'obp.3', on: 'phase:rebound', wait: 'enter', win: ['#chartWrap', '#fracCtl', '#btnLong'], arrow: ['#btnLong', 'DL'] },
   { key: 'obp.4', win: ['#balanceBand', '#infoCard'], arrow: ['#balanceBand', 'UL'] },
   { key: 'obp.5', on: 'phase:stall', wait: 'exit', win: ['#chartWrap', '#btnExit'], arrow: ['#btnExit', 'DL'] },
   { key: 'obp.6' },
@@ -2387,16 +2401,21 @@ function tutBoot() {
     }
   }, 150);
 }
+/* скруглённый прямоугольник-«окно» как подпуть SVG (вырезается из скрима evenodd-правилом) */
+function tutWinPath(x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  return `M${x + r} ${y}H${x + w - r}A${r} ${r} 0 0 1 ${x + w} ${y + r}V${y + h - r}` +
+    `A${r} ${r} 0 0 1 ${x + w - r} ${y + h}H${x + r}A${r} ${r} 0 0 1 ${x} ${y + h - r}` +
+    `V${y + r}A${r} ${r} 0 0 1 ${x + r} ${y}Z`;
+}
 function tutLayout() {
-  const t = $('#tutorial'), card = $('#tutCard'), band = $('#tutBand');
+  const card = $('#tutCard');
   const cfg = (tutSeq || [])[tutStep] || {};
   const arrows = { UL: $('#tutArrowUL'), DL: $('#tutArrowDL'), DR: $('#tutArrowDR') };
   for (const k in arrows) arrows[k].style.display = 'none';
   card.removeAttribute('style');
-  t.style.background = '';
-  band.hidden = true;
   const lay = $('#gamelayer');
-  const H = lay.clientHeight;
+  const W = lay.clientWidth, H = lay.clientHeight;
   let rect = () => null;
   try {
     const doc = $('#gameframe').contentWindow.document;
@@ -2407,70 +2426,43 @@ function tutLayout() {
       return (r.width > 0 && r.height > 0) ? r : null;
     };
   } catch (err) {}
-  // 1) окна в затемнении (mockup: чарт/кнопка-цель/лев-ряд остаются светлыми).
-  //    cfg.win: строка = одно окно, массив = несколько горизонтальных полос
+  // 1) затемнение «окнами» (мокап 12514/12824: скрим #464646 50% на ВСЁМ, кроме целей
+  //    шага — Rectangle 7290/7291, цель отрисована ПОВЕРХ). Один evenodd-путь: полный
+  //    экран минус скруглённые окна по живым ректам целей (±4px воздуха). Неправильные
+  //    контролы в тех же рядах остаются под скримом — и он глотает их тапы (CSS .wait)
   const winSels = cfg.win ? (Array.isArray(cfg.win) ? cfg.win : [cfg.win]) : [];
-  const bands = [];
+  let dimPath = `M0 0H${W}V${H}H0Z`;
   for (const sel of winSels) {
     const r = rect(sel);
-    if (r) bands.push([Math.round(r.top - 4), Math.round(r.bottom + 4)]);
+    if (r) dimPath += tutWinPath(Math.round(r.left - 4), Math.round(r.top - 4),
+      Math.round(r.width + 8), Math.round(r.height + 8), 16);
   }
-  if (bands.length) {
-    bands.sort((a, b) => a[0] - b[0]);
-    const DIM = 'rgba(70,70,70,.5)';
-    const stops = [];
-    let cur = 0;
-    for (let [bt, bb] of bands) {
-      bt = Math.max(bt, cur); bb = Math.max(bb, bt);
-      stops.push(`${DIM} ${cur}px ${bt}px`, `transparent ${bt}px ${bb}px`);
-      cur = bb;
-    }
-    stops.push(`${DIM} ${cur}px 100%`);
-    t.style.background = `linear-gradient(${stops.join(',')})`;
-  }
-  // 1б) патч-затемнение соседа в светлой полосе (onb2-2/3: вторая кнопка пары тёмная)
-  const dimEl = $('#tutDim');
-  dimEl.hidden = true;
-  if (cfg.dim) {
-    const dR = rect(cfg.dim);
-    if (dR) {
-      dimEl.hidden = false;
-      dimEl.style.cssText = `top:${Math.round(dR.top - 4)}px;left:${Math.round(dR.left)}px;` +
-        `width:${Math.round(dR.width)}px;height:${Math.round(dR.height + 8)}px;`;
-    }
-  }
-  // 2) зелёная зона профита поверх чарта (mockup Rectangle 7271)
-  if (cfg.band !== undefined) {
-    const ch = rect('#chartWrap');
-    if (ch) {
-      band.hidden = false;
-      band.style.top = Math.round(ch.top + ch.height * cfg.band - 33) + 'px';
-    }
-  }
-  // 3) стрелка + позиция бабла
+  $('#tutDimPath').setAttribute('d', dimPath);
+  // 2) стрелка + позиция бабла (жёсткая геометрия мокапов, 375-кадр → ×1.04)
   const aSpec = cfg.arrow, aR = aSpec ? rect(aSpec[0]) : null;
   if (aSpec && aR) {
-    const arr = arrows[aSpec[1]];
-    const aw = aSpec[1] === 'UL' ? 67 : 56, ah = aSpec[1] === 'UL' ? 60 : 66;
-    if (aSpec[1] === 'UL') {
-      // стрелка НАД баблом, указывает вверх-влево в якорь (onb1-1: прайс-кард)
-      const aTop = Math.round(aR.top - 2);
-      arr.style.cssText = `display:block;top:${aTop}px;left:${Math.round(aR.left + 44)}px;`;
-      card.style.cssText = `top:${Math.round(aR.bottom + 26)}px;bottom:auto;`;
+    const kind = aSpec[1], arr = arrows[kind];
+    if (kind === 'UL') {
+      // 12514: стрелка ЛЕЖИТ у верха якоря (bbox −5 от верха, +43 от левого края цели),
+      // указывает вверх-влево; бабл ниже якоря с зазором 23 (553 − 530)
+      const aTop = Math.round(aR.top - 5.2);
+      arr.style.cssText = `display:block;top:${aTop}px;left:${Math.round(aR.left + 44.6)}px;`;
+      card.style.cssText = `top:${Math.round(aR.bottom + 23.9)}px;bottom:auto;`;
     } else {
-      // стрелка МЕЖДУ баблом и якорем снизу (кнопки/лев-ряд/ликвидация);
-      // кончик КАСАЕТСЯ цели (QA 30.07: раньше зависал на ряд выше — зазор −ah−4)
-      const aTop = Math.round(aR.top - ah + 8);
-      const ax = aSpec[1] === 'DR'
-        ? Math.round(Math.min(aR.left + aR.width * .72, 390 - aw - 8))
+      // 12824: стрелка над целью, кончик ВХОДИТ в цель на ~27px (718 − 681 = 37 = 65.5−27+…);
+      // бабл над стрелкой с зазором 13.5 (681 − 668)
+      const aw = 56.4, ah = 65.5;
+      const aTop = Math.round(aR.top - ah + 27);
+      const ax = kind === 'DR'
+        ? Math.round(Math.min(aR.left + Math.min(52.5, aR.width * .3), W - aw - 8))
         : Math.round(Math.max(aR.left + aR.width * .25 - aw / 2, 8));
       arr.style.cssText = `display:block;top:${aTop}px;left:${ax}px;`;
-      card.style.cssText = `bottom:${H - aTop + 4}px;top:auto;`;
+      card.style.cssText = `bottom:${Math.round(H - aTop + 13.5)}px;top:auto;`;
     }
   } else if (cfg.top !== undefined) {
     card.style.cssText = `top:${cfg.top}px;bottom:auto;`;
   }
-  // фолбэк без якоря: CSS-позиция бабла (bottom:176px), полное затемнение
+  // фолбэк без якоря: CSS-позиция бабла (bottom:149.8px — низ бабла мокапа), полное затемнение
 }
 /* прогон текущего шага: обычный шаг показывается сразу; шаг с cfg.on прячет баблы
    и ждёт события игры (или показывается сразу, если событие уже в буфере) */

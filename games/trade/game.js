@@ -1465,6 +1465,12 @@ function finishRound() {
   const isBest = profit > G.best;
   if (isBest) { G.best = profit; localStorage.setItem('trade_best', String(profit)); }
 
+  // в хабе СВОЙ экран результатов НЕ показываем (слово Павла 31.07: «два экрана резов —
+  // надо чтобы был второй»): раунд уже отчитан hub:roundEnd, шелл через ~0.9с закроет
+  // iframe и покажет Round Complete — игра остаётся замороженной под ним без вспышки.
+  // Standalone (window.parent === window) живёт по-старому
+  if (window.parent !== window) return;
+
   $('resScore').textContent = fmtCoins(profit, true);
   $('resScore').style.color = profit < 0 ? 'var(--red)' : 'var(--ink)';
   $('resMult').textContent = '×' + (Math.max(0, G.cash) / (G.seed || 1)).toFixed(1) + ' from start';

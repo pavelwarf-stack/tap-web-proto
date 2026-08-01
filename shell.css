@@ -279,11 +279,11 @@ body[data-skin="paper"] {
   --sec-tx:#4C334A; --sec-size:18.7px; --sec-w:900; --sec-case:none; /* shop «Free» 18/25 900 */
   --case-head:none; --case-hero:none;
   --case-btn:none; --case-cta:none; --case-ach:none; --case-tab:none; --case-lbl:none;
-  /* ---- onboarding (welcome + баблы туториала): папирусная производная ----
-     бабл = белая карта, чернильный текст, кобальтовый Next (язык 622) */
+  /* ---- onboarding (welcome + баблы туториала): мокапы 558:12514/12824 ----
+     бабл = КРЕМОВАЯ карта #F0DFC2 с белым контуром, чернильный текст, кобальтовый Next */
   --wl-bg:#F0DFC2; --wl-card:rgba(255,255,255,.30); --wl-h1:#4C334A; --wl-soft:rgba(76,51,74,.70);
   --wl-btn:#4068F5; --wl-btn-tx:#FFFFFF; --wl-r:20.8px;
-  --tut-bg:#FFFFFF; --tut-line:#FFFFFF; --tut-tx:#4C334A;
+  --tut-bg:#F0DFC2; --tut-line:#FFFFFF; --tut-tx:#4C334A;
   --tut-cta:#4068F5; --tut-cta-tx:#FFFFFF; --tut-link:#4068F5;
   --tut-3d:none; --tut-txsh:none;
   --tut-band:rgba(34,197,94,.30); --tut-band-line:#FFFFFF; /* Rectangle 7271: #22C55E 30% + 1px white */
@@ -2119,54 +2119,50 @@ body[data-skin="corporate"] .rc-home { background:var(--panel); box-shadow:none;
   backdrop-filter:blur(2px);
 }
 
-/* tutorial overlay (СКИНУЕТСЯ с 31.07, п.32 — реверс прежнего канона) --------------
-   Раскладка и последовательность баблов — из мокапов onb1..3 (Figma 558:12514,
-   frame 375×812 → ×1.04) и НЕ меняются: их ведёт shell.js. Меняется только палитра —
-   per-skin токены --tut-*. Отдельного макета туториала ни у одного из четырёх
-   вариантов нет, цвета выведены из ДС варианта. */
-#tutorial { position:absolute; inset:0; z-index:60; background:rgba(70,70,70,.5); }
+/* tutorial overlay — скелет ЖЁСТКО по мокапам Миши (558:12514/12824, frame 375×812 → ×1.04):
+   кремовый бабл + маленький маскот у правого верха + белые стрелки path86 + затемнение
+   «окнами» (всё под скримом #464646 50%, кроме целей шага). Между шагами меняются ТОЛЬКО
+   текст (и высота его контейнера), какая стрелка (up/down/none) и какие цели светлые.
+   Палитра баблов скинуется per-skin токенами --tut-*. */
+#tutorial { position:absolute; inset:0; z-index:60; }
 #tutorial[hidden] { display:none; }
+/* затемнение с окнами: один evenodd-путь (полный экран минус скруглённые окна целей).
+   Закрашенная область ЛОВИТ тапы (visiblePainted), окна — пропускают насквозь */
+#tutDimSvg { position:absolute; inset:0; width:100%; height:100%; }
 /* wait-шаг интерактивного туториала (п.36): подсказка ждёт РЕАЛЬНОГО тапа по кнопке
-   игры — оверлей пропускает тапы насквозь (затемнение остаётся визуальным), карточка
-   с Skip остаётся кликабельной, Next скрыт; патч-затемнение соседа ГЛОТАЕТ тапы
-   (неправильная кнопка не работает, пока идёт урок) */
+   игры — корень пропускает события, но закрашенный скрим глотает тапы мимо целей
+   (неправильная кнопка не работает, пока идёт урок); карточка со Skip кликабельна,
+   Next скрыт */
 #tutorial.wait { pointer-events:none; }
 #tutorial.wait .tut-card { pointer-events:auto; }
 #tutorial.wait .tut-next { display:none; }
-#tutorial.wait #tutDim { pointer-events:auto; }
-/* зелёная полоса профит-зоны над графиком (mockup Rectangle 7271) */
-#tutBand {
-  position:absolute; left:0; right:0; height:66px;
-  background:var(--tut-band);
-  border-top:1px solid var(--tut-band-line); border-bottom:1px solid var(--tut-band-line);
-}
-/* патч-затемнение соседа внутри светлой полосы (onb2-2/3: вторая кнопка пары тёмная) */
-#tutDim {
-  position:absolute; background:rgba(70,70,70,.5); border-radius:18px; pointer-events:none;
-}
-#tutDim[hidden] { display:none; }
+#tutorial.wait #tutDimPath { pointer-events:visiblePainted; }
 @keyframes mascotIn { from { transform:translateY(60px) scale(.7); opacity:0; } }
 @media (prefers-reduced-motion: reduce) {
   .tut-mascot, .tut-card { animation:none; }
 }
 .tut-card {
-  position:absolute; left:16.6px; right:16.6px; bottom:176px;
-  background:var(--tut-bg); border:var(--card-bw) solid var(--tut-line); border-radius:var(--r-card-lg);
-  padding:10.8px 12.4px 10.4px;
+  /* мокап: Frame 2131330601 (16,553) 343×115 (12514) / (16,504) 343×164 (12824):
+     карта 2px белым контуром r11.9, низ на 144 от низа экрана (×1.04 = 149.8) */
+  position:absolute; left:16.6px; right:16.6px; bottom:149.8px;
+  background:var(--tut-bg); border:var(--card-bw) solid var(--tut-line); border-radius:12.4px;
+  padding:10.4px 12.5px;
   box-shadow:0 8px 28px rgba(0,0,0,.18);
   color:var(--tut-tx); font-family:var(--font);
   animation:bubbleIn .38s .1s cubic-bezier(.2,1.5,.4,1) both;
 }
 @keyframes bubbleIn { from { transform:translateY(14px) scale(.86); opacity:0; } }
 .tut-card p {
-  /* кегль поднят с 14.4 (вердикт 31.07 п.36 «фразы крупнее»; ★draft: точное значение
-     моё — макета типографики v3 нет); 1–2 главных слова фразы — жирным через <b> */
-  font-size:17px; line-height:24px; font-weight:500;
-  padding-right:128px; min-height:48px; margin-bottom:54px;
+  /* мокап: Nunito 600 13.88/21 (×1.04), текст (28,563), ширина до 201 — правее
+     живут маскот и Next; 1–2 главных слова фразы — жирным через <b> */
+  font-size:14.4px; line-height:21.9px; font-weight:600;
+  padding-right:119px; min-height:44px; margin-bottom:55px;
 }
 .tut-card p b { font-weight:800; }
 .tut-mascot {
-  position:absolute; right:24px; bottom:-4px; height:196px; z-index:2;
+  /* мокап: Frame 2131330655 (229,485) 102×186 — маскот у ПРАВОГО ВЕРХА бабла,
+     перекрывает его верхнюю кромку, низ на 2px ниже низа бабла (×1.04) */
+  position:absolute; right:29.1px; bottom:-2.1px; height:193.4px; z-index:2;
   pointer-events:none;
   animation:mascotIn .45s cubic-bezier(.2,1.4,.4,1) both; transform-origin:bottom center;
 }
@@ -2188,8 +2184,9 @@ body[data-skin="corporate"] .rc-home { background:var(--panel); box-shadow:none;
 body[data-skin="cream"] .tut-next { background:var(--cta-grad), var(--tut-cta); }
 .tut-next:active { transform:translateY(2px); }
 .tut-arrow { position:absolute; display:none; filter:drop-shadow(0 2px 4px rgba(43,36,22,.35)); }
-#tutArrowDL, #tutArrowDR { width:56px; height:66px; }
-#tutArrowUL { width:67px; height:60px; }
+/* габариты = bbox повёрнутых path86 из мокапов ×1.04: 558:12656 63.9×57.6, 558:12961 54.2×63.0 */
+#tutArrowDL, #tutArrowDR { width:56.4px; height:65.5px; }
+#tutArrowUL { width:66.5px; height:59.9px; }
 
 /* ---------- sheets ---------- */
 #sheetlayer, #modallayer { position:absolute; inset:0; }
@@ -2887,13 +2884,19 @@ body[data-skin="paper"] .rc-unlock-head b {
   color:var(--rc-unlock-tx); text-transform:none;
 }
 body[data-skin="paper"] .rc-unlock-name { font-size:16px; line-height:21.8px; font-weight:700; margin-top:9px; }
-body[data-skin="paper"] .rc-unlock-desc { font-size:10.6px; line-height:14.2px; font-weight:500; margin-top:3.5px; max-width:186px; }
-/* ликующий фотореал-маскот живёт в анлок-карте и у paper (622-мокап f2056) */
+body[data-skin="paper"] .rc-unlock-desc { font-size:10.6px; line-height:14.2px; font-weight:500; margin-top:3.5px; max-width:220px; }
+/* прыгающий маскот в анлок-карте (мокап 558:10139, ×0.886): клип-бокс Frame 2131330656
+   (243,195) 181×153 отн. карты (16,228) 408×121 — верх на 29 выше карты, правый край
+   и низ заподлицо с картой (кулак режется КРАЕМ КАРТЫ, кроп-ассет кончается там же) */
 body[data-skin="paper"] .rc-unlock-mascot {
-  display:block; position:absolute; top:-30px; bottom:0; right:2px; width:175px;
+  display:block; position:absolute; top:-29.2px; bottom:1px; right:0; width:160.4px;
   overflow:hidden; border-radius:0 0 17.7px 0; pointer-events:none;
 }
-body[data-skin="paper"] .rc-unlock-mascot img { display:block; height:250px; width:auto; margin:0 auto; }
+body[data-skin="paper"] .rc-unlock-mascot img {
+  /* видимая область листа: img px 2..916 × 0..1474 (маска Vector 40 запечена в ассет);
+     147.1 CSS px = 166 юнитов 440-кадра ×0.886, левый воздух 13.3 = (258−243)×0.886 */
+  display:block; position:absolute; right:0; top:5.3px; width:147.1px; height:auto; margin:0;
+}
 body[data-skin="paper"] .rc-actions { margin:43px 14.2px 0; }
 body[data-skin="paper"] .rc-next { height:62px; font-size:18.7px; font-weight:900; text-shadow:var(--btn-txsh); }
 body[data-skin="paper"] .rc-repeat { font-size:17.7px; line-height:26.6px; font-weight:900; }

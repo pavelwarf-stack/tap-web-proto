@@ -25,7 +25,7 @@
 
   <!-- iOS status bar -->
   <div id="statusbar">
-    <span id="sbTime" title="Long-press to reset prototype">9:41</span>
+    <span id="sbTime" title="Long-press to reset prototype">9:41 AM</span>
     <span class="sb-batt">100%</span><!-- terminal skin: text battery per mockup C -->
     <span class="sb-icons">
       <svg width="19" height="12" viewBox="0 0 17 11"><g fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></g></svg>
@@ -400,8 +400,9 @@
         </div>
         <div class="rc-unlock-name" id="rcUnlockName">Short selling</div>
         <p class="rc-unlock-desc" id="rcUnlockDesc">Now you can open short positions and bet on the price falling</p>
-        <!-- 622-мокап f2056: ликующий фотореал-маскот в карточке анлока -->
-        <span class="rc-unlock-mascot"><img src="mascot-tt-cheer.webp" alt="" width="520" height="1054"></span>
+        <!-- 622-мокап 558:10139: прыгающий маскот «кулаки вверх», кадрирование = Mask group
+             Frame 2131330656 (imageRef 62d5aee4b5, crop img px 2..916 x 0..1474) -->
+        <span class="rc-unlock-mascot"><img src="mascot-rc-jump.webp" alt="" width="441" height="711"></span>
       </div>
       <div class="rc-earn-band">
         <span class="rc-earn-lbl" data-i18n="rc.earned">Earned</span>
@@ -449,20 +450,23 @@
   <div id="gamelayer" hidden>
     <iframe id="gameframe" title="Game" src="about:blank"></iframe>
     <button id="gameBack" class="draft" data-act="game-back" aria-label="Back" data-draft="Floating back-to-hub button over games (no wireframe for in-game hub exit)">&lsaquo;</button>
-    <!-- Tutorial overlay: per-round bubble sequences over sim rounds (mockups onb1..3, вердикт 30.07 п.23) -->
+    <!-- Tutorial overlay: per-round bubble sequences over sim rounds (mockups 558:12514/12824, вердикт 31.07) -->
     <div id="tutorial" hidden>
-      <div id="tutBand" hidden></div><!-- green profit-zone band over the chart (mockup Rectangle 7271) -->
-      <div id="tutDim" hidden></div><!-- re-dim patch over the neighbour inside a light window (onb2-2/3: the other button of the pair stays dark) -->
+      <!-- dim-with-windows: one evenodd path = full-screen scrim (#464646 50%, mockup Rectangle 7290/7291)
+           minus rounded-rect windows over the step's bright targets; painted area swallows taps on wait-steps -->
+      <svg id="tutDimSvg" aria-hidden="true"><path id="tutDimPath" fill="#464646" fill-opacity=".5" fill-rule="evenodd"/></svg>
       <div class="tut-card" id="tutCard">
         <p id="tutText">Analyze the Bitcoin chart and make a decision.</p>
-        <span class="tut-mascot"><img src="mascot-bubble.webp" alt="" width="198" height="360"></span>
+        <!-- small standing mascot at the bubble's top-right (Frame 2131330655: 102x186 @375, cut from imageRef bb5babe042 with Misha's mask polygon) -->
+        <span class="tut-mascot"><img src="mascot-tut.webp" alt="" width="318" height="580"></span>
         <button class="tut-skip" data-act="tut-skip" data-i18n="tut.skip">Skip the tutorial</button>
         <button class="tut-next" data-act="tut-next" data-i18n="tut.next">Next</button>
       </div>
-      <!-- white curved arrows (mockup path86): down-left, down-right, up-left -->
-      <svg id="tutArrowDL" class="tut-arrow" viewBox="0 0 54 63"><path d="M40 4 C 44 22, 40 40, 24 52" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><path d="M10 40 L22 55 L34 44 Z" fill="#fff" stroke="#fff" stroke-width="4" stroke-linejoin="round"/></svg>
-      <svg id="tutArrowDR" class="tut-arrow" viewBox="0 0 54 63"><path d="M14 4 C 10 22, 14 40, 30 52" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><path d="M44 40 L32 55 L20 44 Z" fill="#fff" stroke="#fff" stroke-width="4" stroke-linejoin="round"/></svg>
-      <svg id="tutArrowUL" class="tut-arrow" viewBox="0 0 64 58"><path d="M58 52 C 40 48, 24 36, 16 18 " fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><path d="M4 26 L13 8 L28 17 Z" fill="#fff" stroke="#fff" stroke-width="4" stroke-linejoin="round"/></svg>
+      <!-- white curved arrows — EXACT path86 fillGeometry + relativeTransform from nodes 558:12656 (up-left)
+           and 558:12961 (down-right); DL = the down arrow mirrored (no own mockup) -->
+      <svg id="tutArrowUL" class="tut-arrow" viewBox="0 0 63.909 57.571"><path fill="#fff" transform="matrix(-0.617963 0.786207 -0.786207 -0.617963 63.9092 38.3709)" d="M22.2993 55.7917C18.7587 57.7266 15.2193 59.6615 11.6641 61.5704C9.35264 62.8118 6.1267 61.788 5.47497 59.0526C4.19857 53.6989 2.38771 48.5888 0.283692 43.5081C-1.44598 39.3338 5.21225 36.9457 7.33431 40.5415C7.33882 40.5381 7.34333 40.5336 7.34784 40.5302C8.81479 43.2825 10.0585 46.1048 11.1319 48.9948C17.8127 33.6058 15.4358 16.8571 7.46398 1.82563C6.85961 0.6868 8.40887 -0.680928 9.33121 0.384614C20.8019 13.6447 22.1899 33.3037 16.0684 49.4266C16.6987 49.0737 17.3267 48.7174 17.957 48.3645C22.7976 45.6583 27.1602 53.1363 22.2993 55.7917Z"/></svg>
+      <svg id="tutArrowDR" class="tut-arrow" viewBox="0 0 54.2 62.997"><path fill="#fff" transform="matrix(-0.816946 0.576714 0.576714 0.816946 19.3927 0)" d="M21.6753 54.2307C18.2339 56.1114 14.7935 57.9922 11.3378 59.8477C9.09096 61.0544 5.95528 60.0593 5.32178 57.4003C4.0811 52.1965 2.32091 47.2294 0.275755 42.2908C-1.40552 38.2333 5.06641 35.912 7.1291 39.4072C7.13349 39.4039 7.13787 39.3995 7.14226 39.3962C8.56817 42.0716 9.77707 44.8149 10.8205 47.6239C17.3143 32.6656 15.0039 16.3855 7.25515 1.77455C6.66769 0.667584 8.1736 -0.661876 9.07014 0.373853C20.2198 13.2629 21.569 32.3719 15.6188 48.0437C16.2315 47.7007 16.8419 47.3543 17.4546 47.0113C22.1598 44.3808 26.4002 51.6496 21.6753 54.2307Z"/></svg>
+      <svg id="tutArrowDL" class="tut-arrow" viewBox="0 0 54.2 62.997"><path fill="#fff" transform="matrix(0.816946 0.576714 -0.576714 0.816946 34.8073 0)" d="M21.6753 54.2307C18.2339 56.1114 14.7935 57.9922 11.3378 59.8477C9.09096 61.0544 5.95528 60.0593 5.32178 57.4003C4.0811 52.1965 2.32091 47.2294 0.275755 42.2908C-1.40552 38.2333 5.06641 35.912 7.1291 39.4072C7.13349 39.4039 7.13787 39.3995 7.14226 39.3962C8.56817 42.0716 9.77707 44.8149 10.8205 47.6239C17.3143 32.6656 15.0039 16.3855 7.25515 1.77455C6.66769 0.667584 8.1736 -0.661876 9.07014 0.373853C20.2198 13.2629 21.569 32.3719 15.6188 48.0437C16.2315 47.7007 16.8419 47.3543 17.4546 47.0113C22.1598 44.3808 26.4002 51.6496 21.6753 54.2307Z"/></svg>
     </div>
   </div>
 
