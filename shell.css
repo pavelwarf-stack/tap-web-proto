@@ -848,18 +848,6 @@ body[data-skin="crypto-dark"] .icon-sq { box-shadow:none; color:var(--tx-soft); 
   position:absolute; top:2px; right:2px; width:7px; height:7px; border-radius:50%;
   background:var(--red); border:1.5px solid var(--bg);
 }
-/* corporate: у v4-home шапки нет — метим сохранённую шапку ★draft только в этом скине */
-body.drafts-on[data-skin="corporate"] #scr-home .home2-head {
-  outline:1.5px dashed rgba(230,162,60,.6); outline-offset:2px; position:relative;
-}
-body.drafts-on[data-skin="corporate"] #scr-home .home2-head::after {
-  content:'\2605 draft'; position:absolute; top:-8px; right:6px; z-index:6;
-  background:#fff7e8; color:#c8862a;
-  border:1px dashed rgba(230,162,60,.8); border-radius:6px;
-  padding:0 5px; font-size:8.5px; font-weight:700; line-height:13px;
-  letter-spacing:.03em; pointer-events:none;
-  font-family:-apple-system, "Segoe UI", Roboto, sans-serif;
-}
 .chips-row { display:flex; gap:11px; margin-bottom:14px; }
 .chip { background:var(--panel); color:var(--sb); border-radius:999px; padding:5px 9px; font-size:12.4px; font-weight:500; }
 .chip.active { background:var(--tx); color:#fff; }
@@ -960,15 +948,16 @@ body[data-skin="cream"] .spo-buy {
   text-decoration:underline; text-underline-offset:3px; font-weight:800; font-size:13.5px;
 }
 
-/* маскот на Home (фотореал-рептилоид во всех четырёх -home, перекрывает карту,
-   уходит под Play/таббар) */
+/* маскот на Home: z-порядок мокапа 622:26607 — image 7 идёт ПОСЛЕ scrollable-body
+   (маскот ПОВЕРХ зелёной карты оффера) и ПЕРЕД кнопкой Играть (Play поверх ног).
+   Геометрия мокапа: (37,359) 302×517 в 375-кадре → ×1.04 = 314px, центр совпадает */
 .home-mascot {
   position:absolute; left:50%; bottom:-69px; transform:translateX(-50%);
-  width:314px; height:auto; z-index:0; pointer-events:none;
+  width:314px; height:auto; z-index:1; pointer-events:none;
 }
 
 .hero-play {
-  position:relative; z-index:1;
+  position:relative; z-index:2;
   display:block; width:100%; margin-top:auto;
   height:53px; padding:0 25px;
   border-radius:var(--r-btn);
@@ -1042,12 +1031,14 @@ body[data-skin="cream"] .wl-card, body[data-skin="corporate"] .wl-card {
   box-shadow:inset 0 0 0 var(--card-bw) var(--card-line);
 }
 .wl-mascot { display:block; height:430px; max-height:92%; width:auto; }
-.wl-text { margin-top:36px; flex:0 1 auto; }
+.wl-text { margin-top:32px; flex:0 1 auto; }
+/* крупнее мокапа 558:10224 — слово Павла 01.08: «текст на первом экране онборда
+   должен быть крупнее, особенно описание — оно слишком мелкое» */
 .wl-text h1 {
-  font-size:22px; line-height:31px; font-weight:var(--w-head); color:var(--wl-h1);
+  font-size:26px; line-height:34px; font-weight:var(--w-head); color:var(--wl-h1);
   font-family:var(--font-head); text-transform:none;
 }
-.wl-text p { font-size:14.7px; line-height:22px; font-weight:400; color:var(--wl-soft); margin:11px auto 0; max-width:334px; }
+.wl-text p { font-size:17.5px; line-height:25px; font-weight:500; color:var(--wl-soft); margin:12px auto 0; max-width:346px; }
 .wl-actions { margin-top:auto; padding-top:31px; }
 .wl-start {
   display:block; width:100%; height:52px; border-radius:var(--r-btn);
@@ -1958,18 +1949,18 @@ body[data-skin="corporate"] .rc-menu { background:var(--panel); box-shadow:none;
   font-family:var(--font-num);
   font-size:13px; line-height:17.7px; font-weight:800; color:var(--rc-ink);
 }
+/* значок актива на RC — по мокапу 558:10139: оранжевая биткоин-монета с белым ₿
+   (был слепой кружок: color:transparent прятал символ — «значок кривой», Павел 01.08) */
 .btc-coin {
-  width:16.6px; height:16.6px; border-radius:50%; background:var(--coin-fill); color:transparent;
-  display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:800;
-  flex:0 0 16.6px;
+  width:17.7px; height:17.7px; border-radius:50%; background:#F7931A; color:#fff;
+  display:inline-flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:800;
+  box-shadow:inset -1px -1.5px 0 rgba(0,0,0,.18);
+  flex:0 0 17.7px;
 }
 /* v1: BTC-пилюля без монеты (мокап: только текст «BTC» моно) */
 body[data-skin="crypto-light"] .btc-coin { display:none; }
-/* corporate: v4-RC BTC-пилюли не имеет — сохраняем её в языке варианта, ★draft ниже */
+/* corporate: v4-RC BTC-пилюли не имеет — сохраняем её в языке варианта */
 body[data-skin="corporate"] .rc-btc { background:var(--panel); box-shadow:none; font-weight:700; }
-body.drafts-on[data-skin="corporate"] .rc-btc {
-  outline:1.5px dashed rgba(230,162,60,.6); outline-offset:2px;
-}
 .rc-top h1 {
   font-family:var(--font-head);
   font-size:var(--rc-title-size); line-height:var(--rc-title-lh);
@@ -2472,20 +2463,12 @@ body[data-skin="corporate"] .modal { background:#FFFFFF; }
   100% { opacity:0; }
 }
 
-/* ---------- draft marking (my-design, not in Figma wireframes) ---------- */
-/* :where() keeps specificity at 0 so the badge anchor never overrides
-   an element's own positioning (.xbtn/.sheet/.modal are absolute) */
+/* ---------- draft marking ----------
+   Визуал (пунктирная обводка + плашка «★ draft») удалён НАСОВСЕМ — слово Павла 01.08
+   «убери ярлыки драфт отовсюду». Классы .draft/data-draft в разметке живут как
+   инвентарь не-макетных элементов; тумблер drafts-on остался только гейтом
+   дев-строки Style (п.25). */
 :where(.draft) { position:relative; }
-body.drafts-on .draft { outline:1.5px dashed rgba(230,162,60,.6); outline-offset:2px; }
-body.drafts-on .draft::after {
-  content:'\2605 draft';
-  position:absolute; top:-8px; right:6px; z-index:6;
-  background:#fff7e8; color:#c8862a;
-  border:1px dashed rgba(230,162,60,.8); border-radius:6px;
-  padding:0 5px; font-size:8.5px; font-weight:700; line-height:13px;
-  letter-spacing:.03em; pointer-events:none;
-  font-family:-apple-system, "Segoe UI", Roboto, sans-serif;
-}
 
 /* --- difficulty badges (owner directive 24.07; draft — not in wireframes) --- */
 .gc-diff { display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.02em;
@@ -2493,8 +2476,6 @@ body.drafts-on .draft::after {
 .gc-diff.easy { background:#e3f2e9; color:#2c9e63; }
 .gc-diff.medium { background:#fbf0dd; color:#c98a24; }
 .gc-diff.hard { background:#fbe5e3; color:#d95550; }
-/* мелкие draft-элементы (пилюли сложности): только обводка, без корнер-плашки */
-body.drafts-on .gc-diff.draft::after { content:none; }
 /* строка Settings «Style» — только при включённых драфтах (вердикт 31.07 п.25):
    скин = разметка когорты (?skin= из пролива), юзерского переключателя стиля в проде
    НЕТ; строка живёт как дев-инструмент для демо/симуляции когорт. Обычный drafts-off

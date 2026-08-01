@@ -939,11 +939,15 @@ html[data-skin="corporate"] .du-ico { width:32px; height:32px; }
 .ctl-row.locked .pills button.on {
   background:var(--chip-lock-bg); border-color:var(--chip-lock-line); color:var(--chip-lock-tx);
 }
-.ctl-row.locked .pills button.unlock { opacity:1; pointer-events:auto; }
-.pills button.unlock {
-  flex:0 0 auto; background:var(--warn); color:#fff; border-color:var(--warn);
-  font-size:13px; padding:0 12px;
+/* вход в 4-й туториал: синяя текстовая ссылка «Learn» справа в строке лейбла
+   (мокап 558:10932 — «Изучить» у правого края ряда Trade size, кобальт, ~14/600) */
+.frac-study {
+  margin-left:auto; flex:0 0 auto; cursor:pointer; font-family:inherit;
+  background:none; border:none; padding:0;
+  color:var(--accent, #4068F5); font-size:var(--lbl-fs); font-weight:700; line-height:1.21;
 }
+html[data-skin="paper"] .frac-study { color:#4068F5; }
+.frac-study:active { opacity:.7; }
 
 /* ============================================================================
    RESULT (standalone)
@@ -1066,20 +1070,9 @@ html[data-skin="corporate"] .du-ico { width:32px; height:32px; }
 #flash.on { animation:flashAnim .45s ease-out; }
 @keyframes flashAnim { 0%{opacity:.7} 100%{opacity:0} }
 
-/* ============================================================================
-   DRAFT MARKS
-   ============================================================================ */
-.draftable { outline:1.5px dashed rgba(230,162,60,.6); outline-offset:2px; position:relative; }
-.draftable::after {
-  content:"★ draft"; position:absolute; top:-9px; right:-6px; z-index:6;
-  background:#f0a92e; color:#fff; font-size:9px; font-weight:800;
-  padding:1px 6px; border-radius:8px; letter-spacing:.3px; pointer-events:none;
-}
-.draft-chip {
-  position:absolute; top:-10px; right:14px;
-  background:#f0a92e; color:#fff; font-size:10px; font-weight:800;
-  padding:2px 8px; border-radius:9px; letter-spacing:.3px;
-}
+/* DRAFT MARKS: визуал удалён насовсем (слово Павла 01.08 «убери ярлыки драфт
+   отовсюду»); классы .draftable/.draft-chip в JS остались инвентарём — не рисуют */
+.draft-chip { display:none; }
 
 /* ============================================================================
    PAPER component layer — папирусные отличия, не выражаемые токенами
@@ -1143,6 +1136,5 @@ html[data-skin="paper"] .pills button {
 }
 html[data-skin="paper"] .pills button:active { transform:translateY(3px); box-shadow:0 2px 0 rgba(0,0,0,.20); }
 html[data-skin="paper"] .pills button.on { box-shadow:0 5px 0 #3353C4, 0 6px 3px rgba(0,0,0,.10); }
-html[data-skin="paper"] .pills button.unlock { box-shadow:0 5px 0 rgba(0,0,0,.25); }
 /* сердца в тонкой белой обводке (язык 251880e) */
 html[data-skin="paper"] .heart { filter:drop-shadow(0 2px 0 #fff); }

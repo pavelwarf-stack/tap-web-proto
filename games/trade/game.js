@@ -236,7 +236,7 @@ en: {
   'ui.current': 'Current',
   'ui.liq': 'Liquidation',
   'ui.liqCaption': 'Liquidation at −50% of the rate',
-  'ui.close': 'Close position',
+  'ui.close': 'Close position', 'ui.study': 'Learn',
   'ui.closeFrac': 'Close {0}%',
   /* Deal pre-round screen (Figma 622 / f2055); RU copy макета переведена в EN-базу */
   'deal.title': 'Deal',
@@ -284,7 +284,7 @@ es: {
   'ui.current': 'Actual',
   'ui.liq': 'Liquidación',
   'ui.liqCaption': 'Liquidación al −50% de la tasa',
-  'ui.close': 'Cerrar posición',
+  'ui.close': 'Cerrar posición', 'ui.study': 'Aprender',
   'ui.closeFrac': 'Cerrar {0}%',
   'deal.title': 'Operación',
   'deal.balance': 'Tu saldo',
@@ -331,7 +331,7 @@ fr: {
   'ui.current': 'Actuel',
   'ui.liq': 'Liquidation',
   'ui.liqCaption': 'Liquidation à −50% du cours',
-  'ui.close': 'Clôturer la position',
+  'ui.close': 'Clôturer la position', 'ui.study': 'Découvrir',
   'ui.closeFrac': 'Clôturer {0}%',
   'deal.title': 'Transaction',
   'deal.balance': 'Ton solde',
@@ -378,7 +378,7 @@ de: {
   'ui.current': 'Aktuell',
   'ui.liq': 'Liquidation',
   'ui.liqCaption': 'Liquidation bei −50% des Kurses',
-  'ui.close': 'Position schließen',
+  'ui.close': 'Position schließen', 'ui.study': 'Lernen',
   'ui.closeFrac': '{0}% schließen',
   'deal.title': 'Deal',
   'deal.balance': 'Dein Guthaben',
@@ -425,7 +425,7 @@ ja: {
   'ui.current': '現在',
   'ui.liq': '清算',
   'ui.liqCaption': 'レートの−50%で清算',
-  'ui.close': 'ポジションを決済',
+  'ui.close': 'ポジションを決済', 'ui.study': '学ぶ',
   'ui.closeFrac': '{0}%決済',
   'deal.title': 'ディール',
   'deal.balance': 'あなたの残高',
@@ -472,7 +472,7 @@ zh: {
   'ui.current': '当前',
   'ui.liq': '爆仓',
   'ui.liqCaption': '价格变动−50%时爆仓',
-  'ui.close': '平仓',
+  'ui.close': '平仓', 'ui.study': '学习',
   'ui.closeFrac': '平仓{0}%',
   'deal.title': '交易',
   'deal.balance': '你的余额',
@@ -519,7 +519,7 @@ pt: {
   'ui.current': 'Atual',
   'ui.liq': 'Liquidação',
   'ui.liqCaption': 'Liquidação a −50% da cotação',
-  'ui.close': 'Fechar posição',
+  'ui.close': 'Fechar posição', 'ui.study': 'Aprender',
   'ui.closeFrac': 'Fechar {0}%',
   'deal.title': 'Operação',
   'deal.balance': 'Seu saldo',
@@ -566,7 +566,7 @@ ar: {
   'ui.current': 'الحالي',
   'ui.liq': 'التصفية',
   'ui.liqCaption': 'التصفية عند −50% من السعر',
-  'ui.close': 'إغلاق الصفقة',
+  'ui.close': 'إغلاق الصفقة', 'ui.study': 'تعلّم',
   'ui.closeFrac': 'إغلاق {0}%',
   'deal.title': 'صفقة',
   'deal.balance': 'رصيدك',
@@ -1313,6 +1313,44 @@ function renderPosMeta() {
   }
 }
 
+/* сим-панель открытой позиции для шага туториала про −50% (мокап 568:15209, Павел
+   01.08): рисуем in-position UI с фейковыми числами БЕЗ реальной G.pos — Long x3,
+   PnL −16% (треть пути до ликвидации → полоса заполнена на 32%). Значения статичны:
+   шаг read-типа, график под chartHold. Off возвращает flat-UI через renderControls. */
+function tutSimPos(on) {
+  if (!!G.tutSim === !!on) return;
+  G.tutSim = !!on;
+  if (G.pos) return; // реальная позиция главнее — сим не трогает её UI
+  if (on) {
+    const px = Math.round(G.dispPrice || G.startPrice || 63370);
+    $('pnlBox').classList.remove('hidden');
+    $('pnlBox').classList.add('neg');
+    $('tickerBox').classList.add('hidden');
+    $('infoCard').classList.add('inpos');
+    $('ctlBar').classList.add('hidden');
+    $('btnLong').classList.add('hidden');
+    $('btnShort').classList.add('hidden');
+    $('btnExit').classList.remove('hidden');
+    $('lblExit').textContent = gt('ui.close');
+    const lb = $('posLevBadge'), db = $('posDirBadge');
+    lb.textContent = 'x3'; lb.classList.remove('hidden');
+    db.textContent = 'Long'; db.classList.add('long'); db.classList.remove('short'); db.classList.remove('hidden');
+    $('liqBlock').classList.remove('hidden');
+    $('uPnlUsd').textContent = fmtCoins(-160, true);
+    $('uPnlUsd').style.transform = '';
+    $('uPnlPct').textContent = fmtPct(-16);
+    $('entryPriceEl').textContent = fmtCoins(px);
+    $('curPriceEl').textContent = fmtCoins(Math.round(px * 0.947));
+    $('liqFill').style.width = '32%';
+  } else {
+    $('pnlBox').classList.add('hidden');
+    $('pnlBox').classList.remove('neg');
+    $('tickerBox').classList.remove('hidden');
+    $('liqFill').style.width = '0%';
+    renderControls(); // вернёт ряды/кнопки/inpos по фактическому состоянию (без позиции)
+  }
+}
+
 /* выход: доля fracExit реализуется в кэш; остаток позиции живёт с той же ценой входа */
 function exitPos(auto = false) {
   if (!G.pos) return;
@@ -1408,7 +1446,9 @@ function liquidate() {
 function endRound() {
   G.over = true;
   if (G.pos) exitPos(true);
-  setTimeout(() => finishRound(), 450);
+  // 450 → 200 (Павел 01.08: «пролаг секунду и потом только результаты»);
+  // в паре с 900 → 300 на стороне шелла
+  setTimeout(() => finishRound(), 200);
 }
 
 // hub integration: результат раунда + лесенка (stage/stagedUp) — контракт hub:roundEnd.
@@ -1799,8 +1839,12 @@ function frame(ts) {
   // ЖИВЁТ («игрок должен видеть, что график живёт» — слово Павла) — в отличие от
   // G.paused, который морозит всё (пауза-меню)
   if (!G.timeHold) G.gameT += dt * 1000;
-  G.engine.step(dt);
-  G.dispPrice = G.engine.vis;
+  // chartHold (слово Павла 01.08): на read-шагах туториала (виден Next) морозим и
+  // ЦЕНУ — «спокойно прочитать текст»; экшн-шаги живут (timeHold им таймер держит)
+  if (!G.chartHold) {
+    G.engine.step(dt);
+    G.dispPrice = G.engine.vis;
+  }
 
   // ликвидация проверяется ДО бота/ввода — её нельзя «переиграть» выходом
   if (G.pos && pnlNow() <= CFG.LIQ_PNL) { liquidate(); drawChart(); updateHUD(dt); return; }
@@ -1931,8 +1975,10 @@ window.__trade = { G, CFG, Feed, P, saveP, targetStage, roundCaps, startRound, e
   /* API туториала для оболочки (same-origin, как tutBoot): таймер-холд за баблами,
      отпуск стартового hold-сегмента сценария, полный сброс сценария на Skip */
   setTimeHold(v) { G.timeHold = !!v; },
+  setChartHold(v) { G.chartHold = !!v; }, // read-шаги морозят график (Павел 01.08)
+  tutSimPos,                              // сим-панель позиции для шага −50% (568:15209)
   tutGo() { G.tutGo = true; },
-  tutFree() { G.tutGo = true; G.timeHold = false; if (G.engine) G.engine.script = null; },
+  tutFree() { G.tutGo = true; G.timeHold = false; G.chartHold = false; tutSimPos(false); if (G.engine) G.engine.script = null; },
 }; // QA hook
 applyGT();
 readTheme();
