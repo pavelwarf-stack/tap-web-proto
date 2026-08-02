@@ -1074,6 +1074,10 @@ html[data-skin="paper"] .frac-study { color:#4068F5; }
    отовсюду»); классы .draftable/.draft-chip в JS остались инвентарём — не рисуют */
 .draft-chip { display:none; }
 
+/* tutLock (Павел 02.08): on-фазы туториала — кнопки действий погашены и не тапаются,
+   игрок смотрит на график; отпускается вместе с показом wait-шага */
+.game-action.tutlock .bigbtn { opacity:.45; pointer-events:none; transition:opacity .25s; }
+
 /* ============================================================================
    PAPER component layer — папирусные отличия, не выражаемые токенами
    (spec-game-round/position.txt, f2057/f2058; язык 251880e).

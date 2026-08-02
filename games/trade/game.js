@@ -1859,6 +1859,9 @@ function frame(ts) {
 function onAction(dir) {
   Sound.ensure();
   if (G.screen !== 'game' || G.paused || G.over) return;
+  // tutLock (баг Павла 02.08: в туторе 2 успел взять Long до сценарного «пора шортить»):
+  // на on-фазах туториала обе кнопки залочены — игрок «за ручку» смотрит на график
+  if (G.tutLock) return;
   if (!G.pos) enterPos(dir || 1); else exitPos();
 }
 
@@ -1976,9 +1979,20 @@ window.__trade = { G, CFG, Feed, P, saveP, targetStage, roundCaps, startRound, e
      отпуск стартового hold-сегмента сценария, полный сброс сценария на Skip */
   setTimeHold(v) { G.timeHold = !!v; },
   setChartHold(v) { G.chartHold = !!v; }, // read-шаги морозят график (Павел 01.08)
+  // лок действий на on-фазах туториала (Павел 02.08 «за ручку вести»): кнопки гаснут
+  // визуально и не принимают тапы, пока сценарий не дойдёт до своего события
+  setTutLock(v) {
+    G.tutLock = !!v;
+    try { document.querySelector('.game-action').classList.toggle('tutlock', G.tutLock); } catch (e) {}
+  },
   tutSimPos,                              // сим-панель позиции для шага −50% (568:15209)
   tutGo() { G.tutGo = true; },
-  tutFree() { G.tutGo = true; G.timeHold = false; G.chartHold = false; tutSimPos(false); if (G.engine) G.engine.script = null; },
+  tutFree() {
+    G.tutGo = true; G.timeHold = false; G.chartHold = false; tutSimPos(false);
+    G.tutLock = false;
+    try { document.querySelector('.game-action').classList.remove('tutlock'); } catch (e) {}
+    if (G.engine) G.engine.script = null;
+  },
 }; // QA hook
 applyGT();
 readTheme();

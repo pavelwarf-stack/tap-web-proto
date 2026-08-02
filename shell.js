@@ -2498,6 +2498,9 @@ function runTutStep() {
     setTutHold(false); // игра живёт: игрок смотрит на динамику, не на текст
     const tr = gameTrade();
     try { if (tr && tr.setChartHold) tr.setChartHold(false); } catch (err) {}
+    // «за ручку» (Павел 02.08): пока сценарий не дошёл до события шага — обе кнопки
+    // залочены, игрок только смотрит на график (баг: успевал взять Long до «пора шортить»)
+    try { if (tr && tr.setTutLock) tr.setTutLock(true); } catch (err) {}
     try { if (tr && tr.tutSimPos) tr.tutSimPos(false); } catch (err) {}
     try { if (tr && tr.tutGo) tr.tutGo(); } catch (err) {} // отпустить стартовый hold сценария
     return;
@@ -2540,9 +2543,12 @@ function showTutStep() {
   // сим-панель открытой позиции (мокап 568:15209, шаг про −50%): игра рисует
   // фейковую позицию с полосой ликвидации; на любом другом шаге — гасится
   try { if (tr && tr.tutSimPos) tr.tutSimPos(cfg.sim === 'pos'); } catch (err) {}
-  // read-шаг (виден Next) МОРОЗИТ график — «спокойно прочитать текст» (Павел 01.08);
-  // wait/on-шаги живут: игрок должен видеть динамику, на которую реагирует
-  try { if (tr && tr.setChartHold) tr.setChartHold(!cfg.wait); } catch (err) {}
+  // ЛЮБОЙ видимый бабл МОРОЗИТ график (Павел 01–02.08): read-шаг — «спокойно прочитать
+  // текст», wait-шаг — цена встала в решающую точку (верх перед падением / дно перед
+  // выходом) и ждёт тапа сколько угодно («чтобы бабка 50+ успела»). График бежит только
+  // в СКРЫТЫХ on-фазах между баблами — и там кнопки залочены (setTutLock)
+  try { if (tr && tr.setChartHold) tr.setChartHold(true); } catch (err) {}
+  try { if (tr && tr.setTutLock) tr.setTutLock(false); } catch (err) {}
   tutLayout();
 }
 function tutNext() {
@@ -2596,7 +2602,7 @@ function endTutorial() {
   const tr = gameTrade();
   try { if (tr && tr.setChartHold) tr.setChartHold(false); } catch (err) {}
   try { if (tr && tr.tutSimPos) tr.tutSimPos(false); } catch (err) {}
-  try { if (tr && tr.tutFree) tr.tutFree(); } catch (err) {}
+  try { if (tr && tr.tutFree) tr.tutFree(); } catch (err) {} // tutFree сам снимает tutLock
   if (tutKind === 'ob') finishTutRound();
   tutSeq = null;
 }
