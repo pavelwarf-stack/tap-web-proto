@@ -1996,8 +1996,13 @@ window.__trade = { G, CFG, Feed, P, saveP, targetStage, roundCaps, startRound, e
   },
   tutSimPos,                              // сим-панель позиции для шага −50% (568:15209)
   tutGo() { G.tutGo = true; },
-  tutFree() {
+  /* tailSec (слово Павла 03.08): после ПОСЛЕДНЕГО бабла обучения раунд живёт ещё
+     N секунд свободной игры — игрок пробует сам, пока урок свежий */
+  tutFree(tailSec) {
     G.tutGo = true; G.timeHold = false; G.chartHold = false; tutSimPos(false);
+    if (tailSec > 0 && G.screen === 'game' && !G.over) {
+      G.roundMs = G.gameT + tailSec * 1000;
+    }
     G.tutLock = false;
     try { document.querySelector('.game-action').classList.remove('tutlock'); } catch (e) {}
     if (G.engine) G.engine.script = null;

@@ -2397,6 +2397,9 @@ function showRoundComplete() {
    Leverage-модулем можно); раунд 3 — ВЫШЕ модуля (мокапы 568:15047/572:15946/568:15209:
    низ бабла y≈515 в 812-кадре → bot 309); частичные — по 558:10599 (y≈586 → bot 235).
    wait-шаги (Next скрыт) остаются якорёнными к цели — правило только про Next. */
+/* после последнего бабла обучения раунд идёт ещё столько секунд свободной игры
+   (слово Павла 03.08) — во всех трёх туториалах и в тренировке частичных */
+const TUT_TAIL_SEC = 20;
 const OB_TUT = [
   [ // round 1 — long: интро → падение → отскок (Buy!) → рост → затухание (Close!)
     { key: 'ob1.1', win: '#chartWrap', arrow: ['#tickerBox', 'UL'] }, // мокап 558:12514: окно на графике + стрелка (Павел 01.08)
@@ -2668,7 +2671,7 @@ function endTutorial() {
   const tr = gameTrade();
   try { if (tr && tr.setChartHold) tr.setChartHold(false); } catch (err) {}
   try { if (tr && tr.tutSimPos) tr.tutSimPos(false); } catch (err) {}
-  try { if (tr && tr.tutFree) tr.tutFree(); } catch (err) {} // tutFree сам снимает tutLock
+  try { if (tr && tr.tutFree) tr.tutFree(TUT_TAIL_SEC); } catch (err) {} // tutFree снимает tutLock и даёт хвост свободной игры
   if (tutKind === 'ob') finishTutRound();
   tutSeq = null;
 }
