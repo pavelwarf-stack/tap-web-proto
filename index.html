@@ -68,7 +68,7 @@
           <b class="user-name" id="homeUserName">John Carter</b>
         </button>
         <div class="head-right">
-          <button class="icon-sq gift draft" data-act="open-daily" aria-label="Daily challenge" data-draft="Preserved daily-challenge entry point; absent from the new mockups">
+          <button class="icon-sq gift" data-act="open-daily" aria-label="Daily challenge">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="8.5" width="17" height="4" rx="1"/><rect x="5.5" y="12.5" width="13" height="8" rx="1"/><path d="M12 8.5v12M12 8.5c-2.5 0-5-1-5-3a2 2 0 0 1 4-1c.6.8 1 2.5 1 4zm0 0c2.5 0 5-1 5-3a2 2 0 0 0-4-1c-.6.8-1 2.5-1 4z"/></svg>
           </button>
           <button class="balance-pill" id="balancePill" data-act="open-shop" aria-label="Balance — open shop">
@@ -265,17 +265,20 @@
       <button class="delete-link" data-act="open-delete" data-i18n="set.delete">Delete account</button>
     </section>
 
-    <!-- SETTINGS STUB SUBSCREEN -->
+    <!-- SETTINGS SUBSCREEN (paper mockups 741:29498/29518/29539: chevron in a white circle) -->
     <section class="screen" id="scr-setsub">
-      <header class="sub-head"><button class="back-circle" data-act="back">&larr;</button><span id="setsubTitle">Notifications</span></header>
+      <header class="sub-head"><button class="back-circle" data-act="back"><svg width="10.4" height="16.6" viewBox="0 0 10 16" fill="none"><path d="M6.25 12L3.75 8L6.25 4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button><span id="setsubTitle">Notifications</span></header>
       <div class="stub-body" id="setsubBody"></div>
     </section>
 
-    <!-- PROFILE -->
+    <!-- PROFILE (paper rebuild: Figma 741:29323; кнопки прижаты к низу экрана) -->
     <section class="screen" id="scr-profile">
-      <header class="sub-head"><button class="back-circle" data-act="back">&larr;</button><span data-i18n="prof.title">Profile</span></header>
+      <header class="sub-head">
+        <button class="back-circle" data-act="back" aria-label="Back"><svg width="11" height="17" viewBox="0 0 10 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.4 1.6L2 8l6.4 6.4"/></svg></button>
+        <span data-i18n="prof.title">Profile</span>
+      </header>
       <div class="prof-id">
-        <span class="avatar-ini xl" aria-hidden="true">JC</span>
+        <span class="avatar-ini xl" id="profAvatar" aria-hidden="true">JC</span>
         <span class="prof-name" id="profName">John Carter</span>
         <button class="edit-pill" data-act="edit-profile" data-i18n="prof.edit">Edit</button>
       </div>
@@ -283,12 +286,15 @@
       <div class="stat-rows">
         <div class="stat-row"><span data-i18n="prof.games">Games played</span><b id="stGames">0</b></div>
         <div class="stat-row"><span data-i18n="prof.fav">Favorite game</span><b id="stFav">—</b></div>
-        <div class="stat-row"><span data-i18n="prof.best">Best win</span><b><span class="coin-dot"></span><span id="stBest">0</span><span class="stat-pct">+34.2%</span></b></div>
+        <div class="stat-row"><span data-i18n="prof.best">Best win</span><b class="stat-green"><span class="coin-dot"></span><span id="stBest">0</span><span class="stat-pct">+34.2%</span></b></div>
         <div class="stat-row"><span data-i18n="prof.started">Started playing</span><b id="stStarted">—</b></div>
-        <div class="stat-row draft" data-draft="Purchase-intent counter (meeting decision 24.07: track docupка intent, no in-apps); log = localStorage hub.intents"><span data-i18n="prof.intents">Purchase intents</span><b id="stIntents">0</b></div>
+        <div class="stat-row"><span data-i18n="prof.intents">Purchase intents</span><b id="stIntents">0</b></div>
       </div>
-      <button class="btn btn-ghost wide" data-act="share-stats" data-i18n="prof.share">Share statistics</button>
-      <button class="btn btn-primary wide draft" id="profSaveBtn" data-act="open-saveprogress" data-draft="Entry point to the Save progress flow from Profile (trigger named in flow spec, no wireframe)" data-i18n="prof.savep">Save your progress</button>
+      <button class="btn btn-ghost wide prof-share" data-act="share-stats">
+        <span data-i18n="prof.share">Share statistics</span>
+        <svg width="21" height="21" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" stroke="none"><circle cx="18" cy="5.5" r="2.9"/><circle cx="6" cy="12" r="2.9"/><circle cx="18" cy="18.5" r="2.9"/></g><path d="M8.4 10.6l7.3-4M8.4 13.4l7.3 4" fill="none" stroke="currentColor" stroke-width="2.1"/></svg>
+      </button>
+      <button class="btn btn-primary wide" id="profSaveBtn" data-act="open-saveprogress" data-i18n="prof.savep">Save your progress</button>
     </section>
 
     <!-- GUIDES LIST -->
@@ -296,7 +302,7 @@
       <header class="sub-head"><button class="back-circle" data-act="back">&larr;</button><span data-i18n="guides.title">Guides</span></header>
       <div class="fld search-fld"><input type="text" placeholder="Search" id="guideSearch" data-i18n-ph="search.ph">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></div>
-      <div id="practiceTasks" class="draft" data-draft="Practice tasks block (education module hook, meeting decision 24.07): live checkmarks from real game events"></div>
+      <div id="practiceTasks"></div>
       <div id="guidesBody"></div>
     </section>
 
@@ -318,20 +324,39 @@
       </div>
     </section>
 
-    <!-- NOTIFICATIONS -->
+    <!-- NOTIFICATIONS (мокапы 741:29437 лента / 741:29490 пусто) -->
     <section class="screen" id="scr-notifications">
-      <header class="sub-head"><button class="back-circle" data-act="back">&larr;</button><span data-i18n="sub.notifications">Notifications</span></header>
-      <div class="fld search-fld"><input type="text" placeholder="Search" data-i18n-ph="search.ph">
+      <header class="sub-head"><button class="back-circle" data-act="back"><svg width="10" height="16" viewBox="0 0 10 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 1.5L1.5 8l7 6.5"/></svg></button><span data-i18n="sub.notifications">Notifications</span></header>
+      <div class="fld search-fld" id="ntfSearch"><input type="text" placeholder="Search" data-i18n-ph="search.ph">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></div>
-      <div class="ntf-row unread">
-        <span class="ntf-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4.5a2.5 2.5 0 0 0 2.6 4M17 6h2.5a2.5 2.5 0 0 1-2.6 4M12 14v3M8.5 20h7M10 17h4v3h-4z"/></svg></span>
-        <div class="ntf-text"><b data-i18n="ntf.t1">Tournament starting soon</b><span data-i18n="ntf.d1">Join the tournament and get a chance to win 1,000 chips</span>
-          <button class="btn btn-play sm" data-act="join-tournament" data-i18n="ntf.join">Join</button></div>
+      <div id="ntfList">
+        <div class="ntf-row unread">
+          <span class="ntf-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4.5a2.5 2.5 0 0 0 2.6 4M17 6h2.5a2.5 2.5 0 0 1-2.6 4M12 14v3M8.5 20h7M10 17h4v3h-4z"/></svg></span>
+          <div class="ntf-text">
+            <div class="ntf-top"><b data-i18n="ntf.t1">Tournament starting soon</b><span class="ntf-time" data-i18n="ntf.time1">2 min ago</span></div>
+            <span data-i18n="ntf.d1">Join the tournament and get a chance to win 1,000 chips</span>
+            <button class="btn btn-play sm" data-act="join-tournament" data-i18n="ntf.join">Join</button>
+          </div>
+        </div>
+        <div class="ntf-row unread">
+          <span class="ntf-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="8.5" width="17" height="4" rx="1"/><rect x="5.5" y="12.5" width="13" height="8" rx="1"/><path d="M12 8.5v12M12 8.5c-2.5 0-5-1-5-3a2 2 0 0 1 4-1c.6.8 1 2.5 1 4zm0 0c2.5 0 5-1 5-3a2 2 0 0 0-4-1c-.6.8-1 2.5-1 4z"/></svg></span>
+          <div class="ntf-text">
+            <div class="ntf-top"><b data-i18n="ntf.t2">Welcome bonus for a friend</b><span class="ntf-time" data-i18n="ntf.time2">1h ago</span></div>
+            <span data-i18n="ntf.d2">Get 500 welcome chips for invited friends</span>
+            <button class="btn btn-play sm" data-act="goto-referrals" data-i18n="invite">Invite</button>
+          </div>
+        </div>
+        <div class="ntf-row">
+          <span class="ntf-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="8.5" width="17" height="4" rx="1"/><rect x="5.5" y="12.5" width="13" height="8" rx="1"/><path d="M12 8.5v12M12 8.5c-2.5 0-5-1-5-3a2 2 0 0 1 4-1c.6.8 1 2.5 1 4zm0 0c2.5 0 5-1 5-3a2 2 0 0 0-4-1c-.6.8-1 2.5-1 4z"/></svg></span>
+          <div class="ntf-text">
+            <div class="ntf-top"><b data-i18n="ntf.t2">Welcome bonus for a friend</b><span class="ntf-time" data-i18n="ntf.time3">January 21</span></div>
+            <span data-i18n="ntf.d2">Get 500 welcome chips for invited friends</span>
+          </div>
+        </div>
       </div>
-      <div class="ntf-row">
-        <span class="ntf-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="8.5" width="17" height="4" rx="1"/><rect x="5.5" y="12.5" width="13" height="8" rx="1"/><path d="M12 8.5v12M12 8.5c-2.5 0-5-1-5-3a2 2 0 0 1 4-1c.6.8 1 2.5 1 4zm0 0c2.5 0 5-1 5-3a2 2 0 0 0-4-1c-.6.8-1 2.5-1 4z"/></svg></span>
-        <div class="ntf-text"><b data-i18n="ntf.t2">Welcome bonus for a friend</b><span data-i18n="ntf.d2">Get 500 welcome chips for invited friends</span>
-          <button class="btn btn-play sm" data-act="goto-referrals" data-i18n="invite">Invite</button></div>
+      <div class="ntf-empty" id="ntfEmpty" hidden>
+        <img src="ill-notif-empty.webp" alt="">
+        <p data-i18n="ntf.empty">The notification list is empty</p>
       </div>
     </section>
 
@@ -477,17 +502,17 @@
     <!-- Daily challenge -->
     <div class="sheet" id="sh-daily" hidden>
       <button class="xbtn" data-act="sheet-close">&times;</button>
+      <div class="dc-timer" id="dcTimer">23:46:32</div>
       <div class="sheet-kicker" data-i18n="dc.kicker">Daily challenge</div>
       <h2 data-i18n="dc.title">Candle of the day (BTC)</h2>
       <p class="sheet-sub" data-i18n="dc.sub">Open a trade on BTC's daily close and<br>earn a reward</p>
       <div class="daily-chart">
         <svg viewBox="0 0 302 140" preserveAspectRatio="none">
-          <g class="dc-grid" stroke="#e6d9bb" stroke-width="1" stroke-dasharray="3 4">
+          <g class="dc-grid" stroke="#e6d9bb" stroke-width="1" stroke-dasharray="4 4">
             <line x1="0" y1="35" x2="302" y2="35"/><line x1="0" y1="70" x2="302" y2="70"/><line x1="0" y1="105" x2="302" y2="105"/>
-            <line x1="50" y1="0" x2="50" y2="140"/><line x1="110" y1="0" x2="110" y2="140"/><line x1="170" y1="0" x2="170" y2="140"/>
+            <line x1="60" y1="0" x2="60" y2="140"/><line x1="120" y1="0" x2="120" y2="140"/><line x1="180" y1="0" x2="180" y2="140"/><line x1="240" y1="0" x2="240" y2="140"/>
           </g>
           <g id="dailyCandles"></g>
-          <line x1="243" y1="0" x2="243" y2="140" stroke="#fff" stroke-width="2"/>
         </svg>
         <div class="daily-q" id="dailyQ"><span>?</span><span class="q-big">?</span><span>?</span></div>
         <div class="daily-prices"><span>63.380</span><span>63.360</span><span>63.340</span></div>
@@ -514,33 +539,37 @@
       <button class="btn btn-ghost wide" data-act="sheet-close" data-i18n="np.deny">Deny</button>
     </div>
 
-    <!-- Save progress -->
+    <!-- Save progress (мокап 741:28093: заголовок слева, white-30 банк-баннер с пилюлей «You have», Register + Not now) -->
     <div class="sheet" id="sh-saveprogress" hidden>
       <button class="xbtn" data-act="sheet-close">&times;</button>
       <h2 data-i18n="prof.savep">Save your progress</h2>
       <div class="sp-band">
-        <p id="spHave"><span data-i18n="sp.have">You have</span> <span class="coin-dot"></span> <b id="spBalance">8 253</b></p>
-        <p id="spDaysLine">and <b id="spDays">2 days</b> of wins in the daily challenge</p>
+        <p class="sp-pill" id="spHave"><span data-i18n="sp.have">You have</span> <span class="coin-dot"></span> <b id="spBalance">8 253</b></p>
+        <p class="sp-days" id="spDaysLine">and <b id="spDays">2 days</b> of wins in the daily challenge</p>
       </div>
       <button class="btn btn-primary wide" data-act="open-signup" data-i18n="sp.register">Register</button>
+      <button class="sheet-later" data-act="sheet-close" data-i18n="peak.later">Not now</button>
     </div>
 
-    <!-- Out of chips -->
+    <!-- Out of chips (paper: мокап 741:27489 — вариант С иллюстрацией (primary);
+         вариант без неё = 741:27371, отличие только в отсутствии маскота и левом заголовке) -->
     <div class="sheet" id="sh-outofchips" hidden>
       <button class="xbtn" data-act="sheet-close">&times;</button>
       <h2 data-i18n="ooc.title">Out of chips</h2>
-      <!-- W3: пакеты и фри-ряд = скелет магазина, скин из его CSS (карты A / арт+hot B / тёмные C) -->
+      <img class="ooc-ill" src="ill-oochips.webp" alt="" aria-hidden="true">
+      <!-- W3: пакеты и фри-ряд = скелет магазина, скин из его CSS (карты A / арт+hot B / тёмные C);
+           paper (741:27489): контурная двойная монета 36px в pack-art, показывает её ТОЛЬКО paper -->
       <div class="packs in-sheet">
         <div class="pack">
           <div class="pack-top"></div>
-          <div class="pack-art"></div>
+          <div class="pack-art"><svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><path d="M20.6226 26.6021C20.1723 28.091 19.3438 29.4378 18.2179 30.5111C17.092 31.5844 15.7071 32.3476 14.1984 32.7262C12.6896 33.1048 11.1085 33.0859 9.60927 32.6713C8.11001 32.2568 6.74379 31.4607 5.64387 30.3608C4.54396 29.2608 3.74789 27.8946 3.33333 26.3954C2.91877 24.8961 2.89986 23.315 3.27845 21.8062C3.65704 20.2975 4.42021 18.9126 5.49351 17.7867C6.56681 16.6608 7.9136 15.8323 9.40252 15.382M22.5065 8.99812H24.0065V14.9982M9.20709 22.1496L10.5061 21.3996L13.5061 26.5957M33.0066 11.9982C33.0066 16.9688 28.9771 20.9983 24.0065 20.9983C19.0359 20.9983 15.0065 16.9688 15.0065 11.9982C15.0065 7.02753 19.0359 2.99805 24.0065 2.99805C28.9771 2.99805 33.0066 7.02753 33.0066 11.9982Z" stroke="#FFB703" stroke-width="2" stroke-linecap="round"/></svg></div>
           <div class="pack-amt"><span class="coin-dot"></span><span>50 000</span></div>
           <div class="pack-price">4.99$</div>
           <button class="btn btn-play sm" data-act="buy" data-pack="50k-4.99"><span class="bp-word" data-i18n="buy">Buy</span><span class="bp-price">4.99$</span></button>
         </div>
         <div class="pack hot">
           <div class="pack-top"><span class="hot-tag" data-i18n="hot">Hot</span><span class="pack-save" data-i18n="savePct" data-i18n-arg="47">Save 47%</span></div>
-          <div class="pack-art"></div>
+          <div class="pack-art"><svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><path d="M20.6226 26.6021C20.1723 28.091 19.3438 29.4378 18.2179 30.5111C17.092 31.5844 15.7071 32.3476 14.1984 32.7262C12.6896 33.1048 11.1085 33.0859 9.60927 32.6713C8.11001 32.2568 6.74379 31.4607 5.64387 30.3608C4.54396 29.2608 3.74789 27.8946 3.33333 26.3954C2.91877 24.8961 2.89986 23.315 3.27845 21.8062C3.65704 20.2975 4.42021 18.9126 5.49351 17.7867C6.56681 16.6608 7.9136 15.8323 9.40252 15.382M22.5065 8.99812H24.0065V14.9982M9.20709 22.1496L10.5061 21.3996L13.5061 26.5957M33.0066 11.9982C33.0066 16.9688 28.9771 20.9983 24.0065 20.9983C19.0359 20.9983 15.0065 16.9688 15.0065 11.9982C15.0065 7.02753 19.0359 2.99805 24.0065 2.99805C28.9771 2.99805 33.0066 7.02753 33.0066 11.9982Z" stroke="#FFB703" stroke-width="2" stroke-linecap="round"/></svg></div>
           <div class="pack-amt"><span class="coin-dot"></span><span>150 000</span></div>
           <div class="pack-price">8.99$</div>
           <div class="pack-save2" data-i18n="savePct" data-i18n-arg="47">Save 47%</div>
@@ -548,7 +577,7 @@
         </div>
         <div class="pack">
           <div class="pack-top"><span class="pack-save" data-i18n="savePct" data-i18n-arg="70">Save 70%</span></div>
-          <div class="pack-art"></div>
+          <div class="pack-art"><svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><path d="M20.6226 26.6021C20.1723 28.091 19.3438 29.4378 18.2179 30.5111C17.092 31.5844 15.7071 32.3476 14.1984 32.7262C12.6896 33.1048 11.1085 33.0859 9.60927 32.6713C8.11001 32.2568 6.74379 31.4607 5.64387 30.3608C4.54396 29.2608 3.74789 27.8946 3.33333 26.3954C2.91877 24.8961 2.89986 23.315 3.27845 21.8062C3.65704 20.2975 4.42021 18.9126 5.49351 17.7867C6.56681 16.6608 7.9136 15.8323 9.40252 15.382M22.5065 8.99812H24.0065V14.9982M9.20709 22.1496L10.5061 21.3996L13.5061 26.5957M33.0066 11.9982C33.0066 16.9688 28.9771 20.9983 24.0065 20.9983C19.0359 20.9983 15.0065 16.9688 15.0065 11.9982C15.0065 7.02753 19.0359 2.99805 24.0065 2.99805C28.9771 2.99805 33.0066 7.02753 33.0066 11.9982Z" stroke="#FFB703" stroke-width="2" stroke-linecap="round"/></svg></div>
           <div class="pack-amt"><span class="coin-dot"></span><span>370 000</span></div>
           <div class="pack-price">10.99$</div>
           <div class="pack-save2" data-i18n="savePct" data-i18n-arg="70">Save 70%</div>
@@ -592,8 +621,9 @@
       <button class="btn btn-primary wide" id="drClaimBtn" data-act="claim-dailyreward">Claim bonus</button>
     </div>
 
-    <!-- Log out -->
-    <div class="sheet draft" id="sh-logout" hidden data-draft="Log out confirmation sheet (row exists in the Settings wireframe, the sheet itself does not)">
+    <!-- Log out (Figma 741:28260 — паттерн подтверждения для paper) -->
+    <div class="sheet confirm" id="sh-logout" hidden>
+      <button class="xbtn" data-act="sheet-close">&times;</button>
       <div class="lo-ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></div>
       <h2 data-i18n="lo.title">Log out?</h2>
       <p class="sheet-sub" data-i18n="lo.sub">Are you sure you want to log out of your account?</p>
@@ -610,23 +640,31 @@
       <button class="btn btn-primary wide" data-act="open-guides" data-i18n="rc.guides.btn">Read guides</button>
     </div>
 
-    <!-- Starter pack 1.99$ (вердикт 31.07 п.27: авто-шит со второй сессии, один раз; ★ draft) -->
-    <div class="sheet draft" id="sh-starter" hidden data-draft="Starter pack sheet (owner verdict 31.07 п.27: 1.99$ chip pack, auto-shown once from the SECOND app session; payment stub + intent log per the common scheme п.15). Layout/copy and the 5 000 chips amount are mine (★draft)">
+    <!-- Starter pack 1.99$ (вердикт 31.07 п.27: авто-шит со второй сессии, один раз;
+         вёрстка по мокапу 741:28175 — жёлтый бейдж над таймером 2ч-окна, белая пилюля 5 000) -->
+    <div class="sheet" id="sh-starter" hidden>
       <button class="xbtn" data-act="sheet-close">&times;</button>
-      <div class="sheet-kicker pill" data-i18n="offer.t">Starter chip pack</div>
-      <div class="offer-big"><span class="coin-dot"></span>5 000</div>
-      <div class="offer-price big">1.99$</div>
-      <p class="sheet-sub" data-i18n="offer.d" data-i18n-arg="5 000|1.99$">Get 5 000 chips for just 1.99$ and speed up your progress.</p>
+      <div class="st-head">
+        <span class="st-timer" id="starterSheetTimer">2:00:00</span>
+        <span class="st-badge" data-i18n="offer.t">Starter chip pack</span>
+      </div>
+      <div class="st-chips"><span class="coin-dot"></span><span>5 000</span></div>
+      <div class="st-price">1.99$</div>
+      <p class="sheet-sub st-desc" data-i18n="offer.d" data-i18n-arg="5 000|1.99$">Get 5 000 chips for just 1.99$ and speed up your progress.</p>
       <button class="btn btn-primary wide" data-act="starter-buy" data-i18n="buy">Buy</button>
-      <button class="btn btn-ghost wide" data-act="sheet-close" data-i18n="peak.later">Not now</button>
+      <button class="sheet-later" data-act="sheet-close" data-i18n="peak.later">Not now</button>
     </div>
 
-    <!-- Peak offer «You're on fire» (webv1, встреча п.5: хук «пика тупизны», ★ draft) -->
-    <div class="sheet draft" id="sh-peak" hidden data-draft="Peak-moment upsell sheet (Dunning–Kruger hook, meeting decision 24.07). Trigger (verdict 25.07): 3 winning rounds in a row with PnL ≥ +30%; shows AFTER return to Home, never over Round Complete (verdict 31.07 п.28); once per session, max once a day. All option clicks go to the intent log.">
+    <!-- Peak offer «You're on fire» (webv1, встреча п.5: хук «пика тупизны»).
+         Вёрстка по мокапу 741:27988 (вариант С иллюстрацией; 741:27884 — без неё).
+         Триггер (вердикты 25.07/31.07 п.28) не менялся: 3 победных раунда подряд с PnL ≥ +30%,
+         показ ПОСЛЕ возврата на Home, не поверх Round Complete; раз в сессию, максимум раз в день.
+         Все клики по опциям — в intent-лог. -->
+    <div class="sheet" id="sh-peak" hidden>
       <button class="xbtn" data-act="sheet-close">&times;</button>
-      <div class="peak-flame" aria-hidden="true">🔥</div>
       <h2 data-i18n="peak.title">You’re on fire!</h2>
       <p class="sheet-sub" data-i18n="peak.sub">Level up for real — pick your next step</p>
+      <img class="peak-ill" src="ill-peak.webp" alt="" width="881" height="865">
       <div class="peak-opts">
         <button class="peak-opt" data-act="peak-opt" data-src="peak-course">
           <span class="po-ico">🎓</span>
@@ -644,27 +682,35 @@
           <span class="chev">&rsaquo;</span>
         </button>
       </div>
-      <button class="btn btn-ghost wide" data-act="peak-later" data-i18n="peak.later">Not now</button>
+      <button class="sheet-later" data-act="peak-later" data-i18n="peak.later">Not now</button>
     </div>
 
-    <!-- Payment stub (вердикт 27.07: в веб-прототипе только заглушки платежей) -->
-    <div class="sheet draft" id="sh-paystub" hidden data-draft="Payment stub (owner verdict 27.07: web prototype has payment/quest stubs only): item + price → Pay → endless «Payment processing…»; both steps go to hub.intents. Layout/copy are mine; prop-quest price 49.99$ APPROVED by owner 27.07 evening">
+    <!-- Payment sheet (мокап 741:27608; вердикт 02.08: Pay → лоадер ≈1.8с → успех,
+         чипс-паки реально зачисляются в баланс; success-стейта в макете нет — язык карт paper) -->
+    <div class="sheet" id="sh-paystub" hidden>
       <button class="xbtn" data-act="sheet-close">&times;</button>
       <div id="psConfirm">
         <h2 id="psItem">Item</h2>
-        <div class="ps-price" id="psPrice">9.99$</div>
-        <button class="btn btn-primary wide" data-act="paystub-pay" data-i18n="stub.pay">Pay</button>
+        <div class="ps-priceband">
+          <span class="ps-price" id="psPrice">9.99$</span>
+          <span class="save-pill" id="psSave" hidden>Save 47%</span>
+        </div>
+        <button class="btn btn-primary wide pay-cta" id="psPayBtn" data-act="paystub-pay">
+          <span id="psPayIdle" data-i18n="stub.pay">Pay</span>
+          <span class="pay-busy" id="psPayBusy" hidden><span class="pay-spinner" aria-hidden="true"></span><span data-i18n="stub.making">Making a purchase</span></span>
+        </button>
       </div>
-      <div id="psWait" hidden>
-        <div class="stub-spinner" aria-hidden="true"></div>
-        <h2 data-i18n="stub.processing">Payment processing…</h2>
-        <p class="sheet-sub" data-i18n="stub.notify">We’ll notify you when it’s done</p>
-        <button class="btn btn-ghost wide stub-close" data-act="sheet-close" data-i18n="close">Close</button>
+      <div id="psDone" hidden>
+        <div class="ps-check" aria-hidden="true">&#10003;</div>
+        <h2 data-i18n="stub.success">Payment successful!</h2>
+        <p class="sheet-sub" id="psDoneSub"></p>
+        <button class="btn btn-primary wide" data-act="sheet-close" data-i18n="done">Done</button>
       </div>
     </div>
 
-    <!-- Course tier picker (вердикт 27.07; цены УТВЕРЖДЕНЫ владельцем 27.07 вечер) -->
-    <div class="sheet draft" id="sh-tiers" hidden data-draft="Course tier picker (owner verdict 27.07). Tier names Basic/Pro/Expert stay English in all languages (product convention); USD prices 9.99/29.99/99.99 APPROVED by owner 27.07 evening; tier descriptions are mine">
+    <!-- Course tier picker (мокап 741:27704; цены УТВЕРЖДЕНЫ владельцем 27.07 вечер;
+         имена Basic/Pro/Expert и бейдж BEST — английские во всех языках) -->
+    <div class="sheet" id="sh-tiers" hidden>
       <button class="xbtn" data-act="sheet-close">&times;</button>
       <h2 data-i18n="peak.course">Crypto trading course</h2>
       <p class="sheet-sub" data-i18n="tiers.sub">Choose your level</p>
@@ -674,10 +720,11 @@
           <span class="po-text"><b>Basic</b><span data-i18n="tiers.basic.d">Charts, orders and first trades</span></span>
           <span class="tier-price">9.99$</span>
         </button>
-        <button class="peak-opt" data-act="tier-pick" data-tier="2">
+        <button class="peak-opt best" data-act="tier-pick" data-tier="2">
           <span class="po-ico">🚀</span>
           <span class="po-text"><b>Pro</b><span data-i18n="tiers.pro.d">Strategies, leverage and risk management</span></span>
           <span class="tier-price">29.99$</span>
+          <span class="tier-best" data-i18n="best">Best</span>
         </button>
         <button class="peak-opt" data-act="tier-pick" data-tier="3">
           <span class="po-ico">🧠</span>
@@ -685,11 +732,14 @@
           <span class="tier-price">99.99$</span>
         </button>
       </div>
+      <button class="btn btn-ghost wide stub-close" data-act="sheet-close" data-i18n="peak.later">Not now</button>
     </div>
 
-    <!-- Partner redirect stub (вердикт 27.07: Binance Academy) -->
-    <div class="sheet draft" id="sh-redirect" hidden data-draft="Partner-redirect stub (owner verdict 27.07): endless «Redirecting to partner…», close by hand; no real redirect in the prototype">
+    <!-- Partner redirect stub (мокап 741:27805: вечное «Redirecting to partner…», закрывается руками;
+         rd-logo = пустой плейсхолдер под лого партнёра, так в макете) -->
+    <div class="sheet" id="sh-redirect" hidden>
       <button class="xbtn" data-act="sheet-close">&times;</button>
+      <div class="rd-logo" aria-hidden="true"></div>
       <div class="stub-spinner" aria-hidden="true"></div>
       <h2 data-i18n="stub.redirect">Redirecting to partner… (prototype)</h2>
       <button class="btn btn-ghost wide stub-close" data-act="sheet-close" data-i18n="close">Close</button>
@@ -701,8 +751,9 @@
   <div id="modallayer" hidden>
     <div class="backdrop" data-act="modal-close"></div>
 
-    <!-- Delete account -->
-    <div class="modal" id="md-delete" hidden>
+    <!-- Delete account (Figma 741:28336 — destructive-подтверждение) -->
+    <div class="modal confirm" id="md-delete" hidden>
+      <button class="xbtn" data-act="modal-close">&times;</button>
       <div class="danger-ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 2.5h8.2l5.4 5.4v8.2l-5.4 5.4H7.9l-5.4-5.4V7.9z"/><path d="M12 8v4.5"/><circle cx="12" cy="16" r=".6" fill="currentColor"/></svg></div>
       <h2 class="danger-title" data-i18n="del.title">Delete account?</h2>
       <p data-i18n="del.text">This action is permanent and cannot be undone. All your data, achievements, and history will be lost.</p>
@@ -710,26 +761,48 @@
       <button class="btn btn-outline wide" data-act="modal-close" data-i18n="cancel">Cancel</button>
     </div>
 
-    <!-- First win -->
-    <div class="modal draft" id="md-firstwin" hidden data-draft="First-win congratulation modal (flow spec; no dedicated wireframe)">
+    <!-- First win (Figma 741:28776; триггер модалки выключен — на RC живёт зелёная карточка бонуса, вердикт 26.07) -->
+    <div class="modal" id="md-firstwin" hidden>
+      <button class="xbtn" data-act="modal-close">&times;</button>
       <div class="trophy-art">
-        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4.5a2.5 2.5 0 0 0 2.6 4M17 6h2.5a2.5 2.5 0 0 1-2.6 4M12 14v3M8.5 20h7M10 17h4v3h-4z"/></svg>
+        <img src="mascot-firstwin.webp" alt="">
       </div>
       <h2 data-i18n="fw.title">Congratulations on your first successful trade</h2>
-      <p class="fw-earn"><span data-i18n="fw.earned">You earned</span> <span class="coin-dot"></span> <b>150</b></p>
+      <p class="fw-earn"><span data-i18n="fw.earned">You earned</span> <span class="fw-pill"><span class="coin-dot"></span> <b>150</b></span></p>
       <button class="btn btn-primary wide" data-act="firstwin-continue" data-i18n="fw.continue">Continue playing</button>
     </div>
 
-    <!-- New achievement -->
+    <!-- New achievement (Figma 741:28416: арт достижения в круге-баннере) -->
     <div class="modal" id="md-newach" hidden>
       <button class="xbtn" data-act="modal-close">&times;</button>
       <div class="sheet-kicker" data-i18n="newach">New achievement!</div>
       <div class="ach-art">
-        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4.5a2.5 2.5 0 0 0 2.6 4M17 6h2.5a2.5 2.5 0 0 1-2.6 4M12 14v3M8.5 20h7M10 17h4v3h-4z"/></svg>
+        <img id="naArt" src="" alt="" hidden>
+        <svg id="naArtFallback" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4.5a2.5 2.5 0 0 0 2.6 4M17 6h2.5a2.5 2.5 0 0 1-2.6 4M12 14v3M8.5 20h7M10 17h4v3h-4z"/></svg>
       </div>
       <h2 id="naTitle">Avid player</h2>
       <p id="naSub">You completed 150 games</p>
       <button class="btn btn-primary wide" data-act="claim-newach"><span data-i18n="newach.claim">Claim reward</span> &nbsp;<span class="coin-dot"></span> <span id="naReward">5 000</span></button>
+    </div>
+
+    <!-- Profile settings (Figma 741:29365): никнейм + выбор аватара, выбор фиксируется Save -->
+    <div class="modal" id="md-profedit" hidden>
+      <div class="pe-head">
+        <h2 data-i18n="pe.title">Profile settings</h2>
+        <button class="pe-x" data-act="modal-close" aria-label="Close"><svg width="21" height="21" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4.2 4.2l11.6 11.6M15.8 4.2L4.2 15.8"/></svg></button>
+      </div>
+      <label class="pe-lbl" for="peName" data-i18n="pe.nick">Nickname</label>
+      <input class="pe-input" id="peName" type="text" maxlength="24" autocomplete="off" spellcheck="false">
+      <div class="pe-lbl" data-i18n="pe.avatar">Avatar</div>
+      <div class="pe-grid" id="peGrid">
+        <button class="pe-ava" data-act="pe-ava" data-ava="pepe" aria-label="Avatar 1"><img src="avatar-pepe.webp" alt="" width="208" height="323"></button>
+        <button class="pe-ava" data-act="pe-ava" data-ava="whale" aria-label="Avatar 2"><img src="avatar-whale.webp" alt="" width="208" height="345"></button>
+        <button class="pe-ava" data-act="pe-ava" data-ava="doge" aria-label="Avatar 3"><img src="avatar-doge.webp" alt="" width="208" height="323"></button>
+        <button class="pe-ava" data-act="pe-ava" data-ava="bull" aria-label="Avatar 4"><img src="avatar-bull.webp" alt="" width="208" height="323"></button>
+        <button class="pe-ava" data-act="pe-ava" data-ava="boy" aria-label="Avatar 5"><img src="avatar-boy.webp" alt="" width="208" height="323"></button>
+        <button class="pe-ava" data-act="pe-ava" data-ava="trump" aria-label="Avatar 6"><img src="avatar-trump.webp" alt="" width="208" height="323"></button>
+      </div>
+      <button class="btn btn-primary wide pe-save" data-act="profedit-save" data-i18n="pe.save">Save</button>
     </div>
   </div>
 

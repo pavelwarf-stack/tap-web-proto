@@ -1614,12 +1614,47 @@ body[data-skin="corporate"] .stub-card p { font-size:14.6px; }
   padding:13px 16px; font-size:14.2px; font-weight:500; color:var(--tx); text-align:left;
 }
 .stub-list-row + .stub-list-row { border-top:1px solid var(--line); margin-top:0; }
-.stub-check { margin-left:auto; color:var(--tab-active); font-weight:800; }
+.stub-list-row .switch { margin-left:auto; }
+/* галочка выбора — зелёная во всех скинах (мокап 741:29549: #13A86D) */
+.stub-check { margin-left:auto; display:flex; align-items:center; color:var(--green); font-weight:800; }
 .set-group:has(.stub-list-row) { padding:0; }
+/* ---------- settings subpages (ноды 741:29498/29518/29539, 375→390 ×1.04) ----------
+   base = токены; папирусная геометрия — в PAPER-слое в конце файла */
+#scr-setsub .set-group { border-radius:20.8px; }
+#scr-setsub .set-group.vol-card { display:flex; flex-direction:column; gap:20.8px; padding:20.8px; border-radius:25px; }
+.vol-block { display:flex; flex-direction:column; gap:12.5px; }
+.vol-label { font-size:15.6px; line-height:20.8px; font-weight:800; color:var(--tx); }
+.vol-hr { height:1px; border-radius:80px; background:var(--line); }
+.vol-range {
+  -webkit-appearance:none; appearance:none; display:block; width:100%; height:16.6px;
+  background:none; outline:none; cursor:pointer; margin:0;
+}
+.vol-range::-webkit-slider-runnable-track {
+  height:6.2px; border-radius:100px;
+  background:linear-gradient(90deg, var(--blue) var(--fill, 50%), var(--card-line) var(--fill, 50%));
+}
+.vol-range::-webkit-slider-thumb {
+  -webkit-appearance:none; box-sizing:border-box; width:16.6px; height:16.6px; margin-top:-5.2px;
+  border-radius:50%; background:var(--blue); border:2px solid var(--card-line);
+}
+.vol-range::-moz-range-track {
+  height:6.2px; border-radius:100px;
+  background:linear-gradient(90deg, var(--blue) var(--fill, 50%), var(--card-line) var(--fill, 50%));
+}
+.vol-range::-moz-range-thumb {
+  box-sizing:border-box; width:16.6px; height:16.6px;
+  border-radius:50%; background:var(--blue); border:2px solid var(--card-line);
+}
+#scr-setsub .back-circle { display:flex; align-items:center; justify-content:center; }
 
-/* ---------- profile (reskin W3 ★draft: макета нет — язык по ДС вариантов) ----------
-   A: белая карта статистики с волосяными линиями; B: голые ряды + hairlines;
-   C: тёмная карта, mono-цифры (группа font-num ниже). Один скелет. */
+/* ---------- profile (paper rebuild: Figma 741:29323) ----------
+   Скелет по paper-мокапу: экран = flex-колонка, Share/Save прижаты к низу;
+   четвёрка скинов сохраняет свой язык поверх (карта/hairlines/цвета). */
+#scr-profile { padding:7px 16.6px 31.2px; }
+#scr-profile.active { display:flex; flex-direction:column; }
+#scr-profile.active > * { flex:0 0 auto; }
+/* заголовок 28 Black (741:29324) — только paper: у corporate свой navy-бар с ID-меньшей специфичностью */
+body[data-skin="paper"] #scr-profile .sub-head { font-size:29.1px; }
 .prof-id { display:flex; align-items:center; gap:12.5px; padding:12.5px 0 0; }
 .avatar-ini.xl { width:66.6px; height:66.6px; flex-basis:66.6px; font-size:22.9px; }
 .prof-name { font-size:20.8px; line-height:25px; font-weight:700; color:var(--tx); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -1638,14 +1673,44 @@ body[data-skin="corporate"] .stub-card p { font-size:14.6px; }
 .stat-row span:first-child { color:var(--tx-soft); font-weight:400; }
 .stat-row b { color:var(--tx); font-weight:700; display:flex; align-items:center; gap:5.2px; }
 .stat-row .coin-dot { width:14.6px; height:14.6px; flex-basis:14.6px; }
+.stat-row b.stat-green { color:var(--green); } /* Best win: значение целиком зелёное (741:29346) */
 .stat-pct { color:var(--green); font-weight:700; margin-left:1px; }
 body[data-skin="corporate"] .stat-rows { background:none; border:none; box-shadow:none; padding:0; }
 body[data-skin="corporate"] .stat-row { min-height:53px; font-size:15.6px; }
 body[data-skin="corporate"] .stat-row span:first-child { color:var(--sb); }
 body[data-skin="corporate"] .stat-row b { font-weight:600; }
 body[data-skin="crypto-dark"] .stat-rows { border:none; border-radius:var(--r-card-lg); padding:4.2px 16.6px; }
-#scr-profile .btn.wide { margin-top:25px; }
-#scr-profile .btn-ghost.wide { margin-top:25px; }
+#scr-profile .prof-share { margin-top:auto; display:flex; align-items:center; justify-content:center; gap:12.5px; }
+#scr-profile .prof-share svg { flex:0 0 auto; }
+#scr-profile .btn-primary.wide { margin-top:16.6px; }
+
+/* ---------- profile settings modal (Figma 741:29365) ---------- */
+#md-profedit { left:16.6px; right:16.6px; text-align:left; padding:25px; border-radius:25px; }
+.pe-head { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+#md-profedit h2 { font-size:25px; line-height:32.4px; }
+.pe-x { width:29px; height:29px; flex:0 0 auto; display:flex; align-items:center; justify-content:center; color:var(--tx); background:none; padding:0; }
+.pe-lbl { display:block; font-size:14.6px; line-height:19.8px; font-weight:800; color:var(--tx); margin:20.8px 0 8.3px; }
+.pe-input {
+  display:block; width:100%; padding:14.6px; border:none; border-radius:12.5px;
+  background:rgba(255,255,255,.8); color:var(--tx);
+  font-family:var(--font); font-size:16.6px; line-height:22.7px; font-weight:700;
+}
+.pe-grid { display:flex; flex-wrap:wrap; gap:12.5px; }
+.pe-ava {
+  position:relative; width:93.6px; height:93.6px; padding:0; border-radius:16.6px; overflow:hidden;
+  background:var(--accent2);
+  box-shadow:inset 0 0 0 2px var(--card-line), 0 4.2px 0 rgba(0,0,0,.10);
+}
+/* ассеты — вертикальные бюсты; кадрирование ячейки = мокап (97×150 при box 90, x-3 y-2) */
+.pe-ava img { position:absolute; top:-2.1px; left:-3.1px; width:100.9px; height:auto; }
+.pe-ava[data-ava="whale"] img { top:0; left:-2.1px; width:106.1px; }
+.pe-ava[data-ava="trump"] img { top:-8.3px; }
+.pe-ava.sel::after {
+  content:''; position:absolute; top:6.2px; right:6.2px; width:20.8px; height:20.8px; border-radius:50%;
+  background:var(--green) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'%3E%3Cpath d='M1.5 5.2 4.5 8 10.5 1.8' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/58% no-repeat;
+  box-shadow:inset 0 0 0 2px #fff, 0 2.1px 0 rgba(0,0,0,.10);
+}
+.pe-save { margin-top:20.8px; }
 
 /* ---------- guides (reskin W3 ★draft: макета нет — ряды в языке вариантов) ----------
    A: карточные ряды с шевроном; B: голые ряды + hairlines; C: тёмные карты.
@@ -1664,6 +1729,10 @@ body[data-skin="crypto-dark"] .stat-rows { border:none; border-radius:var(--r-ca
   font-size:14.6px; line-height:19.8px; font-weight:600; color:var(--tx);
 }
 .g-row > span { flex:1 1 auto; }
+/* заголовок + подзаголовок ряда (мокап 741:29147: title 14 Bold, sub 12 Medium) */
+.g-txt { display:flex; flex-direction:column; gap:4.2px; }
+.g-row b { font-weight:700; }
+.g-row em { font-style:normal; font-size:12.5px; line-height:16.6px; font-weight:500; color:var(--tx-soft); }
 .g-row::after { content:'\203A'; margin-left:auto; color:var(--sb); font-size:19.8px; line-height:1; font-weight:600; flex:0 0 auto; }
 body[data-skin="corporate"] .g-row {
   background:none; border:none; border-radius:0; box-shadow:none;
@@ -1681,7 +1750,12 @@ body[data-skin="crypto-dark"] .g-row { border:none; border-radius:var(--r-card-l
 body[data-skin="corporate"] .article p { font-size:15.6px; line-height:22.9px; }
 body[data-skin="crypto-dark"] .article p { font-size:14.6px; line-height:21.8px; }
 .article .art-lead { color:var(--tx); font-weight:600; margin-bottom:16.6px; }
-.art-img { height:174px; border-radius:var(--r-card-lg); background:var(--accent2); margin:14.6px 0; }
+/* врезка-подзаголовок и списки статьи (markdown-lite мокапа 741:29306) */
+.art-h { font-size:17.7px; line-height:22.9px; font-weight:700; color:var(--tx); font-family:var(--font-head); margin:4.2px 0 8.3px; }
+.article ol, .article ul { margin:0 0 12.5px; padding-left:22.9px; }
+.article li { font-size:13.5px; line-height:19.8px; color:var(--tx); margin-bottom:4.2px; }
+/* арт статьи: иллюстрация Миши (мокап 741:29315), у паттернов её перекрывает SVG-скетч */
+.art-img { height:174px; border-radius:var(--r-card-lg); background:var(--accent2) url('ill-guides-article.webp') center/cover no-repeat; margin:14.6px 0; }
 /* блок «закрепи в игре» в статье: wireframe-gcard → карточный язык вариантов (★draft) */
 .article .gcard {
   background:var(--card); border:1px solid var(--line); border-radius:var(--r-card-lg);
@@ -1697,14 +1771,13 @@ body[data-skin="crypto-dark"] .article .gcard { border:none; }
    нейтральные линии currentColor (здесь --tx-soft), акценты var(--green)/var(--red) в самом SVG */
 .art-img.art-chart {
   height:auto; display:flex; align-items:center; justify-content:center;
-  padding:17px 14px; color:var(--tx-soft);
+  padding:17px 14px; color:var(--tx-soft); background:var(--accent2);
 }
 .art-chart svg { display:block; width:100%; max-width:340px; height:auto; }
 .article .gcard { margin-bottom:14px; }
 
-/* ---------- notifications (reskin W3 ★draft: макета нет — ряды в языке вариантов) ----------
-   A: карточные ряды, зелёный кружок-иконка (как achievements); B: голые ряды + hairlines;
-   C: тёмные карты, cyan-иконки. Непрочитанное — красная точка справа сверху. */
+/* ---------- notifications (мокап 741:29437: карточные ряды, время справа от заголовка;
+   непрочитанное — красная точка на правом верхнем крае кружка-иконки) ---------- */
 .ntf-row {
   position:relative; display:flex; gap:12.5px; align-items:flex-start;
   background:var(--card); border:1px solid var(--line); border-radius:var(--r-card);
@@ -1712,11 +1785,12 @@ body[data-skin="crypto-dark"] .article .gcard { border:none; }
   padding:14.6px; margin:0 0 8.3px;
 }
 .ntf-row:first-of-type { margin-top:16.6px; }
-.ntf-row.unread::before {
-  content:''; position:absolute; top:14.6px; right:14.6px; width:8.3px; height:8.3px; border-radius:50%;
-  background:var(--red);
+.ntf-row.unread .ntf-ico::after {
+  content:''; position:absolute; top:0; right:0; width:10.4px; height:10.4px; border-radius:50%;
+  background:var(--red); box-shadow:0 0 0 2px var(--icirc-bg);
 }
 .ntf-ico {
+  position:relative;
   width:41.6px; height:41.6px; border-radius:50%; flex:0 0 41.6px;
   background:var(--icirc-bg); color:var(--icirc-tx);
   display:flex; align-items:center; justify-content:center;
@@ -1730,11 +1804,21 @@ body[data-skin="corporate"] .ntf-row + .ntf-row::after { content:''; position:ab
 body[data-skin="corporate"] .ntf-row.unread::before { right:4.2px; }
 body[data-skin="crypto-dark"] .ntf-row { border:none; border-radius:var(--r-card-lg); padding:16.6px; margin-bottom:12.5px; }
 .ntf-text { display:flex; flex-direction:column; gap:0; padding-top:1px; flex:1 1 auto; min-width:0; }
+.ntf-top { display:flex; justify-content:space-between; align-items:flex-start; gap:8.3px; }
+.ntf-time { flex:0 0 auto; font-size:12.5px; line-height:17.7px; font-weight:600; color:var(--tx-soft); }
 .ntf-text b { font-size:14.6px; line-height:19.8px; color:var(--tx); font-weight:700; padding-right:12.5px; }
 body[data-skin="corporate"] .ntf-text b { font-weight:600; font-size:15.6px; line-height:21.8px; }
 .ntf-text > span { font-size:12.5px; line-height:17.7px; font-weight:400; color:var(--tx-soft); margin-top:2.1px; }
 body[data-skin="corporate"] .ntf-text > span { font-size:13.5px; line-height:18.7px; color:var(--sb); }
 .ntf-text .btn-play { width:auto; align-self:flex-start; min-width:104px; margin-top:10.4px; }
+/* пустая лента (мокап 741:29490): рептилоид с газетой + подпись чернилами-70 */
+.ntf-empty { text-align:center; padding-top:62.4px; }
+.ntf-empty img { display:block; width:302.6px; max-width:88%; height:auto; margin:0 auto; }
+.ntf-empty p {
+  margin:11.4px auto 0; max-width:250px;
+  font-family:var(--font-head); font-weight:var(--w-head);
+  font-size:29.1px; line-height:39.5px; color:var(--tx-soft);
+}
 
 /* ---------- sign up / verify (reskin W2, mockups A/B/C signup + code input/error; ×1.04) ----------
    Один скелет: контент прижат к низу; B добавляет navy-бар с назад и сабтайтл,
@@ -2228,19 +2312,31 @@ body[data-skin="corporate"] .sheet-sub { font-size:14.6px; line-height:20.8px; c
 }
 .sheet .free-row { text-align:left; margin-top:14px; margin-bottom:0; }
 
-/* daily challenge sheet (W3: скин-токены вместо бежевой rc-палитры; график = accent2) */
-#sh-daily { padding-bottom:25px; }
+/* daily challenge sheet — пиксель-пас по мокапам 741:27224/28989 (paper = базовый слой):
+   бейдж-таймер сверху, белая карта графика white-30 с 2px контуром, тёплая пунктирная
+   сетка, солидный белый «?»-слот, равные чипы дней 61.4×95.7, Long/Short с плинтами. */
+#sh-daily { padding:25px 25px; text-align:left; }
+.dc-timer {
+  width:max-content; min-width:95.7px; margin:0 auto 21px; padding:6.2px 16.6px;
+  border-radius:13.5px; box-shadow:inset 0 0 0 2px var(--card-line);
+  font-size:14.6px; line-height:19.8px; font-weight:800; color:var(--tx);
+  font-variant-numeric:tabular-nums; text-align:center;
+}
+#sh-daily .sheet-kicker { font-weight:900; color:var(--tx-soft); margin-bottom:2px; }
+#sh-daily h2 { font-size:25px; line-height:30px; }
+#sh-daily .sheet-sub { margin-top:2px; }
 .daily-chart {
-  position:relative; margin:28px 0 27px; border-radius:var(--r-card-lg); overflow:hidden;
-  background:var(--accent2); height:169px;
+  position:relative; margin:21px 0 12.5px; border-radius:20.8px; overflow:hidden;
+  background:var(--card); box-shadow:inset 0 0 0 var(--card-bw) var(--card-line);
+  height:166.4px;
 }
 .daily-chart svg { position:absolute; inset:0; width:100%; height:100%; }
-.dc-grid { stroke:var(--line); }
-.daily-chart svg > line[stroke='#fff'] { stroke:var(--dq-line); }
+.dc-grid { stroke:var(--pill-line); }
 .daily-prices {
-  position:absolute; top:2px; bottom:2px; right:11px; width:44px;
-  display:flex; flex-direction:column; justify-content:space-around; align-items:flex-end;
-  font-family:var(--font-num); font-size:11px; font-weight:600; color:var(--tx-soft);
+  position:absolute; top:0; bottom:0; right:8px;
+  display:flex; flex-direction:column; justify-content:space-between; align-items:flex-end;
+  padding:12.5px 0;
+  font-family:var(--font-num); font-size:12.5px; font-weight:700; color:var(--tx-soft);
   font-variant-numeric:tabular-nums;
 }
 /* результат вчерашней ставки (классы вместо инлайновых hex — скинуются токенами) */
@@ -2251,47 +2347,46 @@ body[data-skin="corporate"] .sheet-sub { font-size:14.6px; line-height:20.8px; c
 .dc-res.win { background:color-mix(in srgb, var(--green) 13%, transparent); color:var(--green); }
 .dc-res.lose { background:var(--ghost); color:var(--tx-soft); }
 .dc-res .dc-res-ico { font-size:16px; }
-/* «?»-свеча дня: раньше была жёстко белой и на светлой панели графика читалась
-   с контрастом 1.21:1. Теперь ink/линии — токенами скина. */
+/* «?»-свеча дня: слот у мокапа — солидная белая пилюля (paper-оверрайд в конце файла);
+   база для четвёрки скинов остаётся контурной на токенах dq-*. */
 .daily-q {
-  position:absolute; top:3px; bottom:35px; right:57px; width:36px;
-  background:transparent; border:2px solid var(--dq-line); border-radius:7px;
-  display:flex; flex-direction:column; align-items:center; justify-content:space-around;
-  color:var(--dq-tx); font-weight:900; font-size:16px; font-family:var(--font);
+  position:absolute; top:23px; bottom:23px; right:80px; width:29px;
+  background:transparent; border:2px solid var(--dq-line); border-radius:8.3px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between;
+  padding:10.4px 0;
+  color:var(--dq-tx); font-weight:900; font-size:16.6px; font-family:var(--font);
 }
 .daily-q::before {
-  content:''; position:absolute; top:-20px; bottom:-40px; left:50%; width:2px; background:var(--dq-line); z-index:-1;
+  content:''; position:absolute; top:-12px; bottom:-9px; left:50%; width:2px; background:var(--dq-line); z-index:-1;
 }
-.daily-q .q-big { font-size:30px; }
-.daily-q span:first-child:not(.q-big) { opacity:.65; }
-.daily-q span:last-child { opacity:.5; }
+.daily-q .q-big { font-size:25px; }
+.daily-q span:first-child:not(.q-big) { opacity:.7; }
+.daily-q span:last-child { font-size:14.6px; opacity:.7; }
 .daily-q.done { background:var(--green); border-color:var(--green); color:var(--btn-tx); font-size:18px; justify-content:center; }
-.daily-days { display:flex; gap:7px; align-items:center; margin:0 -28px 27px 0; overflow:hidden; }
+.daily-days { display:flex; gap:8.3px; align-items:center; margin:0 0 25px; overflow:hidden; }
 .dd {
-  flex:0 0 60px; border-radius:var(--r-card-lg); background:var(--accent2); padding:10px 2px;
+  flex:0 0 61.4px; border-radius:12.5px; background:var(--accent2); padding:10.4px 2px;
+  box-shadow:inset 0 0 0 var(--card-bw) var(--card-line);
   display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:0;
-  font-size:10.6px; line-height:14.2px; color:var(--tx-soft); font-weight:500; height:89px;
+  font-size:11.4px; line-height:15.6px; color:var(--sb); font-weight:700; height:95.7px;
   position:relative;
 }
-.dd .coin-dot { width:27px; height:27px; flex-basis:27px; }
-.dd .amt { font-size:10.6px; line-height:14.2px; font-weight:600; }
-.dd.today {
-  flex:0 0 83px; background:var(--btn2-bg); color:var(--btn2-tx); height:122px; border-radius:var(--r-sheet);
-  font-size:14.7px; line-height:19.6px; padding:14px 2px;
-}
-.dd.today .coin-dot { width:39px; height:39px; flex-basis:39px; }
-.dd.today .amt { font-size:14.7px; line-height:19.6px; font-weight:600; }
-.dd.done { opacity:.5; }
-.dd.done .amt { text-decoration:none; opacity:1; }
+.dd .coin-dot { width:25px; height:25px; flex-basis:25px; }
+.dd .amt { font-size:11.4px; line-height:15.6px; font-weight:800; color:var(--tx); }
+.dd.today { background:var(--blue); color:#fff; }
+.dd.today .amt { color:#fff; }
+.dd.done { opacity:1; }
+.dd.done .amt { text-decoration:none; }
+#dailyDays .dd.done .amt { text-decoration:line-through; color:var(--sb); }
 .dd-check {
-  width:21px; height:21px; border-radius:50%; background:var(--green); color:#fff;
-  display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;
-  margin:3.5px 0;
+  width:22.9px; height:22.9px; border-radius:50%; background:var(--green); color:#fff;
+  display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;
+  margin:2px 0;
 }
-.daily-btns { display:flex; gap:11px; margin:0; }
+.daily-btns { display:flex; gap:12.5px; margin:0; }
 .btn-long, .btn-short {
-  flex:1; height:53px; border-radius:12.5px; color:#fff;
-  font-size:16.6px; line-height:21.3px; font-weight:900;
+  flex:1; height:54.1px; border-radius:16.6px; color:#fff;
+  font-size:18.7px; line-height:25px; font-weight:900;
   text-shadow:var(--btn-txsh); transition:transform .08s;
 }
 .btn-long:active, .btn-short:active { transform:translateY(2px); }
@@ -2306,7 +2401,7 @@ body[data-skin="crypto-dark"] .btn-long, body[data-skin="crypto-dark"] .btn-shor
 body[data-skin="crypto-dark"] .btn-long { color:var(--btn-tx); }
 .btn-short { background:var(--red); }
 .btn-long:active, .btn-short:active { transform:scale(.97); }
-.daily-victory { display:flex; flex-direction:column; align-items:center; gap:8px; padding-top:4px; }
+.daily-victory { display:flex; flex-direction:column; align-items:center; gap:8px; padding-top:4px; text-align:center; }
 .daily-victory[hidden] { display:none; }
 .dv-badge {
   width:52px; height:52px; border-radius:50%; background:var(--green); color:#fff;
@@ -2324,18 +2419,29 @@ body[data-skin="crypto-dark"] .dv-badge { color:var(--btn-tx); }
 #sh-notifperm .btn-primary.wide { margin-top:21px; }
 #sh-notifperm .btn-ghost { margin-top:11px; background:var(--ghost); color:var(--tx); }
 
-/* save progress sheet */
-#sh-saveprogress { padding:29px 0 28px; }
-#sh-saveprogress h2 { padding:0 28px; }
-#sh-saveprogress .sheet-sub { font-size:17.7px; line-height:22.2px; font-weight:500; color:var(--tx); margin:0; padding:0 55px; }
-.sp-band { background:var(--ghost); margin:21px 0 31px; padding:14px 28px 11px; }
-.sp-band p { font-size:17.7px; line-height:22.2px; color:var(--tx); font-weight:600; }
-.sp-band p + p { margin-top:11px; }
-.sp-band .coin-dot { width:18.7px; height:18.7px; vertical-align:-2px; }
-#sh-saveprogress .btn-primary.wide { width:280px; margin:21px auto 0; display:block; }
+/* save progress sheet (мокап 741:28093: заголовок слева, банк-баннер с пилюлей «You have»,
+   строка дейли-стрика ЧЕРНИЛАМИ, полноширинный Register + текстовый Not now) */
+#sh-saveprogress { padding:25px; }
+#sh-saveprogress h2 { text-align:left; font-size:25px; line-height:30px; padding-right:31px; }
+.sp-band {
+  display:flex; flex-direction:column; align-items:center; gap:8.3px;
+  background:var(--ghost); border-radius:16.6px; margin:20.8px 0 0; padding:12.5px 16.6px;
+}
+.sp-pill {
+  display:inline-flex; align-items:center; gap:6.2px;
+  background:var(--card); box-shadow:inset 0 0 0 1px var(--line); border-radius:16.6px;
+  padding:4.2px 12.5px; font-size:16.6px; line-height:22.5px; font-weight:600; color:var(--tx);
+}
+.sp-pill b { font-size:18.7px; font-weight:900; font-family:var(--font-num); font-variant-numeric:tabular-nums; }
+.sp-pill .coin-dot { width:18.7px; height:18.7px; flex-basis:18.7px; }
+.sp-days { font-size:16.6px; line-height:22.5px; font-weight:600; color:var(--tx); max-width:264px; }
+#sh-saveprogress .btn-primary.wide { margin-top:16.6px; }
 
 /* out of chips (W3: пакеты/фри-ряд = скелет и язык магазина, свой скин из его CSS) */
 #sh-outofchips { padding:26px 14px 25px; }
+/* маскот с кейсом и контурная монета пакетов — язык мокапа 741:27489, показывает только paper */
+.ooc-ill { display:none; }
+#sh-outofchips .pack-art svg { display:none; }
 #sh-outofchips .packs { margin-top:20.8px; }
 /* terminal: шит и карты одного цвета — пакеты/фри-блок поднимаем на accent2 */
 body[data-skin="crypto-dark"] #sh-outofchips .pack,
@@ -2364,27 +2470,29 @@ body[data-skin="corporate"] .ends-card.float b { background:none; padding:0; }
 #sh-offer .offer-price.big { margin-top:8px; }
 #sh-offer .btn-primary.wide { margin-top:27px; }
 
-/* daily reward sheet (W3: подарок на accent2, золото; капсула награды в токенах) */
-#sh-dailyreward { padding:28px 14px 21px; }
-.dr-days { display:flex; gap:7px; align-items:center; margin:21px -14px 21px 0; overflow:hidden; } /* Figma: Today top y476, sub gap 24 */
-#sh-dailyreward .sheet-sub { font-size:17.7px; line-height:21.3px; letter-spacing:-.44px; font-weight:600; color:var(--tx); margin-top:0; }
+/* daily reward sheet — пиксель-пас по мокапам 741:28654/28859: заголовок слева,
+   равные чипы дней (общие .dd), белая карта подарка 145.6×145.6 с пилюлей награды внутри */
+#sh-dailyreward { padding:25px 25px 21px; }
+#sh-dailyreward h2 { text-align:left; font-size:25px; line-height:32px; padding-right:30px; }
+.dr-days { display:flex; gap:8.3px; align-items:center; margin:21px 0; overflow:hidden; }
+#sh-dailyreward .sheet-sub { font-size:18.7px; line-height:25px; font-weight:900; color:var(--tx); margin-top:0; }
 .dr-gift {
-  width:123px; height:123px; margin:16px auto 0; border-radius:var(--r-card-lg); background:var(--accent2);
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0;
-  color:var(--gold); position:relative; overflow:visible;
+  width:145.6px; height:145.6px; margin:12.5px auto 0; border-radius:25px;
+  background:var(--card); box-shadow:inset 0 0 0 var(--card-bw) var(--card-line);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12.5px;
+  color:var(--gold); position:relative;
 }
 .dr-gift .chip-pill {
-  position:absolute; bottom:-18px; left:50%; transform:translateX(-50%);
   background:var(--card); border-radius:999px; box-shadow:inset 0 0 0 1px var(--line); margin:0;
-  padding:6.2px 12.5px 6.2px 8.3px; font-size:16.6px; line-height:19.8px; white-space:nowrap;
+  padding:4.2px 12.5px; font-size:13.5px; line-height:18.7px; font-weight:900; white-space:nowrap;
 }
 body[data-skin="corporate"] .dr-gift .chip-pill { background:#fff; }
-.dr-gift .chip-pill .coin-dot { width:18.7px; height:18.7px; flex-basis:18.7px; margin-right:6.2px; }
-#sh-dailyreward .btn-primary.wide { margin-top:50px; }
+.dr-gift .chip-pill .coin-dot { width:20.8px; height:20.8px; flex-basis:20.8px; margin-right:4.2px; }
+#sh-dailyreward .btn-primary.wide { margin-top:21px; padding:19.8px 18.7px; font-size:18.7px; line-height:23px; }
 
 /* guides promo sheet */
 #sh-guidespromo { padding:35px 55px 28px; }
-.promo-img { height:142px; border-radius:var(--r-card-lg); background:var(--accent2); margin:0 0 22px; }
+.promo-img { height:142px; border-radius:var(--r-card-lg); background:var(--accent2) url('ill-guides-promo.webp') center/contain no-repeat; margin:0 0 22px; }
 .promo-title { font-size:24.8px; line-height:31px; font-weight:500; padding:0; }
 #sh-guidespromo .sheet-sub { font-size:12.4px; line-height:16px; margin-top:7px; }
 #sh-guidespromo .btn-primary.wide { margin-top:21px; }
@@ -2426,13 +2534,17 @@ body[data-skin="corporate"] .modal { background:#FFFFFF; }
 #md-delete .btn-primary { background:var(--danger); color:#fff; box-shadow:none; border-radius:var(--r-btn); padding:14px 28px; font-size:13.3px; line-height:16.1px; font-weight:600; margin-top:22px; }
 #md-delete .btn-outline { border-radius:var(--r-btn); }
 
-/* first-win modal (draft, no wireframe) */
+/* first-win modal (paper = мокап 741:28776; в четвёрке — прежний бокс-плейсхолдер) */
 .trophy-art, .ach-art {
   height:142px; border-radius:var(--r-card-lg); background:var(--accent2); margin:0 auto 21px;
   display:flex; align-items:center; justify-content:center; color:var(--tx-soft);
 }
+.trophy-art img { max-width:100%; max-height:100%; object-fit:contain; }
+.ach-art img { max-width:80%; max-height:80%; object-fit:contain; }
+.ach-ico img { width:80%; height:80%; object-fit:contain; }
 .fw-earn { font-size:14.6px !important; color:var(--tx) !important; font-weight:600; }
 .fw-earn .coin-dot { width:16.6px; height:16.6px; vertical-align:-2px; }
+.fw-pill { display:inline-flex; align-items:center; gap:4.2px; vertical-align:middle; }
 
 /* new achievement → bottom sheet look (Figma 440:27091) */
 .modal#md-newach {
@@ -2509,46 +2621,139 @@ body[data-skin="corporate"] .pt-head b { font-weight:600; font-size:15.6px; }
 }
 .pt-row.done .pt-check { background:var(--green); box-shadow:none; }
 .pt-row.done > span:last-child { text-decoration:line-through; opacity:.6; }
+/* футер карточки (мокапы 741:29147/29212): Play/Claim слева + «Reward ◑100» справа;
+   после клейма — центрированная строка «Claimed ◑100» */
+.pt-hr { height:1px; background:var(--line); margin:8.3px 0 0; }
+.pt-foot { display:flex; justify-content:space-between; align-items:center; padding:10.4px 0 6.2px; }
+.pt-foot.pt-claimed { justify-content:center; }
+.pt-btn {
+  background:var(--btn-bg); color:var(--btn-tx); border-radius:var(--r-btn-sm);
+  box-shadow:var(--btn3d-sm); text-shadow:var(--btn-txsh);
+  padding:8.3px 18.7px; font-size:13.5px; line-height:16.6px;
+}
+.pt-claim { background:var(--green); box-shadow:var(--btn3d-green); }
+.pt-reward { display:flex; align-items:center; gap:4.2px; }
+.pt-reward em { font-style:normal; font-size:12.5px; line-height:16.6px; font-weight:700; color:var(--tx-soft); }
+.pt-reward b { font-size:14.6px; line-height:19.8px; font-weight:800; color:var(--tx); }
+.pt-reward .coin-dot { width:14.6px; height:14.6px; flex-basis:14.6px; }
 
-/* ---------- peak offer sheet ---------- */
-#sh-peak { text-align:center; }
-.peak-flame { font-size:44px; line-height:1; margin:6px 0 8px; }
-#sh-peak h2 { font-size:17.7px; line-height:24.8px; font-weight:500; color:var(--tx); }
-#sh-peak .sheet-sub { margin:4px 0 16px; }
-.peak-opts { display:flex; flex-direction:column; gap:8.3px; margin-bottom:6px; }
+/* ---------- peak offer sheet (мокап 741:27988: заголовок 24, арт-маскот между
+   подзаголовком и опциями, карточки 79 c белым контуром, текстовый Not now) ---------- */
+#sh-peak { text-align:center; padding:25px; }
+#sh-peak h2 { font-size:25px; line-height:30px; }
+#sh-peak .sheet-sub { margin:16.6px 0 0; }
+/* арт: нода image 39 240.63×236 в 375-кадре → 250×245; опции перекрывают его низ
+   (z-порядок мокапа), поэтому видимое окно 182px и object-fit:cover сверху */
+.peak-ill {
+  display:block; width:250px; height:182px; margin:0 auto;
+  object-fit:cover; object-position:top center;
+}
+.peak-opts { display:flex; flex-direction:column; gap:10.4px; }
 .peak-opt {
-  display:flex; align-items:center; gap:11px; width:100%;
-  background:var(--panel2); border:1px solid var(--line); border-radius:var(--r-card); padding:11px 13px;
+  display:flex; align-items:center; gap:12.5px; width:100%; min-height:82.2px;
+  background:var(--panel2); border:1px solid var(--line); border-radius:20.8px; padding:12.5px;
   text-align:left; color:var(--tx);
 }
 body[data-skin="corporate"] .peak-opt { border:none; }
 body[data-skin="crypto-dark"] .peak-opt { background:var(--accent2); border:none; }
 .peak-opt:active { transform:scale(.98); }
 .po-ico {
-  width:39px; height:39px; flex:0 0 39px; border-radius:50%;
-  background:var(--bg); display:flex; align-items:center; justify-content:center; font-size:18px;
+  width:41.6px; height:41.6px; flex:0 0 41.6px; border-radius:50%;
+  background:var(--bg); display:flex; align-items:center; justify-content:center; font-size:20.8px;
 }
 body[data-skin="corporate"] .po-ico { background:#fff; }
 .po-text { flex:1; display:flex; flex-direction:column; gap:1px; }
-.po-text b { font-size:13.5px; line-height:18px; font-weight:700; }
-.po-text span { font-size:11.4px; line-height:15.6px; color:var(--tx-soft); }
-.peak-opt .chev { font-size:17px; color:var(--sb); }
+.po-text b { font-size:16.6px; line-height:21.6px; font-weight:700; }
+.po-text span { font-size:12.5px; line-height:16.2px; font-weight:600; color:var(--tx-soft); }
+.peak-opt .chev { font-size:20.8px; color:var(--sb); }
+/* текстовый «Not now» офферных шитов (все три мокапа 741:*) */
+.sheet-later {
+  display:block; margin:16.6px auto 0; padding:2px 10px;
+  font-size:15.6px; line-height:21.8px; font-weight:800; color:var(--tx-soft);
+}
 
-/* ---------- payment stubs, course tiers, referral course (вердикты 27.07) ---------- */
+/* ---------- starter pack sheet (мокап 741:28175: жёлтый бейдж STARTER CHIP PACK
+   поверх таймер-плашки 2ч-окна, белая пилюля «5 000», цена, Buy + Not now) ---------- */
+#sh-starter { padding:25px; }
+.st-head { position:relative; height:48.9px; }
+.st-timer {
+  position:absolute; left:50%; top:3.1px; transform:translateX(-50%);
+  width:74.9px; height:45.8px; border-radius:13.5px;
+  box-shadow:inset 0 0 0 2px var(--card-line);
+  display:flex; align-items:flex-end; justify-content:center; padding-bottom:5.2px;
+  font-size:14.6px; line-height:19.8px; font-weight:800; color:var(--tx);
+  font-family:var(--font-num); font-variant-numeric:tabular-nums;
+}
+.st-badge {
+  position:absolute; left:50%; top:0; transform:translateX(-50%); z-index:1;
+  background:var(--gold); color:var(--tx); border-radius:4.2px; padding:2.1px 6.2px;
+  font-size:12.5px; line-height:16.6px; font-weight:900; letter-spacing:.02em;
+  text-transform:uppercase; white-space:nowrap;
+}
+.st-chips {
+  display:inline-flex; align-items:center; gap:10.4px;
+  background:var(--card); box-shadow:inset 0 0 0 1px var(--line); border-radius:33.3px;
+  padding:4.2px 14.6px; margin-top:33.3px;
+  font-size:33.3px; line-height:45.4px; font-weight:900; color:var(--tx);
+  font-family:var(--font-num); font-variant-numeric:tabular-nums;
+}
+.st-chips .coin-dot { width:29.6px; height:29.6px; flex-basis:29.6px; }
+.st-price { font-size:18.7px; line-height:25.5px; font-weight:700; color:var(--tx); margin-top:8.3px; }
+#sh-starter .st-desc { margin:16.6px auto 0; max-width:277px; }
+#sh-starter .btn-primary.wide { margin-top:16.6px; }
+
+/* ---------- payment sheet, course tiers, partner redirect ----------
+   Мокапы 741:27608 / 27704 / 27805 (paper-ряд); вердикт 02.08: Pay → лоадер
+   «Making a purchase» в кнопке ≈1.8с → успех (чипс-паки зачисляются в баланс).
+   База — токенами (на четвёрке шиты остаются драфт-обликом), точная геометрия paper —
+   в PAPER component layer внизу. */
 #sh-paystub, #sh-redirect { text-align:center; }
-.ps-price { font-size:24.8px; line-height:31px; font-weight:600; color:var(--tx); margin:10px 0 22px; }
+.ps-priceband {
+  display:flex; align-items:center; justify-content:center; gap:12.5px;
+  background:var(--card); border:var(--card-bw) solid var(--card-line);
+  border-radius:16.6px; padding:12.5px 8px; margin:20.8px 0 0;
+}
+.ps-price { font-size:37.4px; line-height:41.6px; font-weight:var(--w-head); color:var(--tx); }
+/* пилюля экономии (мокап: #4068F5 на 70% непрозрачности, текст белый) */
+.save-pill {
+  background:var(--blue); color:#fff; opacity:.7; border-radius:6.2px;
+  padding:3.1px 6.2px; font-size:10.4px; line-height:13px; font-weight:800; white-space:nowrap;
+}
+.btn.pay-cta { display:flex; align-items:center; justify-content:center; margin-top:20.8px; }
+.pay-cta.paying { pointer-events:none; }
+.pay-busy { display:flex; align-items:center; justify-content:center; gap:12.5px; }
+.pay-spinner {
+  width:28.2px; height:28.2px; flex:0 0 28.2px; border-radius:50%;
+  border:3.1px solid rgba(255,255,255,.35); border-top-color:#fff;
+  animation:stubspin .9s linear infinite;
+}
+/* успех оплаты (★ мокапа нет — язык карт скина: зелёный кружок-галка как у дейлика) */
+.ps-check {
+  width:52px; height:52px; margin:6px auto 14px; border-radius:50%;
+  background:var(--green); color:#fff; font-size:24px; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+}
+#psDone h2 { font-size:20.8px; line-height:26px; }
 .stub-spinner {
-  width:44px; height:44px; margin:8px auto 18px; border-radius:50%;
-  border:4px solid var(--line); border-top-color:var(--tx);
+  width:50px; height:50px; margin:16.6px auto; border-radius:50%;
+  border:5.2px solid var(--line); border-top-color:var(--tx);
   animation:stubspin 1s linear infinite;
 }
 @keyframes stubspin { to { transform:rotate(360deg); } }
 .stub-close { margin-top:18px; }
-#psWait h2 { font-size:17.7px; line-height:24.8px; }
+/* плейсхолдер лого партнёра (мокап 741:27805: пустой white-30 бокс 163×75) */
+.rd-logo { width:169.5px; height:78px; margin:14.6px auto 0; border-radius:20.8px; background:var(--card); }
 #sh-redirect h2 { font-size:17.7px; line-height:24.8px; margin-bottom:4px; }
 #sh-tiers h2 { font-size:17.7px; line-height:24.8px; }
 #sh-tiers .sheet-sub { margin:4px 0 16px; }
+#sh-tiers .peak-opt { position:relative; }
 .tier-price { font-size:13.3px; line-height:18px; font-weight:600; color:var(--tx); white-space:nowrap; }
+/* бейдж BEST на тире Pro (мокап 741:27794; как HOT — не переводится) */
+.tier-best {
+  position:absolute; top:12px; right:15.6px;
+  background:var(--gold); color:var(--tx); border-radius:4.2px;
+  padding:2.1px 6.2px; font-size:8.3px; line-height:10.4px; font-weight:900; text-transform:uppercase;
+}
 .ref-course {
   display:flex; align-items:center; gap:11px; width:100%;
   background:var(--card); border:var(--card-bw) solid var(--card-line); border-radius:var(--r-card);
@@ -2638,13 +2843,26 @@ body[data-skin="paper"] .coin-dot::after {
 body[data-skin="paper"] .balance-pill .coin-dot { width:16.6px; height:16.6px; flex-basis:16.6px; border-color:var(--gold); }
 body[data-skin="paper"] .balance-pill .coin-dot::after { border-color:var(--gold); }
 
+/* --- daily challenge / daily reward (мокапы 741:27224/28989/28654/28859) --- */
+/* «?»-слот = солидная белая пилюля на белом фитиле (questions-highlight 741:27314) */
+body[data-skin="paper"] .daily-q { background:#FFFFFF; border-color:#FFFFFF; }
+/* монеты в чипах дней и в пилюле подарка крупнее дефолтной контурной (24 и 20 в мокапе) */
+body[data-skin="paper"] .dd .coin-dot { width:25px; height:25px; flex-basis:25px; border-width:2.6px; }
+body[data-skin="paper"] .dd .coin-dot::after { width:9px; border-width:2px; }
+body[data-skin="paper"] .dr-gift .chip-pill { background:#FFFFFF; box-shadow:none; }
+body[data-skin="paper"] .dr-gift .chip-pill .coin-dot { width:20.8px; height:20.8px; flex-basis:20.8px; }
+/* Long/Short: точные плинты мокапа (btn-long 0B6E47, btn-short EF4444/B81D1D) */
+body[data-skin="paper"] .btn-long { box-shadow:0 4px 0 #0B6E47, 0 4px 2px rgba(0,0,0,.25), inset 0 -2px 2px rgba(0,0,0,.10); }
+body[data-skin="paper"] .btn-short { background:#EF4444; box-shadow:0 4px 0 #B81D1D, 0 4px 2px rgba(0,0,0,.25), inset 0 -2px 2px rgba(0,0,0,.10); }
+
 /* --- шапка Home: белая юзер-пилюля с фото-аватаром, пилюля баланса с «+», белые кружки --- */
 body[data-skin="paper"] .user-id {
   flex:0 1 auto; height:41.6px; padding:4.2px 12.5px 4.2px 4.2px;
   background:#fff; border-radius:83px; box-shadow:inset 0 0 0 2px var(--pill-line);
 }
 body[data-skin="paper"] .avatar-ini {
-  background:var(--avatar-bg) var(--avatar-img) center/cover; color:transparent;
+  /* center top: выбираемые аватары (741:29365) — вертикальные бюсты, лицо у верхней кромки */
+  background:var(--avatar-bg) var(--avatar-img) center top/cover; color:transparent;
 }
 body[data-skin="paper"] .user-name { font-size:12.5px; line-height:16.6px; font-weight:900; }
 body[data-skin="paper"] .balance-pill {
@@ -2895,3 +3113,422 @@ body[data-skin="paper"] .rc-repeat { font-size:17.7px; line-height:26.6px; font-
 
 /* --- туториал: кобальтовый Next c 3D-плинтом (язык 622), Skip кобальтом --- */
 body[data-skin="paper"] .tut-next { box-shadow:var(--btn3d-sm); text-shadow:var(--btn-txsh); }
+
+/* --- notifications (мокапы 741:29437/29490, ×1.04): карты white-30 r20 stroke2,
+   иконка чернилами на белом кружке, заголовок Black 14, описание SemiBold 14 ink-70,
+   кнопка-плинт 12×18 r12; поиск — чистый белый r16 без внутренней обводки --- */
+body[data-skin="paper"] #scr-notifications .sub-head { font-size:29.1px; line-height:37.4px; padding-bottom:0; }
+body[data-skin="paper"] #scr-notifications .back-circle { background:#FFFFFF; box-shadow:none; }
+body[data-skin="paper"] #scr-notifications .search-fld {
+  height:47.8px; margin-top:20.8px; border-radius:16.6px; box-shadow:none;
+}
+body[data-skin="paper"] #scr-notifications .search-fld input { font-size:16.6px; font-weight:400; }
+body[data-skin="paper"] #scr-notifications .search-fld input::placeholder { color:var(--tx-soft); }
+body[data-skin="paper"] .ntf-row {
+  border:2px solid var(--card-line); border-radius:20.8px;
+  padding:16.6px; margin-bottom:12.5px; gap:12.5px;
+}
+body[data-skin="paper"] .ntf-row:first-of-type { margin-top:20.8px; }
+body[data-skin="paper"] .ntf-ico { color:var(--tx); }
+body[data-skin="paper"] .ntf-text { padding-top:0; }
+body[data-skin="paper"] .ntf-text b { font-size:14.6px; line-height:19.8px; font-weight:900; padding-right:0; }
+body[data-skin="paper"] .ntf-text > span { font-size:14.6px; line-height:20.8px; font-weight:600; color:var(--tx-soft); margin-top:4.2px; }
+body[data-skin="paper"] .ntf-time { font-size:12.5px; line-height:19.8px; font-weight:600; }
+body[data-skin="paper"] .ntf-text .btn-play {
+  min-width:83.2px; margin-top:12.5px; padding:12.5px 18.7px;
+  border-radius:12.5px; font-size:14.6px; line-height:17.7px; font-weight:900;
+}
+
+/* --- notif-permission sheet (мокап 741:28498, ×1.04): лист #F0DFC2 с бумажной
+   отмывкой, r32 и белой обводкой 2px; голый крестик; Allow = плинт-CTA h60,
+   Deny = white-30 с белым плинтом 0 5px --- */
+body[data-skin="paper"] #sh-notifperm {
+  padding:25px 25px 33.3px;
+  background:var(--paper) center/cover no-repeat, var(--bg);
+  box-shadow:inset 0 2px 0 var(--card-line), inset 2px 0 0 var(--card-line), inset -2px 0 0 var(--card-line);
+  border-radius:33.3px 33.3px 0 0;
+}
+body[data-skin="paper"] #sh-notifperm .xbtn {
+  top:25px; right:25px; width:20.8px; height:20.8px;
+  background:none; color:var(--tx); font-size:20.8px; line-height:20.8px; font-weight:900;
+}
+body[data-skin="paper"] #sh-notifperm .np-title { margin-top:45.8px; font-size:25px; line-height:30px; font-weight:900; }
+body[data-skin="paper"] #sh-notifperm .sheet-sub { margin-top:12.5px; font-size:14.6px; line-height:20.4px; font-weight:600; }
+body[data-skin="paper"] #sh-notifperm .btn-primary.wide {
+  margin-top:25px; height:62.4px; padding:0 18.7px; border-radius:16.6px;
+  font-size:18.7px; line-height:24.3px; box-shadow:var(--btn3d-lg); text-shadow:0 2px 0 rgba(0,0,0,.15);
+}
+body[data-skin="paper"] #sh-notifperm .btn-ghost {
+  margin-top:16.6px; height:62.4px; padding:0 18.7px; border-radius:16.6px;
+  background:var(--card); color:var(--tx); font-size:18.7px; line-height:24.3px; font-weight:900;
+  box-shadow:inset 0 0 0 2px var(--card-line), 0 5.2px 0 rgba(255,255,255,.5);
+}
+
+/* --- настройки: субстраницы (ноды 741:29498 Notifications / 29518 Sound / 29539 Language, ×1.04) ---
+   экран: паддинги 12/16/8 + gap 20 до карты; заголовок Nunito Black 28; back — БЕЛЫЙ круг 40
+   с шевроном (не стрелка ←); карта white-30 c белым 2px контуром r20, ряды прозрачные
+   с white-50 hairlines; выбранный язык подсвечен white-30 + зелёная галочка */
+body[data-skin="paper"] #scr-setsub { padding:12.5px 16.6px 31.2px; }
+body[data-skin="paper"] #scr-setsub .sub-head {
+  gap:12.5px; padding:0 0 29.1px;
+  font-size:29.1px; line-height:39.5px; font-weight:900;
+}
+body[data-skin="paper"] #scr-setsub .back-circle { background:#FFF; box-shadow:none; }
+body[data-skin="paper"] #scr-setsub .stub-body { padding-top:0; }
+body[data-skin="paper"] #scr-setsub .stub-list-row {
+  gap:12.5px; padding:16.6px; font-size:15.6px; line-height:20.8px; font-weight:800;
+}
+body[data-skin="paper"] #scr-setsub .stub-list-row + .stub-list-row { border-top:1px solid rgba(255,255,255,.5); }
+body[data-skin="paper"] #scr-setsub .stub-list-row.sel { background:var(--card); }
+body[data-skin="paper"] #scr-setsub .vol-hr { background:rgba(255,255,255,.3); }
+/* папирусный тумблер 44×26 (SVG 741:29508/29512): трек — бумага (вкл) / бумага-10 (выкл)
+   с белым 1px контуром и плоской тенью 0 2 0; шайба 18 зелёная/лиловая #7E6A75 с белым кольцом */
+body[data-skin="paper"] #scr-setsub .switch { width:45.8px; height:27px; flex:0 0 45.8px; }
+body[data-skin="paper"] #scr-setsub .switch .knob {
+  background:rgba(240,223,194,.1);
+  box-shadow:inset 0 0 0 1px #FFF, 0 2px 0 rgba(0,0,0,.1);
+}
+body[data-skin="paper"] #scr-setsub .switch input:checked + .knob { background:#F0DFC2; }
+body[data-skin="paper"] #scr-setsub .switch .knob::after {
+  top:4.2px; left:3.1px; width:18.7px; height:18.7px;
+  background:#7E6A75; box-shadow:inset 0 0 0 1px #FFF, 0 2px 0 rgba(0,0,0,.1);
+  transition:transform .18s, background .18s;
+}
+body[data-skin="paper"] #scr-setsub .switch input:checked + .knob::after { transform:translateX(20.9px); background:var(--green); }
+/* текстовые стабы без макета — тот же язык карт, чтобы не выпадали из ряда */
+body[data-skin="paper"] #scr-setsub .stub-card { border:2px solid var(--card-line); border-radius:20.8px; }
+body[data-skin="paper"] #scr-setsub .stub-card p { font-size:14.6px; line-height:1.5; font-weight:600; }
+
+/* --- Профиль (мокап 741:29323): белый back-кружок, фото-аватар 64 с белым контуром,
+   белая Edit-пилюля, Black-заголовки 22, карта статистики r20 с full-width линиями,
+   Share = white-30 карта с белым «плинтом», Save = крупный кобальт 60 --- */
+body[data-skin="paper"] #scr-profile .back-circle { background:#fff; box-shadow:none; }
+body[data-skin="paper"] .prof-id { gap:16.6px; padding-top:18.7px; }
+body[data-skin="paper"] .avatar-ini.xl { box-shadow:inset 0 0 0 2px var(--card-line); }
+body[data-skin="paper"] .prof-name { font-size:22.9px; line-height:29.1px; font-weight:900; }
+body[data-skin="paper"] .edit-pill { background:#fff; box-shadow:none; padding:6.2px 16.6px; font-size:14.6px; line-height:19.8px; font-weight:800; }
+body[data-skin="paper"] #scr-profile .sub-title { margin:25px 0 20.8px; font-size:22.9px; line-height:29.1px; font-weight:900; }
+body[data-skin="paper"] .stat-rows { border:1px solid var(--card-line); border-radius:20.8px; padding:0; }
+body[data-skin="paper"] .stat-row { min-height:0; padding:16.6px; font-size:15.6px; line-height:21.3px; }
+body[data-skin="paper"] .stat-row span:first-child { font-weight:700; }
+body[data-skin="paper"] .stat-row b { font-weight:900; }
+body[data-skin="paper"] .stat-row + .stat-row::before { background:rgba(255,255,255,.5); }
+body[data-skin="paper"] #scr-profile .prof-share {
+  height:62.4px; padding:12.5px 18.7px; border-radius:16.6px;
+  background:var(--card); box-shadow:inset 0 0 0 2px var(--card-line), 0 5.2px 0 rgba(255,255,255,.5);
+  font-size:20.8px; line-height:27px; font-weight:900; color:var(--tx);
+}
+body[data-skin="paper"] #scr-profile .btn-primary.wide {
+  height:62.4px; padding:17.7px 18.7px; border-radius:16.6px; font-size:20.8px; line-height:27px;
+}
+
+/* --- Настройки профиля (мокап 741:29365): кремовая карта с белым 2px контуром,
+   чернильный скрим 70%, Save 60/r16.6 --- */
+body[data-skin="paper"] #modallayer .backdrop { background:rgba(76,51,74,.7); }
+body[data-skin="paper"] #md-profedit { background:var(--bg); box-shadow:inset 0 0 0 2px var(--card-line); }
+body[data-skin="paper"] .pe-save { height:62.4px; padding:0 18.7px; border-radius:16.6px; font-size:18.7px; line-height:24.3px; }
+/* --- аккаунт-подтверждения и праздничные попапы (мокапы 741:28260 logout /
+   28336 delete / 28776 first win / 28416 new achievement; ×1.04).
+   Язык попапа: крем #F0DFC2 + зерно, r33.3, 2px белый контур, скрим чернилами-70,
+   кнопки h62.4 r16.6 Nunito-900, отмена = white-30 с белым контуром и белым плинтом. --- */
+body[data-skin="paper"] #sheetlayer .backdrop,
+body[data-skin="paper"] #modallayer .backdrop { background:rgba(76,51,74,.70); }
+
+body[data-skin="paper"] .sheet#sh-logout,
+body[data-skin="paper"] .modal#md-delete,
+body[data-skin="paper"] .modal#md-newach {
+  left:16.6px; right:16.6px; border-radius:33.3px; padding:25px;
+  background:var(--paper) center/cover no-repeat, var(--bg);
+  box-shadow:inset 0 0 0 2px var(--card-line);
+}
+/* X — голый крест чернилами в углу (мокап: 20×20 на отступе 24) */
+body[data-skin="paper"] #sh-logout .xbtn, body[data-skin="paper"] #md-delete .xbtn,
+body[data-skin="paper"] #md-firstwin .xbtn, body[data-skin="paper"] #md-newach .xbtn {
+  top:22px; right:22px; width:29px; height:29px; background:none;
+  font-size:25px; line-height:29px; font-weight:600; color:var(--tx);
+}
+/* общий голос заголовков/подводок подтверждений (confirm-паттерн приложения) */
+body[data-skin="paper"] #sh-logout h2, body[data-skin="paper"] #md-delete h2 {
+  font-size:29.1px; line-height:35px; font-weight:900;
+}
+body[data-skin="paper"] #sh-logout .sheet-sub, body[data-skin="paper"] #md-delete p {
+  font-size:14.6px; line-height:20.4px; font-weight:600; color:var(--tx-soft); margin-top:12.5px;
+}
+body[data-skin="paper"] #sh-logout .btn-primary, body[data-skin="paper"] #md-delete .btn-primary,
+body[data-skin="paper"] #md-firstwin .btn-primary, body[data-skin="paper"] #md-newach .btn-primary {
+  height:62.4px; padding:12.5px 18.7px; border-radius:16.6px; margin-top:25px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18.7px; line-height:24.3px; font-weight:900;
+}
+body[data-skin="paper"] #sh-logout .btn-ghost, body[data-skin="paper"] #md-delete .btn-outline {
+  height:62.4px; border-radius:16.6px; margin-top:16.6px; padding:12.5px 18.7px;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(255,255,255,.30);
+  box-shadow:inset 0 0 0 2px var(--card-line), 0 5.2px 0 rgba(255,255,255,.50);
+  color:var(--tx); font-size:18.7px; line-height:24.3px; font-weight:900; text-shadow:none;
+}
+/* logout (741:28260): без иконки, X + заголовок + подводка + пара кнопок */
+body[data-skin="paper"] .sheet#sh-logout { top:246.5px; bottom:auto; }
+body[data-skin="paper"] #sh-logout .lo-ico { display:none; }
+body[data-skin="paper"] #sh-logout h2 { margin-top:45.8px; }
+/* delete (741:28336): красный круг 64 c белым треугольником, красный заголовок,
+   destructive-кнопка = #EF4444 с плинтом #B81D1D (хексы мокапа) */
+body[data-skin="paper"] #md-delete .danger-ico {
+  width:66.6px; height:66.6px; margin:12.5px auto 25px; background:#EF4444; color:#fff;
+}
+body[data-skin="paper"] #md-delete .danger-ico svg { width:25px; height:25px; }
+body[data-skin="paper"] #md-delete .danger-title { color:#EF4444 !important; }
+body[data-skin="paper"] #md-delete .btn-primary {
+  background:#EF4444;
+  box-shadow:0 6px 0 #B81D1D, 0 4px 2px rgba(0,0,0,.25), inset 0 -2px 2px rgba(0,0,0,.10);
+  text-shadow:var(--btn-txsh);
+}
+/* first win (741:28776): нижний шит с артом-маскотом 215×323, пилюля награды белым */
+body[data-skin="paper"] .modal#md-firstwin {
+  top:auto; bottom:0; left:0; right:0; transform:none;
+  border-radius:33.3px 33.3px 0 0; padding:25px 25px 29px;
+  background:var(--paper) center/cover no-repeat, var(--bg);
+  box-shadow:inset 0 0 0 2px var(--card-line);
+  animation:sheetUp .3s cubic-bezier(.2,.8,.3,1);
+}
+body[data-skin="paper"] #md-firstwin .trophy-art {
+  background:none; border-radius:0; height:323px; margin:6.2px auto 25px;
+}
+body[data-skin="paper"] #md-firstwin h2 { font-size:25px; line-height:30px; font-weight:900; }
+body[data-skin="paper"] #md-firstwin .fw-earn {
+  margin-top:12.5px; font-size:15.6px !important; font-weight:600; color:var(--tx-soft) !important;
+}
+body[data-skin="paper"] #md-firstwin .fw-pill {
+  background:#fff; border-radius:100px; padding:4.2px 8.3px;
+  color:var(--tx); font-size:13.5px; font-weight:900;
+}
+body[data-skin="paper"] #md-firstwin .fw-pill .coin-dot { width:20.8px; height:20.8px; flex-basis:20.8px; }
+body[data-skin="paper"] #md-firstwin .btn-primary { margin-top:20.8px; }
+/* new achievement (741:28416): центр-модалка (в четвёрке остаётся нижним шитом),
+   арт в круге-баннере 93.6 white-30 c белым контуром */
+body[data-skin="paper"] .modal#md-newach {
+  top:50%; bottom:auto; transform:translateY(-50%);
+  animation:modalIn .25s cubic-bezier(.2,.8,.3,1);
+}
+body[data-skin="paper"] #md-newach .sheet-kicker {
+  font-size:12.5px; line-height:16.6px; font-weight:900; letter-spacing:0;
+  color:var(--tx); margin-bottom:20.8px;
+}
+body[data-skin="paper"] #md-newach .ach-art {
+  width:93.6px; height:93.6px; border-radius:50%; margin:0 auto 20.8px;
+  background:rgba(255,255,255,.30); box-shadow:inset 0 0 0 2px var(--card-line);
+}
+body[data-skin="paper"] #md-newach .ach-art img { max-width:76%; max-height:76%; }
+body[data-skin="paper"] #md-newach h2 { font-size:25px; line-height:30px; font-weight:900; }
+body[data-skin="paper"] #md-newach p {
+  font-size:14.6px; line-height:20.4px; font-weight:600; color:var(--tx-soft); margin-top:6.2px;
+}
+body[data-skin="paper"] #md-newach .btn-primary { gap:8.3px; margin-top:20.8px; }
+body[data-skin="paper"] #md-newach .btn-primary .coin-dot { width:20.8px; height:20.8px; flex-basis:20.8px; }
+/* --- офферные шиты (мокапы 741:27988 / 28093 / 28175) — первые мокапы шитов у paper:
+   хром = бумага #F0DFC2 с зерном, белый контур 2px без низа, радиус 32 (→33.3);
+   применён ко ВСЕМ шитам paper разом — иначе в скине два разных хрома шитов --- */
+body[data-skin="paper"] .sheet {
+  background:var(--paper) center/cover no-repeat, var(--bg);
+  border:2px solid var(--card-line); border-bottom:none;
+  border-radius:33.3px 33.3px 0 0;
+}
+/* X в мокапах — голый чернильный крест без кружка-подложки */
+body[data-skin="paper"] #sheetlayer .xbtn {
+  top:22.9px; right:22.9px; background:none;
+  font-size:22.9px; line-height:25px; font-weight:700; color:var(--tx);
+}
+/* карточки опций и иконки-кружки: бумага + белый контур, кружок сплошной белый */
+body[data-skin="paper"] .peak-opt { background:var(--accent2); border-color:var(--card-line); }
+body[data-skin="paper"] .po-ico { background:#FFFFFF; }
+/* пилюли «You have …» и «5 000» — сплошные белые; банк-баннер white-30 */
+body[data-skin="paper"] .sp-pill, body[data-skin="paper"] .st-chips { background:#FFFFFF; box-shadow:none; }
+body[data-skin="paper"] .sp-band { background:var(--panel); }
+/* контурная монета в пилюлях: 18 у save-progress, 28.5 у стартер-пака (толще линия) */
+body[data-skin="paper"] .sp-pill .coin-dot { width:18.7px; height:18.7px; flex-basis:18.7px; }
+body[data-skin="paper"] .st-chips .coin-dot { width:29.6px; height:29.6px; flex-basis:29.6px; border-width:2.6px; }
+body[data-skin="paper"] .st-chips .coin-dot::after { width:10px; border-width:2px; }
+/* CTA офферных шитов = крупный кобальтовый плинт (Button 723:12207: 60 → 62.4) */
+body[data-skin="paper"] #sh-saveprogress .btn-primary.wide, body[data-skin="paper"] #sh-starter .btn-primary.wide {
+  height:62.4px; border-radius:16.6px; font-size:20.8px; line-height:31.2px;
+}
+
+/* --- монетизационные шиты (мокапы 741:27489/27371/27608/27704/27805, worker s/money):
+   бумага var(--bg) + зерно 12%, 2px белый контур, радиус 32 (33.3), паддинг 24 (25),
+   X — голый чернильный крест 20px в правом верхнем углу --- */
+body[data-skin="paper"] #sh-outofchips, body[data-skin="paper"] #sh-paystub,
+body[data-skin="paper"] #sh-tiers, body[data-skin="paper"] #sh-redirect {
+  background:var(--paper) center/cover no-repeat, var(--bg);
+  border:2px solid var(--card-line); border-bottom:none;
+  border-radius:33.3px 33.3px 0 0; padding:25px 25px 26px;
+}
+body[data-skin="paper"] #sh-outofchips .xbtn, body[data-skin="paper"] #sh-paystub .xbtn,
+body[data-skin="paper"] #sh-tiers .xbtn, body[data-skin="paper"] #sh-redirect .xbtn {
+  top:25px; right:25px; width:28px; height:28px; background:none;
+  font-size:23px; line-height:26px; font-weight:700; color:var(--tx);
+}
+/* заголовки Black 24 (25); в paystub/tiers — слева (мокапы), в out-of-chips-с-маскотом — по центру */
+body[data-skin="paper"] #sh-outofchips h2 { font-size:25px; line-height:30px; }
+body[data-skin="paper"] #sh-paystub #psConfirm h2, body[data-skin="paper"] #sh-tiers h2 {
+  font-size:25px; line-height:30px; text-align:left; padding-right:31px;
+}
+
+/* out of chips 741:27489: маскот между заголовком и пакетами; крем-карты пакетов
+   с монетой 36px, HOT по центру верха, синяя пилюля Save, зелёный Watch с плинтом #0B6E47 */
+body[data-skin="paper"] .ooc-ill { display:block; width:159.1px; margin:4px auto 0; }
+body[data-skin="paper"] #sh-outofchips .packs { margin-top:0; align-items:center; }
+body[data-skin="paper"] #sh-outofchips .pack {
+  background:var(--bg); border:2px solid var(--card-line); border-radius:20.8px;
+  padding:12.5px; min-height:0; gap:12.5px; justify-content:flex-start;
+}
+body[data-skin="paper"] #sh-outofchips .pack-top {
+  position:static; display:flex; justify-content:center; align-self:stretch; height:18.7px; margin:0;
+}
+/* третий пак в мокапе БЕЗ hot-якоря — он ниже соседей и начинается сразу с монеты */
+body[data-skin="paper"] #sh-outofchips .pack:nth-child(3) .pack-top { display:none; }
+body[data-skin="paper"] #sh-outofchips .pack-art {
+  display:flex; width:37.4px; height:37.4px; background:none; border-radius:0; margin:0;
+}
+body[data-skin="paper"] #sh-outofchips .pack-art svg { display:block; width:37.4px; height:37.4px; }
+body[data-skin="paper"] #sh-outofchips .pack-amt { margin:0; gap:0; flex-direction:row; font-size:15.6px; line-height:20.3px; font-weight:900; }
+body[data-skin="paper"] #sh-outofchips .pack-amt .coin-dot { display:none; }
+body[data-skin="paper"] #sh-outofchips .pack-price { font-size:13.5px; line-height:17.6px; font-weight:700; color:var(--tx-soft); margin-top:-10.4px; }
+body[data-skin="paper"] #sh-outofchips .pack-save2 {
+  align-self:center; margin-top:0; background:var(--blue); color:#fff; opacity:.7;
+  border-radius:6.2px; padding:3.1px 6.2px; font-size:10.4px; line-height:13px; font-weight:800;
+}
+body[data-skin="paper"] #sh-outofchips .pack .btn-play {
+  border-radius:12.5px; padding:12.5px 8.3px; font-size:12.5px; line-height:16.6px; margin-top:0;
+}
+body[data-skin="paper"] #sh-outofchips .hot-tag {
+  background:var(--gold); color:var(--tx); border-radius:4.2px; padding:2.1px 6.2px;
+  font-size:8.3px; line-height:11.4px; font-weight:900;
+}
+body[data-skin="paper"] #sh-outofchips .free-list { margin-top:16.6px; }
+body[data-skin="paper"] #sh-outofchips .free-row {
+  background:var(--card); border:2px solid var(--card-line); border-radius:25px;
+  padding:16.6px; min-height:0;
+}
+body[data-skin="paper"] #sh-outofchips .fr-text b { font-size:16.6px; line-height:21.6px; font-weight:700; }
+body[data-skin="paper"] #sh-outofchips .fr-text > span { font-size:14.6px; line-height:20.4px; font-weight:600; margin-top:6.2px; }
+body[data-skin="paper"] #sh-outofchips .chip-pill { margin-top:6.2px; font-size:14.6px; line-height:19.8px; font-weight:800; color:var(--tx); }
+body[data-skin="paper"] #sh-outofchips .btn-free {
+  max-width:none; background:var(--green); color:#fff; border-radius:12.5px;
+  padding:10.4px 16.6px; font-size:14.6px; line-height:19.8px; font-weight:900;
+  box-shadow:0 4.2px 0 #0B6E47; text-shadow:var(--btn-txsh);
+}
+body[data-skin="paper"] .ooc-tomorrow { font-size:14.6px; line-height:20.4px; font-weight:600; margin-top:16.6px; }
+
+/* payment 741:27608: белая-30 полоса цены Black 36, Pay = Large-кнопка h60 r16 с плинтом */
+body[data-skin="paper"] #sh-paystub .btn-primary.wide {
+  min-height:62.4px; border-radius:16.6px; font-size:20.8px; line-height:27px; font-weight:900;
+  box-shadow:var(--cta-shadow);
+}
+
+/* course tiers 741:27704: белые-30 ряды r20 stroke 1px white (Pro — кобальт), бейдж 40, цена Black 16 */
+body[data-skin="paper"] #sh-tiers .sheet-sub { text-align:left; font-size:16.6px; line-height:21.6px; font-weight:700; margin:8.3px 0 16.6px; }
+body[data-skin="paper"] #sh-tiers .peak-opts { gap:12.5px; margin-bottom:8.3px; }
+body[data-skin="paper"] #sh-tiers .peak-opt {
+  background:var(--card); border:1px solid var(--card-line); border-radius:20.8px;
+  padding:16.6px; gap:14.6px;
+}
+body[data-skin="paper"] #sh-tiers .peak-opt.best { border-color:var(--blue); }
+body[data-skin="paper"] #sh-tiers .po-ico { width:41.6px; height:41.6px; flex:0 0 41.6px; background:#fff; font-size:20.8px; }
+body[data-skin="paper"] #sh-tiers .po-text b { font-size:16.6px; line-height:21.6px; font-weight:700; }
+body[data-skin="paper"] #sh-tiers .po-text span { font-size:12.5px; line-height:16.2px; font-weight:700; }
+body[data-skin="paper"] #sh-tiers .tier-price { font-size:16.6px; line-height:22.6px; font-weight:900; }
+
+/* redirect 741:27805: чернильный спиннер 48 (дуга 270°), текст Bold 16; Close/Not now —
+   голый текст ExtraBold 15 чернилами-70 (без ghost-плашки) */
+body[data-skin="paper"] .stub-spinner { border-color:var(--tx); border-top-color:rgba(76,51,74,.15); }
+body[data-skin="paper"] #sh-redirect h2 { font-size:16.6px; line-height:21.6px; font-weight:700; }
+body[data-skin="paper"] #sh-tiers .stub-close, body[data-skin="paper"] #sh-redirect .stub-close {
+  background:none; color:var(--tx-soft); font-size:15.6px; line-height:21.8px; font-weight:800; padding:8.3px;
+}
+
+/* ============================================================
+   GUIDES / ARTICLE / GUIDES-PROMO — финальные мокапы Миши
+   (741:29147 guides, 741:29212 состояния Practice tasks,
+   741:29306 статья, 741:28574 промо-шит). ×1.04.
+   ============================================================ */
+
+/* --- шапка субэкранов: белый кружок-шеврон 40 + Nunito Black 28 (741:29148) --- */
+body[data-skin="paper"] .sub-head { font-size:29.1px; line-height:37.4px; gap:12.5px; padding:4.2px 0 12.5px; }
+body[data-skin="paper"] .back-circle {
+  display:flex; align-items:center; justify-content:center;
+  background:#fff; box-shadow:inset 0 0 0 2px var(--pill-line); font-size:0;
+}
+body[data-skin="paper"] .back-circle::before {
+  content:'\2039'; font-size:24.9px; line-height:1; font-weight:900;
+  display:block; transform:translateY(-2.5px);
+}
+body[data-skin="paper"] #scr-guides, body[data-skin="paper"] #scr-article { padding-left:16.6px; padding-right:16.6px; }
+
+/* --- поиск: белое поле без контура, плейсхолдер 16 Regular (741:29154) --- */
+body[data-skin="paper"] .search-fld { height:49.9px; border-radius:16.6px; box-shadow:none; }
+body[data-skin="paper"] .search-fld input { font-size:16.6px; font-weight:400; }
+body[data-skin="paper"] .search-fld input::placeholder { font-weight:400; }
+body[data-skin="paper"] .search-fld svg { width:18.7px; height:18.7px; color:var(--tx); }
+
+/* --- карта Practice tasks: крем на креме, 2px белый контур, r25 (741:29159) --- */
+body[data-skin="paper"] #practiceTasks {
+  margin:20.8px 0 0; background:var(--bg);
+  border:2px solid var(--card-line); border-radius:25px; padding:16.6px;
+}
+body[data-skin="paper"] .pt-head { gap:8.3px; margin-bottom:12.5px; }
+body[data-skin="paper"] .pt-head b { font-size:18.7px; line-height:25px; font-weight:900; }
+body[data-skin="paper"] .pt-head span { font-size:13.5px; line-height:18.4px; font-weight:600; }
+body[data-skin="paper"] .pt-row { border-top:none; padding:5.2px 0; gap:12.5px; font-size:14.6px; line-height:19.8px; font-weight:700; }
+body[data-skin="paper"] .pt-check {
+  width:20.8px; height:20.8px; flex-basis:20.8px;
+  background:var(--card); box-shadow:inset 0 0 0 2px var(--card-line); font-size:11.4px;
+}
+body[data-skin="paper"] .pt-row.done .pt-check { background:var(--green); box-shadow:none; }
+/* мокап выполненные строки НЕ зачёркивает */
+body[data-skin="paper"] .pt-row.done > span:last-child { text-decoration:none; opacity:1; }
+body[data-skin="paper"] .pt-hr { background:rgba(255,255,255,.3); margin:12.5px 0 0; }
+body[data-skin="paper"] .pt-foot { padding:12.5px 0 0; }
+body[data-skin="paper"] .pt-btn { min-width:104px; padding:12.5px 18.7px; font-size:14.6px; line-height:17.7px; border-radius:12.5px; }
+body[data-skin="paper"] .pt-reward em { font-size:12.5px; line-height:16.6px; }
+body[data-skin="paper"] .pt-reward b { font-size:14.6px; line-height:19.8px; font-weight:900; }
+body[data-skin="paper"] .pt-reward .coin-dot { width:14.6px; height:14.6px; flex-basis:14.6px; border-width:1.8px; }
+
+/* --- ряды гайдов: white-30 карта r16.6, чернильный подзаголовок, жирный шеврон (741:29186) --- */
+body[data-skin="paper"] .g-row { border:1px solid var(--card-line); border-radius:16.6px; padding:16.6px; margin-bottom:10.4px; gap:12.5px; }
+body[data-skin="paper"] .g-txt { gap:6.2px; }
+body[data-skin="paper"] .g-row em { color:var(--tx); }
+body[data-skin="paper"] .g-row::after { color:var(--tx); font-size:22.9px; font-weight:900; }
+
+/* --- статья: Nunito 600 14.6/21.8 чернилами, арт 187/r16.6 (741:29306) --- */
+body[data-skin="paper"] .article h1 { font-weight:900; margin:8.3px 0 16.6px; }
+body[data-skin="paper"] .article p { font-size:14.6px; line-height:21.8px; font-weight:600; color:var(--tx); margin-bottom:16.6px; }
+body[data-skin="paper"] .art-img { height:187.2px; margin:0 0 16.6px; }
+body[data-skin="paper"] .art-h { font-size:18.7px; line-height:25px; font-weight:900; margin:0 0 8.3px; }
+body[data-skin="paper"] .article li { font-size:14.6px; line-height:21.8px; font-weight:600; }
+/* блок «закрепи в игре» — не из мокапа статьи; переведён в карточный язык Practice tasks */
+body[data-skin="paper"] .article h2 { font-size:18.7px; line-height:25px; margin:8.3px 0 10.4px; }
+body[data-skin="paper"] .article .gcard { background:var(--bg); border:2px solid var(--card-line); border-radius:16.6px; box-shadow:none; }
+body[data-skin="paper"] .article .gc-text h3 { font-weight:900; }
+body[data-skin="paper"] .article .gc-text p { font-weight:600; }
+
+/* --- guides promo sheet (741:28574): бумага с зерном, арт 229×290, голый X, CTA 60/r16 --- */
+body[data-skin="paper"] #sh-guidespromo {
+  padding:25px 25px 26px;
+  background:var(--paper) center/cover no-repeat, var(--bg);
+  box-shadow:inset 0 0 0 2px var(--card-line);
+  border-radius:33.3px 33.3px 0 0;
+}
+body[data-skin="paper"] .promo-img {
+  width:229px; height:290px; margin:2px auto 20.8px;
+  background:url('ill-guides-promo.webp') center/contain no-repeat; border-radius:0;
+}
+body[data-skin="paper"] .promo-title { font-size:25px; line-height:30px; font-weight:900; }
+body[data-skin="paper"] #sh-guidespromo .sheet-sub { font-size:14.6px; line-height:20.4px; margin-top:8.3px; font-weight:600; }
+body[data-skin="paper"] #sh-guidespromo .btn-primary.wide {
+  margin-top:21.8px; padding:0; height:62.4px; border-radius:16.6px;
+  font-size:18.7px; line-height:62.4px;
+}
+body[data-skin="paper"] #sh-guidespromo .xbtn {
+  background:none; width:20.8px; height:20.8px; top:25px; right:25px;
+  font-size:24px; line-height:20.8px; font-weight:700; color:var(--tx);
+}

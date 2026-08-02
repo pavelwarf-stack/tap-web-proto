@@ -41,6 +41,7 @@ const DEF_STATE = {
   daily: { last: null, day: 0, claims: 0, bet: null, result: null },
   shopDaily: { last: null, day: 0 },            // shop daily reward
   ach: { done: {}, claimed: {} },
+  tasksClaimed: false,      // награда Practice tasks (Guides) забрана (мокап 741:29212: Play → Claim → Claimed)
   promoShown: false,        // home guides promo (once, after 4th session)
   savepShown: false,        // save-progress sheet auto-trigger (once, after 3rd session)
   starterShown: false,      // starter pack 1.99$ auto-sheet (once, from 2nd visit; вердикт 31.07 п.27)
@@ -55,7 +56,10 @@ const DEF_STATE = {
   dailyOffer: null,         // дата последнего авто-оффера дейлика (once per day)
   lang: 0,                  // выбранный язык в Settings (visual only)
   setFlags: { notif: true, music: true }, // editorial row toggles (mockup B; prototype-only master flags)
+  subFlags: { dcrem: true, offers: false, tourn: false }, // Notifications subpage toggles (741:29498 defaults)
+  vol: { sfx: 75, music: 30 }, // Sound subpage sliders 0–100 (741:29518 defaults: 225/300 и 90/300)
   skin: 'paper',            // визуальный скин; ДЕФОЛТ = папирусный (слово Павла 31.07 поздний вечер)
+  profile: { name: 'John Carter', avatar: '' }, // имя + аватар из «Настроек профиля» (741:29365); '' = дефолтное фото
   btc: null,                // кэш цен BTC {open, price, openDate, ts, live} — оффлайн-фолбэк
   peakDay: null,            // дата последнего «пикового» оффера (max 1/день; webv1 п.5)
 };
@@ -66,7 +70,7 @@ function loadState() {
   const out = JSON.parse(JSON.stringify(DEF_STATE));
   for (const k of Object.keys(out)) if (k in s) out[k] = s[k];
   // гигиена вложенных структур: битое/старое хранилище не должно давать NaN в логике
-  for (const k of ['daily', 'shopDaily', 'ach', 'homeVisits', 'setFlags', 'visit']) {
+  for (const k of ['daily', 'shopDaily', 'ach', 'homeVisits', 'setFlags', 'subFlags', 'vol', 'visit', 'profile']) {
     if (typeof out[k] !== 'object' || out[k] === null) out[k] = {};
     out[k] = Object.assign(JSON.parse(JSON.stringify(DEF_STATE[k])), out[k]);
   }
@@ -82,6 +86,8 @@ function loadState() {
   out.offerEnd = Number.isFinite(+out.offerEnd) ? +out.offerEnd : 0;
   out.started = Number.isFinite(+out.started) ? +out.started : 0;
   out.lang = +out.lang || 0;
+  if (typeof out.profile.name !== 'string' || !out.profile.name.trim()) out.profile.name = DEF_STATE.profile.name;
+  if (typeof out.profile.avatar !== 'string') out.profile.avatar = '';
   // старые ключи скинов из прошлых сессий чинятся алиасом ниже (normSkin), здесь только тип
   if (typeof out.skin !== 'string' || !out.skin) out.skin = 'paper';
   if (typeof out.btc !== 'object') out.btc = null;
@@ -177,7 +183,8 @@ en: {
   'peak.prop': 'Prop-trading quests', 'peak.prop.d': 'Trade a funded account',
   'peak.later': 'Not now', 't.peaklogged': 'Choice logged (prototype)',
   /* payment stubs + course tiers + referral course hook (вердикты 27.07) */
-  'stub.pay': 'Pay', 'stub.processing': 'Payment processing…', 'stub.notify': 'We’ll notify you when it’s done',
+  'stub.pay': 'Pay', 'stub.making': 'Making a purchase', 'stub.success': 'Payment successful!',
+  'stub.credited': '{0} chips added to your balance', 'stub.thanks': 'Thanks for your purchase!',
   'stub.redirect': 'Redirecting to partner… (prototype)',
   'stub.item.chips': '{0} chips', 'stub.item.prop': 'Prop-trading quest: qualification round',
   'stub.item.refcourse': 'In-depth Long/Short course by an expert',
@@ -232,7 +239,7 @@ en: {
   'tab.home': 'Home', 'tab.shop': 'Shop', 'tab.referrals': 'Referrals', 'tab.achievements': 'Achievements', 'tab.settings': 'Settings',
   'offer.badge': 'Special offer', 'offer.t': 'Starter chip pack', 'offer.d': 'Get {0} chips for just {1} and speed up your progress.', 'chips': 'chips', 'shop.packs': 'Chip packages', 'bar.home': 'Main',
   'shop.title': 'Shop', 'shop.personal': 'Personal offer', 'shop.endsin': 'Ends in', 'savePct': 'Save {0}%',
-  'buy': 'Buy', 'hot': 'Hot', 'shop.free': 'Free',
+  'buy': 'Buy', 'hot': 'Hot', 'best': 'Best', 'shop.free': 'Free',
   'shop.invite.t': 'Invite a friend', 'shop.invite.d': 'Get chips for each referral', 'invite': 'Invite',
   'shop.video.t': 'Watch video', 'shop.video.d': 'Earn chips for each view', 'shop.video.btn': 'Watch',
   'shop.fb.t': 'Feedback', 'shop.fb.d': 'Get chips for an honest review', 'shop.fb.btn': 'Leave a review',
@@ -253,7 +260,7 @@ en: {
   'sub.help': 'Help & Support', 'sub.about': 'About app', 'sub.agreements': 'Agreements', 'sub.terms': 'Terms of Service',
   'set.logout': 'Log out', 'set.delete': 'Delete account',
   'subitem.dcrem': 'Daily challenge reminder', 'subitem.offers': 'Personal offers', 'subitem.tourn': 'Tournament alerts',
-  'subitem.music': 'Music', 'subitem.sfx': 'Sound effects', 'subitem.vibro': 'Vibration',
+  'sub.sound': 'Sound', 'subitem.sfxvol': 'Sound effects volume', 'subitem.musicvol': 'Music volume',
   'sub.help.text': 'Support chat and FAQ are not part of the prototype yet. For now — poke the team directly.',
   'sub.about.text': 'Tap Trading Hub — interactive wireframe prototype. Built for concept review: no real money, no real market orders. All balances are play chips.',
   'sub.agreements.text': 'Placeholder for legal agreements. Final texts are not part of the prototype.',
@@ -262,6 +269,8 @@ en: {
   'prof.title': 'Profile', 'prof.edit': 'Edit', 'prof.stats': 'Statistics', 'prof.games': 'Games played',
   'prof.fav': 'Favorite game', 'prof.best': 'Best win', 'prof.started': 'Started playing',
   'prof.share': 'Share statistics', 'prof.savep': 'Save your progress',
+  'pe.title': 'Profile settings', 'pe.nick': 'Nickname', 'pe.avatar': 'Avatar', 'pe.save': 'Save',
+  't.profsaved': 'Profile updated',
   'days.one': '{0} day', 'days.many': '{0} days',
   'guides.title': 'Guides', 'search.ph': 'Search', 'guides.empty': 'Nothing found',
   'cat.Long': 'Long', 'cat.Short': 'Short', 'cat.Psychology': 'Psychology',
@@ -294,6 +303,7 @@ en: {
   'art.consolidate': 'Consolidate your knowledge in games',
   'ntf.t1': 'Tournament starting soon', 'ntf.d1': 'Join the tournament and get a chance to win 1,000 chips', 'ntf.join': 'Join',
   'ntf.t2': 'Welcome bonus for a friend', 'ntf.d2': 'Get 500 welcome chips for invited friends',
+  'ntf.time1': '2 min ago', 'ntf.time2': '1h ago', 'ntf.time3': 'January 21', 'ntf.empty': 'The notification list is empty',
   'su.title': 'Sign up', 'su.createacct': 'Create account', 'su.sub': 'Start playing and trading right now', 'vf.verification': 'Verification', 'vf.err': 'Invalid code. Try again.', 'vf.changemail': 'Use another email', 'su.email': 'Email', 'su.pass': 'Password', 'su.or': 'Or continue with',
   'su.login': 'Already have an account? Log in', 'su.legal': 'By continuing, you agree to the Terms and Privacy Policy.',
   'vf.title': 'Enter verification code', 'vf.sub': '6-digit code sent to', 'vf.expires': 'Code expires in {0}',
@@ -347,7 +357,8 @@ es: {
   'peak.academy': 'Binance Academy', 'peak.academy.d': 'Lecciones gratis del partner',
   'peak.prop': 'Retos de prop trading', 'peak.prop.d': 'Opera una cuenta fondeada',
   'peak.later': 'Ahora no', 't.peaklogged': 'Elección registrada (prototipo)',
-  'stub.pay': 'Pagar', 'stub.processing': 'Procesando el pago…', 'stub.notify': 'Te avisaremos cuando esté listo',
+  'stub.pay': 'Pagar', 'stub.making': 'Realizando la compra', 'stub.success': '¡Pago realizado!',
+  'stub.credited': '{0} fichas añadidas a tu saldo', 'stub.thanks': '¡Gracias por tu compra!',
   'stub.redirect': 'Redirigiendo al partner… (prototipo)',
   'stub.item.chips': '{0} fichas', 'stub.item.prop': 'Reto de prop trading: ronda de calificación',
   'stub.item.refcourse': 'Curso Long/Short en profundidad de un experto',
@@ -399,7 +410,7 @@ es: {
   'tab.home': 'Inicio', 'tab.shop': 'Tienda', 'tab.referrals': 'Referidos', 'tab.achievements': 'Logros', 'tab.settings': 'Ajustes',
   'offer.badge': 'Oferta especial', 'offer.t': 'Pack de fichas inicial', 'offer.d': 'Consigue {0} fichas por solo {1} y acelera tu progreso.', 'chips': 'fichas', 'shop.packs': 'Paquetes de fichas', 'bar.home': 'Inicio',
   'shop.title': 'Tienda', 'shop.personal': 'Oferta personal', 'shop.endsin': 'Termina en', 'savePct': '−{0}%',
-  'buy': 'Comprar', 'hot': 'Hot', 'shop.free': 'Gratis',
+  'buy': 'Comprar', 'hot': 'Hot', 'best': 'Best', 'shop.free': 'Gratis',
   'shop.invite.t': 'Invita a un amigo', 'shop.invite.d': 'Recibe fichas por cada referido', 'invite': 'Invitar',
   'shop.video.t': 'Ver video', 'shop.video.d': 'Gana fichas por cada visualización', 'shop.video.btn': 'Ver',
   'shop.fb.t': 'Opinión', 'shop.fb.d': 'Recibe fichas por una reseña honesta', 'shop.fb.btn': 'Dejar reseña',
@@ -420,7 +431,7 @@ es: {
   'sub.help': 'Ayuda y soporte', 'sub.about': 'Sobre la app', 'sub.agreements': 'Acuerdos', 'sub.terms': 'Términos de servicio',
   'set.logout': 'Cerrar sesión', 'set.delete': 'Eliminar cuenta',
   'subitem.dcrem': 'Recordatorio del reto diario', 'subitem.offers': 'Ofertas personales', 'subitem.tourn': 'Avisos de torneos',
-  'subitem.music': 'Música', 'subitem.sfx': 'Efectos de sonido', 'subitem.vibro': 'Vibración',
+  'sub.sound': 'Sonido', 'subitem.sfxvol': 'Volumen de efectos de sonido', 'subitem.musicvol': 'Volumen de la música',
   'sub.help.text': 'El chat de soporte y las FAQ aún no forman parte del prototipo. Por ahora, contacta al equipo directamente.',
   'sub.about.text': 'Tap Trading Hub: prototipo interactivo de wireframes. Hecho para revisar el concepto: sin dinero real ni órdenes reales. Todos los saldos son fichas de juego.',
   'sub.agreements.text': 'Marcador de posición para los acuerdos legales. Los textos finales no forman parte del prototipo.',
@@ -429,6 +440,8 @@ es: {
   'prof.title': 'Perfil', 'prof.edit': 'Editar', 'prof.stats': 'Estadísticas', 'prof.games': 'Partidas jugadas',
   'prof.fav': 'Juego favorito', 'prof.best': 'Mejor premio', 'prof.started': 'Empezaste a jugar',
   'prof.share': 'Compartir estadísticas', 'prof.savep': 'Guarda tu progreso',
+  'pe.title': 'Ajustes del perfil', 'pe.nick': 'Apodo', 'pe.avatar': 'Avatar', 'pe.save': 'Guardar',
+  't.profsaved': 'Perfil actualizado',
   'days.one': '{0} día', 'days.many': '{0} días',
   'guides.title': 'Guías', 'search.ph': 'Buscar', 'guides.empty': 'Nada encontrado',
   'cat.Long': 'Long', 'cat.Short': 'Short', 'cat.Psychology': 'Psicología',
@@ -460,6 +473,7 @@ es: {
   'art.consolidate': 'Refuerza tus conocimientos en los juegos',
   'ntf.t1': 'El torneo empieza pronto', 'ntf.d1': 'Únete al torneo y opta a ganar 1.000 fichas', 'ntf.join': 'Unirse',
   'ntf.t2': 'Bono de bienvenida por un amigo', 'ntf.d2': 'Recibe 500 fichas por los amigos invitados',
+  'ntf.time1': 'hace 2 min', 'ntf.time2': 'hace 1 h', 'ntf.time3': '21 de enero', 'ntf.empty': 'La lista de notificaciones está vacía',
   'su.title': 'Crear cuenta', 'su.createacct': 'Crear cuenta', 'su.sub': 'Empieza a jugar y a operar ahora mismo', 'vf.verification': 'Verificación', 'vf.err': 'Código no válido. Inténtalo de nuevo.', 'vf.changemail': 'Usar otro correo', 'su.email': 'Correo', 'su.pass': 'Contraseña', 'su.or': 'O continúa con',
   'su.login': '¿Ya tienes cuenta? Inicia sesión', 'su.legal': 'Al continuar aceptas los Términos y la Política de privacidad.',
   'vf.title': 'Introduce el código', 'vf.sub': 'Código de 6 dígitos enviado a', 'vf.expires': 'El código expira en {0}',
@@ -513,7 +527,8 @@ fr: {
   'peak.academy': 'Binance Academy', 'peak.academy.d': 'Leçons gratuites du partenaire',
   'peak.prop': 'Défis de prop trading', 'peak.prop.d': 'Trade un compte financé',
   'peak.later': 'Pas maintenant', 't.peaklogged': 'Choix enregistré (prototype)',
-  'stub.pay': 'Payer', 'stub.processing': 'Paiement en cours…', 'stub.notify': 'On te préviendra quand ce sera fait',
+  'stub.pay': 'Payer', 'stub.making': 'Achat en cours', 'stub.success': 'Paiement réussi !',
+  'stub.credited': '{0} jetons ajoutés à ton solde', 'stub.thanks': 'Merci pour ton achat !',
   'stub.redirect': 'Redirection vers le partenaire… (prototype)',
   'stub.item.chips': '{0} jetons', 'stub.item.prop': 'Défi de prop trading : tour de qualification',
   'stub.item.refcourse': 'Cours Long/Short approfondi d’un expert',
@@ -565,7 +580,7 @@ fr: {
   'tab.home': 'Accueil', 'tab.shop': 'Boutique', 'tab.referrals': 'Parrainage', 'tab.achievements': 'Succès', 'tab.settings': 'Réglages',
   'offer.badge': 'Offre spéciale', 'offer.t': 'Pack de jetons de départ', 'offer.d': 'Obtiens {0} jetons pour seulement {1} et accélère ta progression.', 'chips': 'jetons', 'shop.packs': 'Packs de jetons', 'bar.home': 'Accueil',
   'shop.title': 'Boutique', 'shop.personal': 'Offre perso', 'shop.endsin': 'Fin dans', 'savePct': '−{0}%',
-  'buy': 'Acheter', 'hot': 'Hot', 'shop.free': 'Gratuit',
+  'buy': 'Acheter', 'hot': 'Hot', 'best': 'Best', 'shop.free': 'Gratuit',
   'shop.invite.t': 'Invite un ami', 'shop.invite.d': 'Reçois des jetons par filleul', 'invite': 'Inviter',
   'shop.video.t': 'Regarder une vidéo', 'shop.video.d': 'Gagne des jetons par vue', 'shop.video.btn': 'Regarder',
   'shop.fb.t': 'Avis', 'shop.fb.d': 'Reçois des jetons pour un avis honnête', 'shop.fb.btn': 'Laisser un avis',
@@ -586,7 +601,7 @@ fr: {
   'sub.help': 'Aide et support', 'sub.about': 'À propos', 'sub.agreements': 'Accords', 'sub.terms': 'Conditions d’utilisation',
   'set.logout': 'Se déconnecter', 'set.delete': 'Supprimer le compte',
   'subitem.dcrem': 'Rappel du défi quotidien', 'subitem.offers': 'Offres personnelles', 'subitem.tourn': 'Alertes tournois',
-  'subitem.music': 'Musique', 'subitem.sfx': 'Effets sonores', 'subitem.vibro': 'Vibration',
+  'sub.sound': 'Son', 'subitem.sfxvol': 'Volume des effets sonores', 'subitem.musicvol': 'Volume de la musique',
   'sub.help.text': 'Le chat de support et la FAQ ne font pas encore partie du prototype. Pour l’instant, contacte l’équipe directement.',
   'sub.about.text': 'Tap Trading Hub — prototype interactif de wireframes. Conçu pour la revue du concept : pas d’argent réel, pas d’ordres réels. Tous les soldes sont des jetons de jeu.',
   'sub.agreements.text': 'Emplacement réservé aux accords juridiques. Les textes finaux ne font pas partie du prototype.',
@@ -595,6 +610,8 @@ fr: {
   'prof.title': 'Profil', 'prof.edit': 'Modifier', 'prof.stats': 'Statistiques', 'prof.games': 'Parties jouées',
   'prof.fav': 'Jeu préféré', 'prof.best': 'Meilleur gain', 'prof.started': 'Début du jeu',
   'prof.share': 'Partager les stats', 'prof.savep': 'Sauvegarde ta progression',
+  'pe.title': 'Réglages du profil', 'pe.nick': 'Pseudo', 'pe.avatar': 'Avatar', 'pe.save': 'Enregistrer',
+  't.profsaved': 'Profil mis à jour',
   'days.one': '{0} jour', 'days.many': '{0} jours',
   'guides.title': 'Guides', 'search.ph': 'Rechercher', 'guides.empty': 'Aucun résultat',
   'cat.Long': 'Long', 'cat.Short': 'Short', 'cat.Psychology': 'Psychologie',
@@ -626,6 +643,7 @@ fr: {
   'art.consolidate': 'Consolide tes connaissances en jouant',
   'ntf.t1': 'Le tournoi commence bientôt', 'ntf.d1': 'Rejoins le tournoi et tente de gagner 1 000 jetons', 'ntf.join': 'Rejoindre',
   'ntf.t2': 'Bonus de bienvenue pour un ami', 'ntf.d2': 'Reçois 500 jetons pour les amis invités',
+  'ntf.time1': 'il y a 2 min', 'ntf.time2': 'il y a 1 h', 'ntf.time3': '21 janvier', 'ntf.empty': 'La liste des notifications est vide',
   'su.title': 'Inscription', 'su.createacct': 'Créer un compte', 'su.sub': 'Commence à jouer et à trader dès maintenant', 'vf.verification': 'Vérification', 'vf.err': 'Code invalide. Réessaie.', 'vf.changemail': 'Utiliser un autre e-mail', 'su.email': 'E-mail', 'su.pass': 'Mot de passe', 'su.or': 'Ou continuer avec',
   'su.login': 'Déjà un compte ? Connexion', 'su.legal': 'En continuant, tu acceptes les Conditions et la Politique de confidentialité.',
   'vf.title': 'Entre le code de vérification', 'vf.sub': 'Code à 6 chiffres envoyé à', 'vf.expires': 'Le code expire dans {0}',
@@ -679,7 +697,8 @@ de: {
   'peak.academy': 'Binance Academy', 'peak.academy.d': 'Gratis-Lektionen vom Partner',
   'peak.prop': 'Prop-Trading-Quests', 'peak.prop.d': 'Handle ein finanziertes Konto',
   'peak.later': 'Nicht jetzt', 't.peaklogged': 'Auswahl protokolliert (Prototyp)',
-  'stub.pay': 'Bezahlen', 'stub.processing': 'Zahlung wird verarbeitet…', 'stub.notify': 'Wir benachrichtigen dich, sobald es fertig ist',
+  'stub.pay': 'Bezahlen', 'stub.making': 'Kauf wird ausgeführt', 'stub.success': 'Zahlung erfolgreich!',
+  'stub.credited': '{0} Chips wurden deinem Guthaben gutgeschrieben', 'stub.thanks': 'Danke für deinen Kauf!',
   'stub.redirect': 'Weiterleitung zum Partner… (Prototyp)',
   'stub.item.chips': '{0} Chips', 'stub.item.prop': 'Prop-Trading-Quest: Qualifikationsrunde',
   'stub.item.refcourse': 'Long/Short-Vertiefungskurs vom Experten',
@@ -731,7 +750,7 @@ de: {
   'tab.home': 'Start', 'tab.shop': 'Shop', 'tab.referrals': 'Freunde', 'tab.achievements': 'Erfolge', 'tab.settings': 'Optionen',
   'offer.badge': 'Sonderangebot', 'offer.t': 'Starter-Chip-Paket', 'offer.d': 'Hol dir {0} Chips für nur {1} und beschleunige deinen Fortschritt.', 'chips': 'Chips', 'shop.packs': 'Chip-Pakete', 'bar.home': 'Start',
   'shop.title': 'Shop', 'shop.personal': 'Dein Angebot', 'shop.endsin': 'Endet in', 'savePct': '−{0}%',
-  'buy': 'Kaufen', 'hot': 'Hot', 'shop.free': 'Gratis',
+  'buy': 'Kaufen', 'hot': 'Hot', 'best': 'Best', 'shop.free': 'Gratis',
   'shop.invite.t': 'Freund einladen', 'shop.invite.d': 'Chips für jeden Geworbenen', 'invite': 'Einladen',
   'shop.video.t': 'Video ansehen', 'shop.video.d': 'Verdiene Chips pro Ansicht', 'shop.video.btn': 'Ansehen',
   'shop.fb.t': 'Feedback', 'shop.fb.d': 'Chips für eine ehrliche Bewertung', 'shop.fb.btn': 'Bewerten',
@@ -752,7 +771,7 @@ de: {
   'sub.help': 'Hilfe & Support', 'sub.about': 'Über die App', 'sub.agreements': 'Vereinbarungen', 'sub.terms': 'Nutzungsbedingungen',
   'set.logout': 'Abmelden', 'set.delete': 'Konto löschen',
   'subitem.dcrem': 'Erinnerung an die Tages-Challenge', 'subitem.offers': 'Persönliche Angebote', 'subitem.tourn': 'Turnier-Hinweise',
-  'subitem.music': 'Musik', 'subitem.sfx': 'Soundeffekte', 'subitem.vibro': 'Vibration',
+  'sub.sound': 'Sound', 'subitem.sfxvol': 'Lautstärke der Soundeffekte', 'subitem.musicvol': 'Musiklautstärke',
   'sub.help.text': 'Support-Chat und FAQ sind noch nicht Teil des Prototyps. Wende dich vorerst direkt ans Team.',
   'sub.about.text': 'Tap Trading Hub — interaktiver Wireframe-Prototyp. Für das Konzept-Review: kein echtes Geld, keine echten Orders. Alle Guthaben sind Spielchips.',
   'sub.agreements.text': 'Platzhalter für rechtliche Vereinbarungen. Finale Texte sind nicht Teil des Prototyps.',
@@ -761,6 +780,8 @@ de: {
   'prof.title': 'Profil', 'prof.edit': 'Bearbeiten', 'prof.stats': 'Statistik', 'prof.games': 'Gespielte Runden',
   'prof.fav': 'Lieblingsspiel', 'prof.best': 'Bester Gewinn', 'prof.started': 'Dabei seit',
   'prof.share': 'Statistik teilen', 'prof.savep': 'Fortschritt sichern',
+  'pe.title': 'Profileinstellungen', 'pe.nick': 'Spitzname', 'pe.avatar': 'Avatar', 'pe.save': 'Speichern',
+  't.profsaved': 'Profil aktualisiert',
   'days.one': '{0} Tag', 'days.many': '{0} Tage',
   'guides.title': 'Guides', 'search.ph': 'Suchen', 'guides.empty': 'Nichts gefunden',
   'cat.Long': 'Long', 'cat.Short': 'Short', 'cat.Psychology': 'Psychologie',
@@ -792,6 +813,7 @@ de: {
   'art.consolidate': 'Festige dein Wissen in den Spielen',
   'ntf.t1': 'Turnier startet bald', 'ntf.d1': 'Mach mit und gewinne bis zu 1.000 Chips', 'ntf.join': 'Mitmachen',
   'ntf.t2': 'Willkommensbonus für einen Freund', 'ntf.d2': 'Erhalte 500 Chips für eingeladene Freunde',
+  'ntf.time1': 'vor 2 Min.', 'ntf.time2': 'vor 1 Std.', 'ntf.time3': '21. Januar', 'ntf.empty': 'Die Mitteilungsliste ist leer',
   'su.title': 'Registrieren', 'su.createacct': 'Konto erstellen', 'su.sub': 'Spiele und trade ab sofort', 'vf.verification': 'Verifizierung', 'vf.err': 'Ungültiger Code. Versuch es erneut.', 'vf.changemail': 'Andere E-Mail verwenden', 'su.email': 'E-Mail', 'su.pass': 'Passwort', 'su.or': 'Oder weiter mit',
   'su.login': 'Schon ein Konto? Anmelden', 'su.legal': 'Wenn du fortfährst, akzeptierst du die Bedingungen und die Datenschutzerklärung.',
   'vf.title': 'Bestätigungscode eingeben', 'vf.sub': '6-stelliger Code gesendet an', 'vf.expires': 'Code läuft ab in {0}',
@@ -845,7 +867,8 @@ ja: {
   'peak.academy': 'Binance Academy', 'peak.academy.d': 'パートナーの無料レッスン',
   'peak.prop': 'プロップトレードのクエスト', 'peak.prop.d': '資金提供アカウントで取引',
   'peak.later': '今はしない', 't.peaklogged': '選択を記録しました（プロトタイプ）',
-  'stub.pay': '支払う', 'stub.processing': '決済処理中…', 'stub.notify': '完了したらお知らせします',
+  'stub.pay': '支払う', 'stub.making': '購入処理中', 'stub.success': '支払い完了！',
+  'stub.credited': 'チップ {0}枚が残高に追加されました', 'stub.thanks': 'ご購入ありがとうございます！',
   'stub.redirect': 'パートナーへリダイレクト中…（プロトタイプ）',
   'stub.item.chips': 'チップ {0}枚', 'stub.item.prop': 'プロップトレードクエスト: 予選ラウンド',
   'stub.item.refcourse': 'エキスパートによるLong/Short徹底講座',
@@ -897,7 +920,7 @@ ja: {
   'tab.home': 'ホーム', 'tab.shop': 'ショップ', 'tab.referrals': '招待', 'tab.achievements': '実績', 'tab.settings': '設定',
   'offer.badge': '特別オファー', 'offer.t': 'スターターチップパック', 'offer.d': '{0}チップがたったの{1}。進化を加速しよう。', 'chips': 'チップ', 'shop.packs': 'チップパック', 'bar.home': 'ホーム',
   'shop.title': 'ショップ', 'shop.personal': '特別オファー', 'shop.endsin': '終了まで', 'savePct': '{0}%お得',
-  'buy': '購入', 'hot': 'Hot', 'shop.free': '無料',
+  'buy': '購入', 'hot': 'Hot', 'best': 'Best', 'shop.free': '無料',
   'shop.invite.t': '友達を招待', 'shop.invite.d': '紹介ごとにチップ獲得', 'invite': '招待',
   'shop.video.t': '動画を見る', 'shop.video.d': '視聴ごとにチップ獲得', 'shop.video.btn': '見る',
   'shop.fb.t': 'フィードバック', 'shop.fb.d': '正直なレビューでチップ獲得', 'shop.fb.btn': 'レビューを書く',
@@ -918,7 +941,7 @@ ja: {
   'sub.help': 'ヘルプとサポート', 'sub.about': 'アプリについて', 'sub.agreements': '規約', 'sub.terms': '利用規約',
   'set.logout': 'ログアウト', 'set.delete': 'アカウント削除',
   'subitem.dcrem': 'デイリーチャレンジの通知', 'subitem.offers': '特別オファー', 'subitem.tourn': 'トーナメント通知',
-  'subitem.music': '音楽', 'subitem.sfx': '効果音', 'subitem.vibro': 'バイブレーション',
+  'sub.sound': 'サウンド', 'subitem.sfxvol': '効果音の音量', 'subitem.musicvol': '音楽の音量',
   'sub.help.text': 'サポートチャットとFAQはまだプロトタイプに含まれていません。今はチームに直接連絡してください。',
   'sub.about.text': 'Tap Trading Hub — インタラクティブなワイヤーフレームのプロトタイプ。コンセプト確認用：実際のお金や注文はありません。残高はすべてゲーム用チップです。',
   'sub.agreements.text': '法的規約のプレースホルダー。最終テキストはプロトタイプに含まれません。',
@@ -927,6 +950,8 @@ ja: {
   'prof.title': 'プロフィール', 'prof.edit': '編集', 'prof.stats': '統計', 'prof.games': 'プレイ回数',
   'prof.fav': 'お気に入り', 'prof.best': '最高勝利', 'prof.started': '開始日',
   'prof.share': '統計をシェア', 'prof.savep': '進行状況を保存',
+  'pe.title': 'プロフィール設定', 'pe.nick': 'ニックネーム', 'pe.avatar': 'アバター', 'pe.save': '保存',
+  't.profsaved': 'プロフィールを更新しました',
   'days.one': '{0}日', 'days.many': '{0}日',
   'guides.title': 'ガイド', 'search.ph': '検索', 'guides.empty': '見つかりません',
   'cat.Long': 'Long', 'cat.Short': 'Short', 'cat.Psychology': '心理学',
@@ -958,6 +983,7 @@ ja: {
   'art.consolidate': 'ゲームで知識を定着させよう',
   'ntf.t1': 'まもなくトーナメント開始', 'ntf.d1': 'トーナメントに参加して1,000チップを狙おう', 'ntf.join': '参加',
   'ntf.t2': '友達のウェルカムボーナス', 'ntf.d2': '招待した友達ごとに500チップ',
+  'ntf.time1': '2分前', 'ntf.time2': '1時間前', 'ntf.time3': '1月21日', 'ntf.empty': '通知リストは空です',
   'su.title': '登録', 'su.createacct': 'アカウント作成', 'su.sub': '今すぐプレイしてトレードを始めよう', 'vf.verification': '認証', 'vf.err': 'コードが無効です。もう一度お試しください。', 'vf.changemail': '別のメールを使う', 'su.email': 'メール', 'su.pass': 'パスワード', 'su.or': 'または次で続行',
   'su.login': 'アカウントをお持ちですか？ログイン', 'su.legal': '続行すると、利用規約とプライバシーポリシーに同意したことになります。',
   'vf.title': '確認コードを入力', 'vf.sub': '6桁のコードを送信しました：', 'vf.expires': 'コード有効期限 {0}',
@@ -1011,7 +1037,8 @@ zh: {
   'peak.academy': 'Binance Academy', 'peak.academy.d': '合作伙伴的免费课程',
   'peak.prop': '自营交易挑战', 'peak.prop.d': '操作资助账户',
   'peak.later': '暂不', 't.peaklogged': '已记录选择（原型）',
-  'stub.pay': '支付', 'stub.processing': '支付处理中…', 'stub.notify': '完成后我们会通知你',
+  'stub.pay': '支付', 'stub.making': '正在购买', 'stub.success': '支付成功！',
+  'stub.credited': '{0}筹码已加入你的余额', 'stub.thanks': '感谢购买！',
   'stub.redirect': '正在跳转到合作伙伴…（原型）',
   'stub.item.chips': '{0}筹码', 'stub.item.prop': '自营交易挑战: 资格赛',
   'stub.item.refcourse': '专家的Long/Short深度课程',
@@ -1063,7 +1090,7 @@ zh: {
   'tab.home': '首页', 'tab.shop': '商店', 'tab.referrals': '邀请', 'tab.achievements': '成就', 'tab.settings': '设置',
   'offer.badge': '特别优惠', 'offer.t': '新手筹码包', 'offer.d': '仅需{1}即可获得{0}筹码，加速你的进度。', 'chips': '筹码', 'shop.packs': '筹码套餐', 'bar.home': '主页',
   'shop.title': '商店', 'shop.personal': '专属优惠', 'shop.endsin': '剩余时间', 'savePct': '省{0}%',
-  'buy': '购买', 'hot': 'Hot', 'shop.free': '免费',
+  'buy': '购买', 'hot': 'Hot', 'best': 'Best', 'shop.free': '免费',
   'shop.invite.t': '邀请好友', 'shop.invite.d': '每邀请一人获得筹码', 'invite': '邀请',
   'shop.video.t': '观看视频', 'shop.video.d': '每次观看获得筹码', 'shop.video.btn': '观看',
   'shop.fb.t': '反馈', 'shop.fb.d': '认真评价即得筹码', 'shop.fb.btn': '写评价',
@@ -1084,7 +1111,7 @@ zh: {
   'sub.help': '帮助与支持', 'sub.about': '关于应用', 'sub.agreements': '协议', 'sub.terms': '服务条款',
   'set.logout': '退出登录', 'set.delete': '删除账号',
   'subitem.dcrem': '每日挑战提醒', 'subitem.offers': '专属优惠', 'subitem.tourn': '锦标赛提醒',
-  'subitem.music': '音乐', 'subitem.sfx': '音效', 'subitem.vibro': '震动',
+  'sub.sound': '声音', 'subitem.sfxvol': '音效音量', 'subitem.musicvol': '音乐音量',
   'sub.help.text': '客服聊天和FAQ暂未包含在原型中。目前请直接联系团队。',
   'sub.about.text': 'Tap Trading Hub — 交互式线框原型。用于概念评审：无真实资金，无真实订单。所有余额均为游戏筹码。',
   'sub.agreements.text': '法律协议占位符。最终文本不包含在原型中。',
@@ -1093,6 +1120,8 @@ zh: {
   'prof.title': '个人资料', 'prof.edit': '编辑', 'prof.stats': '统计', 'prof.games': '游戏局数',
   'prof.fav': '最爱游戏', 'prof.best': '最高赢利', 'prof.started': '开始时间',
   'prof.share': '分享统计', 'prof.savep': '保存进度',
+  'pe.title': '个人资料设置', 'pe.nick': '昵称', 'pe.avatar': '头像', 'pe.save': '保存',
+  't.profsaved': '资料已更新',
   'days.one': '{0}天', 'days.many': '{0}天',
   'guides.title': '指南', 'search.ph': '搜索', 'guides.empty': '未找到',
   'cat.Long': 'Long', 'cat.Short': 'Short', 'cat.Psychology': '心理',
@@ -1124,6 +1153,7 @@ zh: {
   'art.consolidate': '在游戏中巩固知识',
   'ntf.t1': '锦标赛即将开始', 'ntf.d1': '参加锦标赛，有机会赢1,000筹码', 'ntf.join': '参加',
   'ntf.t2': '好友欢迎奖励', 'ntf.d2': '每邀请一位好友得500筹码',
+  'ntf.time1': '2分钟前', 'ntf.time2': '1小时前', 'ntf.time3': '1月21日', 'ntf.empty': '通知列表为空',
   'su.title': '注册', 'su.createacct': '创建账户', 'su.sub': '立即开始游戏和交易', 'vf.verification': '验证', 'vf.err': '验证码无效，请重试。', 'vf.changemail': '使用其他邮箱', 'su.email': '邮箱', 'su.pass': '密码', 'su.or': '或继续使用',
   'su.login': '已有账号？登录', 'su.legal': '继续即表示你同意条款和隐私政策。',
   'vf.title': '输入验证码', 'vf.sub': '6位验证码已发送至', 'vf.expires': '验证码有效期 {0}',
@@ -1177,7 +1207,8 @@ pt: {
   'peak.academy': 'Binance Academy', 'peak.academy.d': 'Aulas grátis do parceiro',
   'peak.prop': 'Desafios de prop trading', 'peak.prop.d': 'Opere uma conta financiada',
   'peak.later': 'Agora não', 't.peaklogged': 'Escolha registrada (protótipo)',
-  'stub.pay': 'Pagar', 'stub.processing': 'Processando o pagamento…', 'stub.notify': 'Avisaremos quando estiver pronto',
+  'stub.pay': 'Pagar', 'stub.making': 'Realizando a compra', 'stub.success': 'Pagamento concluído!',
+  'stub.credited': '{0} fichas adicionadas ao seu saldo', 'stub.thanks': 'Obrigado pela compra!',
   'stub.redirect': 'Redirecionando ao parceiro… (protótipo)',
   'stub.item.chips': '{0} fichas', 'stub.item.prop': 'Desafio de prop trading: rodada de qualificação',
   'stub.item.refcourse': 'Curso Long/Short aprofundado de um expert',
@@ -1229,7 +1260,7 @@ pt: {
   'tab.home': 'Início', 'tab.shop': 'Loja', 'tab.referrals': 'Indicações', 'tab.achievements': 'Conquistas', 'tab.settings': 'Ajustes',
   'offer.badge': 'Oferta especial', 'offer.t': 'Pacote inicial de fichas', 'offer.d': 'Receba {0} fichas por apenas {1} e acelere seu progresso.', 'chips': 'fichas', 'shop.packs': 'Pacotes de fichas', 'bar.home': 'Início',
   'shop.title': 'Loja', 'shop.personal': 'Oferta pessoal', 'shop.endsin': 'Termina em', 'savePct': '−{0}%',
-  'buy': 'Comprar', 'hot': 'Hot', 'shop.free': 'Grátis',
+  'buy': 'Comprar', 'hot': 'Hot', 'best': 'Best', 'shop.free': 'Grátis',
   'shop.invite.t': 'Convide um amigo', 'shop.invite.d': 'Ganhe fichas por cada indicação', 'invite': 'Convidar',
   'shop.video.t': 'Assistir vídeo', 'shop.video.d': 'Ganhe fichas por visualização', 'shop.video.btn': 'Assistir',
   'shop.fb.t': 'Feedback', 'shop.fb.d': 'Ganhe fichas por uma avaliação honesta', 'shop.fb.btn': 'Avaliar',
@@ -1250,7 +1281,7 @@ pt: {
   'sub.help': 'Ajuda e suporte', 'sub.about': 'Sobre o app', 'sub.agreements': 'Acordos', 'sub.terms': 'Termos de serviço',
   'set.logout': 'Sair', 'set.delete': 'Excluir conta',
   'subitem.dcrem': 'Lembrete do desafio diário', 'subitem.offers': 'Ofertas pessoais', 'subitem.tourn': 'Alertas de torneios',
-  'subitem.music': 'Música', 'subitem.sfx': 'Efeitos sonoros', 'subitem.vibro': 'Vibração',
+  'sub.sound': 'Som', 'subitem.sfxvol': 'Volume dos efeitos sonoros', 'subitem.musicvol': 'Volume da música',
   'sub.help.text': 'O chat de suporte e o FAQ ainda não fazem parte do protótipo. Por enquanto, fale direto com a equipe.',
   'sub.about.text': 'Tap Trading Hub — protótipo interativo de wireframes. Feito para revisão de conceito: sem dinheiro real, sem ordens reais. Todos os saldos são fichas de jogo.',
   'sub.agreements.text': 'Espaço reservado para acordos legais. Os textos finais não fazem parte do protótipo.',
@@ -1259,6 +1290,8 @@ pt: {
   'prof.title': 'Perfil', 'prof.edit': 'Editar', 'prof.stats': 'Estatísticas', 'prof.games': 'Partidas jogadas',
   'prof.fav': 'Jogo favorito', 'prof.best': 'Maior prêmio', 'prof.started': 'Começou a jogar',
   'prof.share': 'Compartilhar estatísticas', 'prof.savep': 'Salve seu progresso',
+  'pe.title': 'Configurações do perfil', 'pe.nick': 'Apelido', 'pe.avatar': 'Avatar', 'pe.save': 'Salvar',
+  't.profsaved': 'Perfil atualizado',
   'days.one': '{0} dia', 'days.many': '{0} dias',
   'guides.title': 'Guias', 'search.ph': 'Buscar', 'guides.empty': 'Nada encontrado',
   'cat.Long': 'Long', 'cat.Short': 'Short', 'cat.Psychology': 'Psicologia',
@@ -1290,6 +1323,7 @@ pt: {
   'art.consolidate': 'Consolide seu conhecimento nos jogos',
   'ntf.t1': 'Torneio começa em breve', 'ntf.d1': 'Participe do torneio e concorra a 1.000 fichas', 'ntf.join': 'Participar',
   'ntf.t2': 'Bônus de boas-vindas por amigo', 'ntf.d2': 'Ganhe 500 fichas pelos amigos convidados',
+  'ntf.time1': 'há 2 min', 'ntf.time2': 'há 1 h', 'ntf.time3': '21 de janeiro', 'ntf.empty': 'A lista de notificações está vazia',
   'su.title': 'Criar conta', 'su.createacct': 'Criar conta', 'su.sub': 'Comece a jogar e operar agora mesmo', 'vf.verification': 'Verificação', 'vf.err': 'Código inválido. Tente novamente.', 'vf.changemail': 'Usar outro e-mail', 'su.email': 'E-mail', 'su.pass': 'Senha', 'su.or': 'Ou continue com',
   'su.login': 'Já tem conta? Entrar', 'su.legal': 'Ao continuar, você aceita os Termos e a Política de Privacidade.',
   'vf.title': 'Digite o código de verificação', 'vf.sub': 'Código de 6 dígitos enviado para', 'vf.expires': 'O código expira em {0}',
@@ -1343,7 +1377,8 @@ ar: {
   'peak.academy': 'Binance Academy', 'peak.academy.d': 'دروس مجانية من الشريك',
   'peak.prop': 'تحديات البروب تريدنغ', 'peak.prop.d': 'تداول بحساب ممول',
   'peak.later': 'ليس الآن', 't.peaklogged': 'سُجّل الاختيار (نموذج أولي)',
-  'stub.pay': 'ادفع', 'stub.processing': 'جارٍ معالجة الدفع…', 'stub.notify': 'سنخبرك عند الانتهاء',
+  'stub.pay': 'ادفع', 'stub.making': 'جارٍ إتمام الشراء', 'stub.success': 'تم الدفع بنجاح!',
+  'stub.credited': 'تمت إضافة {0} رقاقة إلى رصيدك', 'stub.thanks': 'شكرًا لشرائك!',
   'stub.redirect': 'جارٍ التحويل إلى الشريك… (نموذج أولي)',
   'stub.item.chips': '{0} رقاقة', 'stub.item.prop': 'تحدي البروب تريدنغ: جولة التصفيات',
   'stub.item.refcourse': 'دورة Long/Short معمّقة من خبير',
@@ -1395,7 +1430,7 @@ ar: {
   'tab.home': 'الرئيسية', 'tab.shop': 'المتجر', 'tab.referrals': 'الدعوات', 'tab.achievements': 'الإنجازات', 'tab.settings': 'الإعدادات',
   'offer.badge': 'عرض خاص', 'offer.t': 'حزمة الرقائق الأولى', 'offer.d': 'احصل على {0} رقاقة مقابل {1} فقط وسرّع تقدمك.', 'chips': 'رقاقة', 'shop.packs': 'حزم الرقائق', 'bar.home': 'الرئيسية',
   'shop.title': 'المتجر', 'shop.personal': 'عرض خاص', 'shop.endsin': 'ينتهي خلال', 'savePct': 'وفّر {0}%',
-  'buy': 'شراء', 'hot': 'Hot', 'shop.free': 'مجاني',
+  'buy': 'شراء', 'hot': 'Hot', 'best': 'Best', 'shop.free': 'مجاني',
   'shop.invite.t': 'ادعُ صديقًا', 'shop.invite.d': 'احصل على رقائق عن كل دعوة', 'invite': 'دعوة',
   'shop.video.t': 'شاهد فيديو', 'shop.video.d': 'اربح رقائق عن كل مشاهدة', 'shop.video.btn': 'مشاهدة',
   'shop.fb.t': 'رأيك', 'shop.fb.d': 'احصل على رقائق مقابل تقييم صادق', 'shop.fb.btn': 'اكتب تقييمًا',
@@ -1416,7 +1451,7 @@ ar: {
   'sub.help': 'المساعدة والدعم', 'sub.about': 'عن التطبيق', 'sub.agreements': 'الاتفاقيات', 'sub.terms': 'شروط الخدمة',
   'set.logout': 'تسجيل الخروج', 'set.delete': 'حذف الحساب',
   'subitem.dcrem': 'تذكير التحدي اليومي', 'subitem.offers': 'عروض خاصة', 'subitem.tourn': 'تنبيهات البطولات',
-  'subitem.music': 'الموسيقى', 'subitem.sfx': 'المؤثرات الصوتية', 'subitem.vibro': 'الاهتزاز',
+  'sub.sound': 'الصوت', 'subitem.sfxvol': 'مستوى صوت المؤثرات', 'subitem.musicvol': 'مستوى صوت الموسيقى',
   'sub.help.text': 'دردشة الدعم والأسئلة الشائعة ليست جزءًا من النموذج الأولي بعد. حاليًا تواصل مع الفريق مباشرة.',
   'sub.about.text': 'Tap Trading Hub — نموذج أولي تفاعلي. لمراجعة الفكرة: لا أموال حقيقية ولا أوامر حقيقية. كل الأرصدة رقائق لعب.',
   'sub.agreements.text': 'عنصر نائب للاتفاقيات القانونية. النصوص النهائية ليست جزءًا من النموذج الأولي.',
@@ -1425,6 +1460,8 @@ ar: {
   'prof.title': 'الملف الشخصي', 'prof.edit': 'تعديل', 'prof.stats': 'الإحصائيات', 'prof.games': 'الجولات الملعوبة',
   'prof.fav': 'اللعبة المفضلة', 'prof.best': 'أفضل ربح', 'prof.started': 'بدأ اللعب',
   'prof.share': 'مشاركة الإحصائيات', 'prof.savep': 'احفظ تقدمك',
+  'pe.title': 'إعدادات الملف الشخصي', 'pe.nick': 'الاسم المستعار', 'pe.avatar': 'الصورة الرمزية', 'pe.save': 'حفظ',
+  't.profsaved': 'تم تحديث الملف الشخصي',
   'days.one': '{0} يوم', 'days.many': '{0} أيام',
   'guides.title': 'الأدلة', 'search.ph': 'بحث', 'guides.empty': 'لا نتائج',
   'cat.Long': 'Long', 'cat.Short': 'Short', 'cat.Psychology': 'علم النفس',
@@ -1456,6 +1493,7 @@ ar: {
   'art.consolidate': 'رسّخ معلوماتك في الألعاب',
   'ntf.t1': 'البطولة تبدأ قريبًا', 'ntf.d1': 'انضم إلى البطولة واربح فرصة 1,000 رقاقة', 'ntf.join': 'انضمام',
   'ntf.t2': 'مكافأة ترحيب عن صديق', 'ntf.d2': 'احصل على 500 رقاقة عن الأصدقاء المدعوين',
+  'ntf.time1': 'قبل دقيقتين', 'ntf.time2': 'قبل ساعة', 'ntf.time3': '21 يناير', 'ntf.empty': 'قائمة الإشعارات فارغة',
   'su.title': 'إنشاء حساب', 'su.createacct': 'إنشاء حساب', 'su.sub': 'ابدأ اللعب والتداول الآن', 'vf.verification': 'التحقق', 'vf.err': 'رمز غير صالح. حاول مجددًا.', 'vf.changemail': 'استخدام بريد آخر', 'su.email': 'البريد الإلكتروني', 'su.pass': 'كلمة المرور', 'su.or': 'أو تابع عبر',
   'su.login': 'لديك حساب؟ تسجيل الدخول', 'su.legal': 'بالمتابعة أنت توافق على الشروط وسياسة الخصوصية.',
   'vf.title': 'أدخل رمز التحقق', 'vf.sub': 'أُرسل رمز من 6 أرقام إلى', 'vf.expires': 'ينتهي الرمز خلال {0}',
@@ -1617,7 +1655,7 @@ const GUIDES = [
     body: [
       'A long is the simplest trade there is: you expect the price to go up, so you enter first and close later — the difference is yours.',
       'Before you enter, look at where the price has already been. A chart that climbs calmly with small pullbacks is friendlier for a long than one that just shot straight up — vertical spikes love to cool off right after.',
-      'Check how nervous the asset is. Big wild candles mean big wins and big losses; smooth candles mean slower but steadier moves. In a Long/Short round you can feel this in seconds — watch the chart breathe before you tap.',
+      '**Check how nervous the asset is.** Big wild candles mean big wins and big losses; smooth candles mean slower but steadier moves. In a Long/Short round you can feel this in seconds — watch the chart breathe before you tap.',
       'Give your entry one clear reason. “It fell a lot” is not a plan; “it bounced off the same level twice” is. One good reason beats five vague ones.',
       'And decide in advance where you are wrong — the point at which you close and move on. If you decide it after entering, emotions will decide it for you.',
       'Practice in the Long/Short game: open a long only when you can say the reason out loud. Your balance will feel the difference quickly.',
@@ -1688,26 +1726,30 @@ function guideBody(g)  { return g.key ? [1, 2, 3].map(n => t(g.key + '.p' + n)) 
 /* Награды ребалансированы 25.07 (слово владельца «не по-охуевшему»): было 19 000 фишек
    суммарно при кошельке 1000 и fee 150 — ачивки обесценивали фишки и Out of chips был
    недостижим. После вердиктов 26.07 (минус shorts, ladder 500→100) потолок 1 500. */
+/* img — иллюстрации из дизайнерского сета 741:30700 (два листа 4×3 и 5×3, прозрачный фон),
+   нарезаны в ach-<slug>.webp; маппинг по смыслу ачивки (★draft — явного маппинга в макете нет) */
 const ACH = [
-  { id: 'first',     target: 1,   reward: 200, prog: () => Math.min(1, totalSessions()) },
-  { id: 'avid',      target: 3,   reward: 400, prog: totalSessions },
-  { id: 'bigwin',    target: 1,   reward: 500, prog: () => (bestWinAll() >= 500 ? 1 : 0) },
-  { id: 'daily2',    target: 2,   reward: 300, prog: () => S.daily.claims },
+  { id: 'first',     target: 1,   reward: 200, img: 'ach-first.webp',  prog: () => Math.min(1, totalSessions()) },
+  { id: 'avid',      target: 3,   reward: 400, img: 'ach-avid.webp',   prog: totalSessions },
+  { id: 'bigwin',    target: 1,   reward: 500, img: 'ach-bigwin.webp', prog: () => (bestWinAll() >= 500 ? 1 : 0) },
+  { id: 'daily2',    target: 2,   reward: 300, img: 'ach-daily2.webp', prog: () => S.daily.claims },
   // webv1: ачивка лесенки вместо explorer/flappy100 (архив 5 игр)
   // (вердикт 26.07 поздний) 'shorts' УБРАНА: за базовое обучение из 3 шагов ачивки нет.
   // Остаётся Full arsenal = открыл ВСЕ механики (вкл. частичные 25/50/75), награда 100.
-  { id: 'ladder',    target: 4,   reward: 100, play: 'trade', prog: () => (tradeStage() >= 3 ? tradeStage() : 0) },
+  { id: 'ladder',    target: 4,   reward: 100, img: 'ach-ladder.webp', play: 'trade', prog: () => (tradeStage() >= 3 ? tradeStage() : 0) },
 ];
 
 /* keys of SUBS = data-sub values in index.html (stable English ids);
    displayed strings resolve through I18N (titleKey/textKey/item keys) */
 const SUBS = {
-  'Notifications':       { type: 'toggles', titleKey: 'sub.notifications', items: ['subitem.dcrem', 'subitem.offers', 'subitem.tourn'] },
-  // Figma node 440:21476 — ровно эти 8, без русского; endonyms are NOT translated
+  // node 741:29498: toggles persist in S.subFlags (flag key + label key per row)
+  'Notifications':       { type: 'toggles', titleKey: 'sub.notifications', items: [['dcrem', 'subitem.dcrem'], ['offers', 'subitem.offers'], ['tourn', 'subitem.tourn']] },
+  // Figma node 741:29539 — ровно эти 8, без русского; endonyms are NOT translated
   'Language':            { type: 'list',    titleKey: 'sub.language', items: ['English', 'Español', 'Français', 'Deutsch', '日本語', '中文', 'Português', 'العربية'], checked: () => S.lang },
   // skin names stay English in all languages (same convention as course tiers Basic/Pro/Expert)
   'Style':               { type: 'list',    titleKey: 'sub.style', items: ['Paper', 'Crypto light', 'Crypto dark', 'Cream', 'Corporate'], checked: () => SKINS.indexOf(SKIN), act: 'skin-pick' },
-  'Music and vibration': { type: 'toggles', titleKey: 'sub.music', items: ['subitem.music', 'subitem.sfx', 'subitem.vibro'] },
+  // node 741:29518: субстраница ряда «Music and vibration» = «Sound» с двумя слайдерами громкости
+  'Music and vibration': { type: 'sliders', titleKey: 'sub.sound', items: [['sfx', 'subitem.sfxvol'], ['music', 'subitem.musicvol']] },
   'Help & Support':      { type: 'text', titleKey: 'sub.help', textKey: 'sub.help.text' },
   'About app':           { type: 'text', titleKey: 'sub.about', textKey: 'sub.about.text' },
   'Agreements':          { type: 'text', titleKey: 'sub.agreements', textKey: 'sub.agreements.text' },
@@ -1862,6 +1904,10 @@ function processQueue() {
     $('#naTitle').textContent = t('ach.' + a.id + '.t');
     $('#naSub').textContent = t('ach.' + a.id + '.done');
     $('#naReward').textContent = fmt(a.reward);
+    // арт достижения в баннере (сет 741:30700); без img — прежний трофей-фолбэк
+    $('#naArt').hidden = !a.img;
+    $('#naArtFallback').style.display = a.img ? 'none' : '';
+    if (a.img) $('#naArt').src = a.img;
     $('#md-newach').dataset.ach = a.id;
     openModal('md-newach');
   } else if (p.type === 'savep') {
@@ -2002,31 +2048,45 @@ function purchaseIntentCount() {
     !x.source.startsWith('tut-')).length;
 }
 
-/* ---------- заглушки платежей (вердикт владельца 27.07: в веб-прототипе только заглушки) ----------
-   Любой покупательный тап → шит sh-paystub: название + цена → «Pay» → вечное
-   «Payment processing… we'll notify you» (спиннер не разрешается, закрытие руками).
-   В intent-лог идут ОБА шага: источник тапа (шаг 1, исторические теги shop-pack/ooc-pack/
-   offer-sheet/course-tierN/referral-course/peak-prop) и 'stub-pay:<item>' (шаг 2). */
-const PACKS = { // паки фишек из вёрстки (data-pack → имя/цена для заглушки)
-  '50k-4.99':        { amt: '50 000',  price: '4.99$' },
-  '150k-hot-8.99':   { amt: '150 000', price: '8.99$' },
+/* ---------- платёжный шит (вердикт 27.07 «только заглушки» + вердикт 02.08) ----------
+   Любой покупательный тап → шит sh-paystub: название + цена → «Pay» → лоадер в кнопке
+   «Making a purchase» ≈1.8с (мокап 741:27608) → успех; чипс-паки РЕАЛЬНО зачисляются
+   в баланс хаба (credit), курс/проп-квест — успех без зачисления.
+   В intent-лог идут ТРИ шага: источник тапа (шаг 1, исторические теги shop-pack/ooc-pack/
+   offer-sheet/course-tierN/referral-course/peak-prop), 'stub-pay:<item>' (шаг 2)
+   и 'pay-success:<item>' (шаг 3, разрешение оплаты). */
+const PACKS = { // паки фишек из вёрстки (data-pack → имя/цена/сумма зачисления/экономия)
+  '50k-4.99':        { amt: '50 000',  price: '4.99$',  num: 50000 },
+  '150k-hot-8.99':   { amt: '150 000', price: '8.99$',  num: 150000, save: 47 },
   // 370k: объём подогнан под ЧЕСТНЫЕ Save 70% от базовой цены 50k-пака (слово Павла 31.07:
   // «по арифметике, но пакет поменяй чтобы сейв 70% был реальным»): 370000×0.0000998$=36.93$ full → 10.99$ = −70.2%
-  '370k-10.99':      { amt: '370 000', price: '10.99$' },
-  'offer-150k-1.99': { amt: '150 000', price: '1.99$' },
+  '370k-10.99':      { amt: '370 000', price: '10.99$', num: 370000, save: 70 },
+  'offer-150k-1.99': { amt: '150 000', price: '1.99$',  num: 150000, save: 80 },
 };
 /* тиры курса (вердикт 27.07): имена английские во всех языках (конвенция продукта);
    цены USD 9.99/29.99/99.99 и проп-квест 49.99 — УТВЕРЖДЕНЫ владельцем 27.07 (вечер),
    больше не плейсхолдеры (★ draft с цен снят; шиты остаются draft — вёрстка/описания мои) */
 const TIER_NAMES = ['Basic', 'Pro', 'Expert'];
 const TIER_PRICES = ['9.99$', '29.99$', '99.99$'];
-let payStubTag = null; // <item> текущей заглушки — для 'stub-pay:<item>'
-function openPayStub(tag, itemName, price) {
+let payStubTag = null;   // <item> текущей оплаты — для 'stub-pay:'/'pay-success:'
+let payStubChips = 0;    // сколько фишек зачислить при успехе (0 = не чипс-товар)
+let payStubSeq = 0;      // токен против гонок: новый шит убивает старый таймер лоадера
+let payStubBusy = false; // Pay уже нажат, крутится лоадер (гард от даблтапа)
+function openPayStub(tag, itemName, price, opts = {}) {
   payStubTag = tag;
+  payStubChips = +opts.chips || 0;
+  payStubSeq++;
+  payStubBusy = false;
   $('#psItem').textContent = itemName;
   $('#psPrice').textContent = price;
+  const sv = $('#psSave');
+  sv.hidden = !opts.save;
+  if (opts.save) sv.textContent = t('savePct', opts.save);
+  $('#psPayBtn').classList.remove('paying');
+  $('#psPayIdle').hidden = false;
+  $('#psPayBusy').hidden = true;
   $('#psConfirm').hidden = false;
-  $('#psWait').hidden = true;
+  $('#psDone').hidden = true;
   openSheet('sh-paystub');
 }
 
@@ -2374,7 +2434,7 @@ const PARTIAL_TUT = [
   { key: 'obp.1', win: ['#chartWrap', '#fracCtl'], arrow: ['#fracCtl', 'DL'], bot: 235 },
   { key: 'obp.2', wait: 'frac', win: ['#chartWrap', '#fracCtl'], arrow: ['#fracCtl', 'DL'] },
   { key: 'obp.3', on: 'phase:rebound', wait: 'enter', win: ['#chartWrap', '#fracCtl', '#btnLong'], arrow: ['#btnLong', 'DL'] },
-  { key: 'obp.4', win: ['#balanceBand', '#infoCard'], arrow: ['#balanceBand', 'UL'] },
+  { key: 'obp.4', win: ['#balanceBand', '#infoCard'], arrow: ['#balanceBand', 'ULb'] }, // стрелка ПОД блоком (уезжала выше — Павел 02.08)
   { key: 'obp.5', on: 'phase:stall', wait: 'exit', win: ['#chartWrap', '#btnExit'], arrow: ['#btnExit', 'DL'] },
   { key: 'obp.6', bot: 235 },
 ];
@@ -2457,8 +2517,14 @@ function tutLayout() {
   // 2) стрелка + позиция бабла (жёсткая геометрия мокапов, 375-кадр → ×1.04)
   const aSpec = cfg.arrow, aR = aSpec ? rect(aSpec[0]) : null;
   if (aSpec && aR) {
-    const kind = aSpec[1], arr = arrows[kind];
-    if (kind === 'UL') {
+    const kind = aSpec[1], arr = arrows[kind === 'ULb' ? 'UL' : kind];
+    if (kind === 'ULb') {
+      // вариант «якорь у ВЕРХА экрана» (obp.4, полоса Balance/Trade): стрелка ПОД целью,
+      // остриё вверх; бабл ниже стрелки (стрелка «уезжала выше блока» — Павел 02.08)
+      const aTop = Math.round(aR.bottom + 4);
+      arr.style.cssText = `display:block;top:${aTop}px;left:${Math.round(aR.left + 44.6)}px;`;
+      card.style.cssText = `top:${Math.round(aTop + 59.9 + 13.5)}px;bottom:auto;`;
+    } else if (kind === 'UL') {
       // 12514: стрелка ЛЕЖИТ у верха якоря (bbox −5 от верха, +43 от левого края цели),
       // указывает вверх-влево; бабл ниже якоря с зазором 23 (553 − 530)
       const aTop = Math.round(aR.top - 5.2);
@@ -2730,21 +2796,24 @@ function renderDailySheet() {
   let seed = 0;
   for (const ch of todayStr()) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
   const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
-  // ~9 узких свечей (w12, шаг 26) — геометрия Figma-арта 440:19186 (хендофф вёрстки 24.07)
+  // 8 широких свечей (w16.6, шаг 23) — геометрия мокапа 741:27301 (тела w18/шаг 25 в поле 327 → viewBox 302)
   let y = 75, parts = [];
-  for (let i = 0; i < 9; i++) {
+  for (let i = 0; i < 8; i++) {
     const up = rnd() > 0.45;
-    const body = 14 + rnd() * 26;
-    const x = 8 + i * 26;
+    const body = 12 + rnd() * 33;
+    const x = 23 + i * 23;
     const yy = y - (up ? body : 0);
     // цвета свечей — токены скина (style-атрибут: var() в презентационных атрибутах не работает)
     const col = up ? 'var(--green)' : 'var(--red)';
-    parts.push(`<line x1="${x + 6}" y1="${yy - 8}" x2="${x + 6}" y2="${yy + body + 8}" style="stroke:${col}" stroke-width="2.5" stroke-linecap="round"/>`);
-    parts.push(`<rect x="${x}" y="${yy}" width="12" height="${body}" rx="3" style="fill:${col}"/>`);
+    parts.push(`<line x1="${x + 8.3}" y1="${yy - 8}" x2="${x + 8.3}" y2="${yy + body + 8}" style="stroke:${col}" stroke-width="1.2" stroke-linecap="round"/>`);
+    parts.push(`<rect x="${x}" y="${yy}" width="16.6" height="${body}" rx="1.1" style="fill:${col}"/>`);
     y += (up ? -1 : 1) * body * 0.55;
-    y = Math.max(34, Math.min(106, y));
+    y = Math.max(30, Math.min(106, y));
   }
   $('#dailyCandles').innerHTML = parts.join('');
+  // бейдж-таймер до конца челленджа (00:00 GMT) — живёт и до ставки (мокап 741:27288)
+  const mid = new Date(); mid.setUTCHours(24, 0, 0, 0);
+  $('#dcTimer').textContent = fmtHMS(mid.getTime() - Date.now());
 
   const { live, res, bet } = ensureDailyDom();
   const tU = todayUTCStr();
@@ -2765,10 +2834,10 @@ function renderDailySheet() {
   const r = S.daily.result;
   const showRes = r && !dailyBettedToday();
   if (showRes && r.win) {
-    res.innerHTML = `<div class="dc-res win draft">` +
+    res.innerHTML = `<div class="dc-res win">` +
       `<span class="dc-res-ico">✓</span><span><b>${t('dc.won', Math.min(S.daily.day, 5))}</b> ${t('dc.winrest', t(r.dir === 'long' ? 'higher' : 'lower'), fmt(r.reward))}</span></div>`;
   } else if (showRes && !r.win) {
-    res.innerHTML = `<div class="dc-res lose draft">` +
+    res.innerHTML = `<div class="dc-res lose">` +
       `<span class="dc-res-ico">▮</span><span><b>${t('dc.lost')}</b> ${t('dc.lostrest', t(r.dir === 'long' ? 'lower' : 'higher'))}</span></div>`;
   } else {
     res.innerHTML = '';
@@ -2807,7 +2876,7 @@ function renderDailySheet() {
     bet.innerHTML = '';
   }
   if (betStale) {
-    res.innerHTML = `<div class="dc-res lose draft">${t('dc.stale', S.daily.bet.dir, S.daily.bet.dateUTC)}</div>`;
+    res.innerHTML = `<div class="dc-res lose">${t('dc.stale', S.daily.bet.dir, S.daily.bet.dateUTC)}</div>`;
   }
 
   // слот «свечи дня» на арте: после ставки — свеча НОРМАЛЬНОГО размера внутри слота
@@ -2839,6 +2908,16 @@ function dailyPick(dir) {
   save();
   toast(t('t.placed', dir === 'long' ? 'Long' : 'Short'));
   renderDailySheet();
+}
+
+/* лента уведомлений: прототип живёт на сэмпл-рядах; пустой #ntfList →
+   экран-заглушка 741:29490 (рептилоид с газетой), поиск прячется вместе с лентой */
+function renderNotifications() {
+  const list = $('#ntfList');
+  const empty = !list || !list.querySelector('.ntf-row');
+  if (list) list.hidden = empty;
+  const search = $('#ntfSearch'); if (search) search.hidden = empty;
+  const es = $('#ntfEmpty'); if (es) es.hidden = !empty;
 }
 
 /* «Want to predict...» — кнопки переписываются из JS (вёрстка у агента вёрстки):
@@ -2940,7 +3019,7 @@ function renderAch() {
       </div>`;
     return `<div class="ach-row${claimed ? ' claimed' : ''}">
       <div class="ach-top">
-        <div class="ach-ico">${ACH_ICON}</div>
+        <div class="ach-ico">${a.img ? `<img src="${a.img}" alt="">` : ACH_ICON}</div>
         <div class="ach-texts">
           <span class="ach-title">${t('ach.' + a.id + '.t')}</span>
           <span class="ach-desc">${t('ach.' + a.id + '.d')}</span>
@@ -2954,7 +3033,41 @@ function renderAch() {
 }
 
 /* ---------- profile ---------- */
+const AVATARS = ['pepe', 'whale', 'doge', 'bull', 'boy', 'trump']; // сетка «Настроек профиля» (741:29365)
+let peAvatar = null; // выбор в открытой модалке; применяется ТОЛЬКО кнопкой Save (мокап)
+function profileName() { return ((S.profile || {}).name || '').trim() || 'John Carter'; }
+/* identity sync: имя + инициалы + выбранный аватар → Home-шапка и Профиль.
+   Фото рисует только paper (через --avatar-img поверх токена); четвёрка скинов
+   остаётся на инициалах — их мокапы фото-аватара не показывают. */
+function syncIdentity() {
+  const pn = profileName();
+  const ini = pn.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() || 'JC';
+  const nm = $('#profName'); if (nm) nm.textContent = pn;
+  const un = $('#homeUserName'); if (un) un.textContent = pn;
+  for (const el of [$('#homeAvatar'), $('#profAvatar')]) {
+    if (!el) continue;
+    el.textContent = ini;
+    if (AVATARS.includes(S.profile.avatar)) el.style.setProperty('--avatar-img', `url('avatar-${S.profile.avatar}.webp')`);
+    else el.style.removeProperty('--avatar-img');
+  }
+}
+function openProfileEdit() {
+  peAvatar = AVATARS.includes(S.profile.avatar) ? S.profile.avatar : null;
+  const inp = $('#peName'); if (inp) inp.value = profileName();
+  $$('#peGrid .pe-ava').forEach(b => b.classList.toggle('sel', b.dataset.ava === peAvatar));
+  openModal('md-profedit');
+}
+function saveProfileEdit() {
+  const v = ($('#peName').value || '').trim();
+  if (v) S.profile.name = v.slice(0, 24);
+  if (peAvatar) S.profile.avatar = peAvatar;
+  save();
+  syncIdentity();
+  closeModal();
+  toast(t('t.profsaved'));
+}
 function renderProfile() {
+  syncIdentity();
   $('#stGames').textContent = totalSessions();
   const fav = favoriteGame();
   $('#stFav').textContent = fav ? ((GAMES[fav] || {}).name || LEGACY_NAMES[fav] || fav) : '—';
@@ -3008,13 +3121,16 @@ function renderHomeHero() {
   if (box) box.innerHTML = '';
 }
 
-/* ---------- practice tasks (обучающий модуль; встреча п.6, ★ draft) ----------
-   Живые галочки по реальным событиям игры (localStorage trade.tasks, пишет игра). */
+/* ---------- practice tasks (обучающий модуль; встреча п.6; мокапы Миши 741:29147/29212) ----------
+   Живые галочки по реальным событиям игры (localStorage trade.tasks, пишет игра).
+   Футер = три состояния мокапа: Play (кобальт) → Claim (зелёный, всё выполнено) →
+   Claimed (кнопки нет, «Claimed ◑100» по центру). Награда 100 зачисляется один раз. */
 const PRACTICE_TASKS = [
   ['profit', 'tasks.1'],
   ['survive', 'tasks.2'],
   ['partial50', 'tasks.3'],
 ];
+const TASKS_REWARD = 100; // Reward 100 из мокапа 741:29159
 function tradeTasks() {
   try { return JSON.parse(localStorage.getItem('trade.tasks') || '{}') || {}; } catch (e) { return {}; }
 }
@@ -3022,14 +3138,32 @@ function renderPracticeTasks() {
   const box = $('#practiceTasks');
   if (!box) return;
   const done = tradeTasks();
+  const allDone = PRACTICE_TASKS.every(([flag]) => done[flag]);
+  const claimed = !!S.tasksClaimed;
+  const reward = `<span class="pt-reward"><em>${claimed ? t('claimed') : t('ach.reward')}</em><span class="coin-dot"></span><b>${fmt(TASKS_REWARD)}</b></span>`;
+  const foot = claimed
+    ? `<div class="pt-foot pt-claimed">${reward}</div>`
+    : `<div class="pt-foot">${allDone
+        ? `<button class="btn pt-btn pt-claim" data-act="tasks-claim">${t('claim')}</button>`
+        : `<button class="btn pt-btn" data-act="play" data-game="trade">${t('play')}</button>`}${reward}</div>`;
   box.innerHTML =
     `<div class="pt-head"><b>${t('tasks.title')}</b><span>${t('tasks.sub')}</span></div>` +
     PRACTICE_TASKS.map(([flag, key]) =>
       `<div class="pt-row${done[flag] ? ' done' : ''}"><span class="pt-check">${done[flag] ? '✓' : ''}</span><span>${t(key)}</span></div>`
-    ).join('');
+    ).join('') +
+    '<div class="pt-hr"></div>' + foot;
 }
 
 /* ---------- guides ---------- */
+/* карточка гайда (мокап 741:29147): заголовок — до первого двоеточия, хвост —
+   подзаголовком с заглавной буквы; ':' латиница, '：' — ja/zh */
+function guideSplitTitle(g) {
+  const full = guideTitle(g);
+  const m = /[:：]/.exec(full);
+  if (!m) return [full, ''];
+  const sub = full.slice(m.index + 1).trim();
+  return [full.slice(0, m.index).trim(), sub.charAt(0).toUpperCase() + sub.slice(1)];
+}
 function renderGuides(filter) {
   const q = (filter || '').trim().toLowerCase();
   const box = $('#guidesBody');
@@ -3037,10 +3171,11 @@ function renderGuides(filter) {
   for (const cat of GUIDE_CATS) {
     const items = GUIDES.map((g, i) => [g, i]).filter(([g]) => g.cat === cat && (!q || guideTitle(g).toLowerCase().includes(q)));
     if (!items.length) continue;
-    // ★ draft: секция кейсов паттернов — моя (копия+SVG), вайрфрейма нет
-    const draft = cat === 'patterns' ? ' draft" data-draft="Chart patterns case set (education module, meeting 24.07; copy + SVG sketches mine, no wireframe)' : '';
-    html += `<div class="g-sec${draft}">${t('cat.' + cat)} (${items.length})</div>`;
-    html += items.map(([g, i]) => `<button class="g-row" data-guide="${i}"><span>${guideTitle(g)}</span></button>`).join('');
+    html += `<div class="g-sec">${t('cat.' + cat)} (${items.length})</div>`;
+    html += items.map(([g, i]) => {
+      const [tt, sub] = guideSplitTitle(g);
+      return `<button class="g-row" data-guide="${i}"><span class="g-txt"><b>${tt}</b>${sub ? `<em>${sub}</em>` : ''}</span></button>`;
+    }).join('');
     html += '<div class="g-hr"></div>';
   }
   box.innerHTML = html || `<div class="g-empty">${t('guides.empty')}</div>`;
@@ -3053,7 +3188,19 @@ function openGuides() {
   pushScreen('scr-guides');
 }
 /* тело статьи — из данных гайда (стили вёрстки переиспользуются: art-lead / p / art-img).
-   Статические плейсхолдеры между <h1> и <h2> вычищаются один раз при первом рендере. */
+   Статические плейсхолдеры между <h1> и <h2> вычищаются один раз при первом рендере.
+   markdown-lite мокапа 741:29306: «## …» — врезка-подзаголовок, «**…**» — жирный акцент,
+   абзац из строк «- …» / «1. …» — маркированный/нумерованный список. */
+function mdInline(s) { return s.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); }
+function artBlock(p) {
+  if (/^##\s/.test(p)) return `<h3 class="art-h">${mdInline(p.slice(3))}</h3>`;
+  const lines = p.split('\n');
+  if (lines.length > 1 && lines.every(l => /^(-|\d+\.)\s/.test(l))) {
+    const tag = /^\d/.test(lines[0]) ? 'ol' : 'ul';
+    return `<${tag}>` + lines.map(l => `<li>${mdInline(l.replace(/^(-|\d+\.)\s/, ''))}</li>`).join('') + `</${tag}>`;
+  }
+  return null;
+}
 function renderArticleBody(g) {
   let box = document.getElementById('artBody');
   if (!box) {
@@ -3065,12 +3212,12 @@ function renderArticleBody(g) {
     h1.insertAdjacentElement('afterend', box);
   }
   const paras = guideBody(g);
-  // ★ draft: у кейсов паттернов вместо арт-плейсхолдера — инлайн-SVG-скетч (g.svg)
+  // у кейсов паттернов вместо арт-иллюстрации — инлайн-SVG-скетч (g.svg)
   const illo = g.svg
-    ? `<div class="art-img art-chart draft" data-draft="Pattern mini-chart: inline SVG sketch, skin tokens only (currentColor + --green/--red)">${g.svg}</div>`
+    ? `<div class="art-img art-chart">${g.svg}</div>`
     : '<div class="art-img"></div>';
   box.innerHTML = paras.map((p, i) =>
-    `<p${i === 0 ? ' class="art-lead"' : ''}>${p}</p>` + (i === 0 ? illo : '')
+    (artBlock(p) || `<p${i === 0 ? ' class="art-lead"' : ''}>${mdInline(p)}</p>`) + (i === 0 ? illo : '')
   ).join('');
 }
 function openArticle(i) {
@@ -3086,23 +3233,48 @@ function openArticle(i) {
   pushScreen('scr-article');
 }
 
-/* ---------- settings subscreens ---------- */
+/* ---------- settings subscreens (paper mockups 741:29498/29518/29539) ---------- */
 let curSub = null;
+// галочка выбора из макета 741:29549 (14×12 → ×1.04), красится в var(--green)
+const SUB_CHECK = '<span class="stub-check"><svg width="14.6" height="12.5" viewBox="0 0 14 12" fill="none"><path d="M11.66 3L5.25 8.5 2.33 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></span>';
 function renderSubBody(name) {
   const def = SUBS[name] || { type: 'text', textKey: 'sub.stub' };
   const body = $('#setsubBody');
   if (def.type === 'text') {
     body.innerHTML = `<div class="stub-card draft" data-draft="Stub subscreen content (no wireframe)"><p>${t(def.textKey)}</p></div>`;
   } else if (def.type === 'toggles') {
-    body.innerHTML = `<div class="set-group draft" data-draft="Stub subscreen content (no wireframe)">` +
-      def.items.map((k, i) => `<div class="stub-list-row">${t(k)}<label class="switch"><input type="checkbox" ${i === 0 ? 'checked' : ''}><span class="knob"></span></label></div>`).join('') +
+    // node 741:29498 (Notifications): card of rows, a paper switch each; states persist in S.subFlags
+    body.innerHTML = `<div class="set-group">` +
+      def.items.map(([flag, k]) => `<div class="stub-list-row"><span>${t(k)}</span><label class="switch"><input type="checkbox" data-flag="${flag}"${S.subFlags[flag] ? ' checked' : ''}><span class="knob"></span></label></div>`).join('') +
       `</div>`;
+    for (const el of body.querySelectorAll('input[data-flag]'))
+      el.addEventListener('change', () => { S.subFlags[el.dataset.flag] = el.checked; save(); });
+  } else if (def.type === 'sliders') {
+    // node 741:29518 (Sound): volume sliders — cobalt fill + white rest, 16px knob w/ white ring
+    const val = key => Math.max(0, Math.min(100, +S.vol[key] || 0));
+    body.innerHTML = `<div class="set-group vol-card">` +
+      def.items.map(([key, k], i) =>
+        (i ? '<div class="vol-hr"></div>' : '') +
+        `<div class="vol-block"><span class="vol-label">${t(k)}</span><input type="range" class="vol-range" min="0" max="100" value="${val(key)}" data-vol="${key}" style="--fill:${val(key)}%"></div>`).join('') +
+      `</div>`;
+    for (const el of body.querySelectorAll('input[data-vol]'))
+      el.addEventListener('input', () => {
+        const v = +el.value;
+        el.style.setProperty('--fill', v + '%');
+        S.vol[el.dataset.vol] = v;
+        if (el.dataset.vol === 'music') { // громкость музыки = источник мастер-флага music
+          S.setFlags.music = v > 0;
+          const sw = $('#swMusic');
+          if (sw) sw.checked = v > 0;
+        }
+        save();
+      });
   } else if (def.type === 'list') {
-    // items = language endonyms / style names, NOT translated (product decision)
+    // node 741:29539: items = language endonyms / style names, NOT translated (product decision)
     const checked = typeof def.checked === 'function' ? def.checked() : (def.checked || 0);
     const act = def.act || 'lang-pick';
     body.innerHTML = `<div class="set-group">` +
-      def.items.map((n, i) => `<button class="stub-list-row" data-act="${act}" data-idx="${i}">${n}${i === checked ? '<span class="stub-check">✓</span>' : ''}</button>`).join('') +
+      def.items.map((n, i) => `<button class="stub-list-row${i === checked ? ' sel' : ''}" data-act="${act}" data-idx="${i}">${n}${i === checked ? SUB_CHECK : ''}</button>`).join('') +
       `</div>`;
   }
 }
@@ -3151,15 +3323,19 @@ function tickTimers() {
   // витрина стартер-пака на Home живёт по своему 2ч-окну (622-мокап), не по циклу personal offer
   if (S.starterShown) {
     const sLeft = S.starterEnd - now;
-    $('#offerTimerHome').textContent = fmtHMS(Math.max(0, sLeft));
+    const sTxt = fmtHMS(Math.max(0, sLeft));
+    $('#offerTimerHome').textContent = sTxt;
+    // тот же отсчёт в шите стартер-пака (мокап 741:28175: «1:32:23» — часы без ведущего нуля)
+    const st = $('#starterSheetTimer');
+    if (st) st.textContent = sTxt.replace(/^0(?=\d:)/, '');
     if (sLeft <= 0) renderStarterCard();
   }
-  // daily challenge: живой отсчёт до 00:00 GMT (результат ставки)
+  // daily challenge: живой отсчёт до 00:00 GMT (бейдж шита + строка результата ставки)
+  const m = new Date(); m.setUTCHours(24, 0, 0, 0);
+  const dcLeft = fmtHMS(m.getTime() - now);
+  $('#dcTimer').textContent = dcLeft;
   const cd = document.getElementById('dcCountdown');
-  if (cd) {
-    const m = new Date(); m.setUTCHours(24, 0, 0, 0);
-    cd.textContent = t('dc.result', fmtHMS(m.getTime() - now));
-  }
+  if (cd) cd.textContent = t('dc.result', dcLeft);
   // а в новый UTC-день — авто-резолв нерешённой ставки (не чаще раза в минуту в оффлайне)
   if (S.daily.bet && S.daily.bet.dateUTC !== todayUTCStr() && !dailyResolving &&
       now - dailyResolveLast > 60000) resolveDailyBet();
@@ -3250,11 +3426,22 @@ const ACT = {
   'open-notifications': () => {
     S.bellSeen = true; save();
     const dot = $('#bellDot'); if (dot) dot.hidden = true;
+    renderNotifications();
     pushScreen('scr-notifications');
   },
   'open-shop': () => showTab('shop'),
   'goto-referrals': () => { closeSheet(); showTab('referrals'); },
   'open-guides': openGuides,
+  // Claim карточки Practice tasks (мокап 741:29212): все три галочки → +100, один раз
+  'tasks-claim': () => {
+    const done = tradeTasks();
+    if (S.tasksClaimed || !PRACTICE_TASKS.every(([flag]) => done[flag])) return;
+    S.tasksClaimed = true;
+    save();
+    credit(TASKS_REWARD);
+    toast(t('t.achreward', t('tasks.title'), fmt(TASKS_REWARD)));
+    renderPracticeTasks();
+  },
 
   /* games */
   'play': el => {
@@ -3315,13 +3502,30 @@ const ACT = {
     logIntent(el.closest('#sh-outofchips') ? 'ooc-pack' :
       el.closest('#sh-offer') ? 'offer-sheet' : 'shop-pack', pack); // шаг 1
     const p = PACKS[pack];
-    if (p) openPayStub(pack, t('stub.item.chips', p.amt), p.price);
+    if (p) openPayStub(pack, t('stub.item.chips', p.amt), p.price, { chips: p.num, save: p.save });
     else toast(t('t.nopurch')); // страховка: неизвестный пак — старое поведение
   },
+  /* Pay (вердикт 02.08): лоадер «Making a purchase» ≈1.8с → успех; чипс-паки
+     зачисляются в баланс (credit → setBalance с анимацией пилюли), остальное — без.
+     Закрытие шита во время лоадера платёж НЕ отменяет (оплата «ушла» — фишки придут). */
   'paystub-pay': () => {
+    if (payStubBusy) return; // даблтап по крутящейся кнопке
     if (payStubTag) logIntent('stub-pay:' + payStubTag); // шаг 2
-    $('#psConfirm').hidden = true;
-    $('#psWait').hidden = false; // «Payment processing…» — не разрешается никогда
+    payStubBusy = true;
+    const seq = payStubSeq;
+    $('#psPayBtn').classList.add('paying');
+    $('#psPayIdle').hidden = true;
+    $('#psPayBusy').hidden = false;
+    setTimeout(() => {
+      if (seq !== payStubSeq) return; // уже открыли другую оплату — таймер мёртв
+      payStubBusy = false;
+      if (payStubChips > 0) credit(payStubChips);
+      logIntent('pay-success:' + payStubTag); // шаг 3
+      $('#psDoneSub').textContent = payStubChips > 0
+        ? t('stub.credited', fmt(payStubChips)) : t('stub.thanks');
+      $('#psConfirm').hidden = true;
+      $('#psDone').hidden = false;
+    }, 1800);
   },
   'watch-video': watchVideo,
   'open-dailyreward': () => { renderShopDailySheet(); openSheet('sh-dailyreward'); },
@@ -3367,7 +3571,7 @@ const ACT = {
      по общей схеме п.15 ('starter-pack' → 'stub-pay:starter-pack'); сумма 5 000 — ★draft */
   'starter-buy': () => {
     logIntent('starter-pack', '5k-1.99'); // шаг 1
-    openPayStub('starter-pack', t('stub.item.chips', '5 000'), '1.99$');
+    openPayStub('starter-pack', t('stub.item.chips', '5 000'), '1.99$', { chips: 5000 });
   },
 
   /* referral course hook (вердикт 27.07): курс за первого заплатившего друга */
@@ -3411,7 +3615,12 @@ const ACT = {
     try { await navigator.clipboard.writeText(text); toast(t('t.statscopied')); }
     catch (err) { toast(t('t.stats', text)); }
   },
-  'edit-profile': stubToast,
+  'edit-profile': openProfileEdit,
+  'pe-ava': el => { // тап по аватару в сетке: выделение; фиксация — кнопкой Save
+    peAvatar = el.dataset.ava;
+    $$('#peGrid .pe-ava').forEach(b => b.classList.toggle('sel', b === el));
+  },
+  'profedit-save': saveProfileEdit,
   'open-saveprogress': () => {
     if (S.progressSaved) { toast(t('t.progalready')); return; }
     openSaveProgress();
@@ -3505,14 +3714,9 @@ const VISIT_GAP = 30 * 60 * 1000; // тишина ≥30 мин = новая се
 
   applyLang(); // statics via [data-i18n] in the persisted S.lang, before first paint of renders below
   renderBalance();
-  // home header identity = имя из профиля (у приложения нет username, ★draft вердикта 30.07):
-  // «John Carter» в макете — сэмпл; берём живое отображаемое имя профиля + инициалы
-  (function syncHomeIdentity() {
-    const pn = ($('#profName') && $('#profName').textContent.trim()) || 'John Carter';
-    const un = $('#homeUserName'); if (un) un.textContent = pn;
-    const av = $('#homeAvatar');
-    if (av) av.textContent = pn.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
-  })();
+  // home header identity = имя/аватар из S.profile (у приложения нет username, вердикт 30.07):
+  // «John Carter» в макете — сэмпл и дефолт; правится в «Настройках профиля» (741:29365)
+  syncIdentity();
   renderHomeHero();
   renderStarterCard();
   renderAch();

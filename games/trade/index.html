@@ -198,18 +198,23 @@
     </section>
 
     <!-- ===== OVERLAYS ===== -->
+    <!-- пауза по макету 761:31147: X, Paused, ряды End round / Sound / Exit to menu, зелёный Resume -->
     <div id="pauseOverlay" class="overlay hidden">
       <div class="pause-card">
+        <button id="btnPauseX" class="ov-x" aria-label="Resume"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
         <div class="pause-title">Paused</div>
+        <button id="btnExitRound" class="pause-row">End round</button>
+        <button id="btnSound" class="pause-row">🔊 Sound: on</button>
+        <button id="btnExitMenu" class="pause-row">Exit to menu</button>
         <button id="btnResume" class="bigbtn green slim"><span class="btn-label">Resume</span></button>
-        <button id="btnExitRound" class="ghostbtn">End round</button>
-        <button id="btnSound" class="ghostbtn">🔊 Sound: on</button>
       </div>
     </div>
 
     <!-- one-time stage onboarding (shorts / leverage) -->
+    <!-- интро механик по макету 761:31253 (частичные): X, заголовок, абзацы, пилюли, Got it -->
     <div id="introOverlay" class="overlay intro-overlay hidden">
       <div class="intro-card">
+        <button id="btnIntroX" class="ov-x" aria-label="Close"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
         <span id="introDraft" class="draft-chip hidden">★ draft</span>
         <div id="introTitle" class="intro-title">Shorts unlocked</div>
         <div id="introBody" class="intro-body"></div>

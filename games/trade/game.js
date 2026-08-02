@@ -1062,18 +1062,20 @@ function showIntro(kind, onDone) {
     (kind === 'short'
       ? `<div class="intro-demo"><span class="demo-pill long">Long ▲</span><span class="demo-pill short">Short ▼</span></div>`
       : kind === 'partial'
-      ? `<div class="intro-demo"><span class="demo-pill lev">25%</span><span class="demo-pill lev">50%</span><span class="demo-pill lev on">75%</span><span class="demo-pill lev">100%</span></div>`
+      ? `<div class="intro-demo"><span class="demo-pill lev">25%</span><span class="demo-pill lev">50%</span><span class="demo-pill lev">75%</span><span class="demo-pill lev on">100%</span></div>` // активный 100% — мокап 761:31253
       : `<div class="intro-demo"><span class="demo-pill lev">×1</span><span class="demo-pill lev on">×2</span><span class="demo-pill lev">×3</span><span class="demo-pill lev">×4</span><span class="demo-pill lev">×5</span></div>`);
   $('introDraft').classList.toggle('hidden', !DRAFTS_ON);
   ov.classList.remove('hidden');
   $('btnIntroOk').textContent = gt('gotit');
-  $('btnIntroOk').onclick = () => {
+  const closeIntro = () => {
     ov.classList.add('hidden');
     G.paused = wasPaused;
     P.intros[kind] = true;
     saveP();
     if (onDone) onDone();
   };
+  $('btnIntroOk').onclick = closeIntro;
+  $('btnIntroX').onclick = closeIntro; // X по макету 761:31253 = то же закрытие
 }
 
 function startRound() {
@@ -1933,10 +1935,12 @@ function bind() {
     G.paused = true;
     $('pauseOverlay').classList.remove('hidden');
   });
-  $('btnResume').addEventListener('click', () => {
+  const resumeGame = () => {
     G.paused = false;
     $('pauseOverlay').classList.add('hidden');
-  });
+  };
+  $('btnResume').addEventListener('click', resumeGame);
+  $('btnPauseX').addEventListener('click', resumeGame); // X по макету 761:31147 = Resume
   $('btnExitRound').addEventListener('click', () => {
     G.paused = false;
     $('pauseOverlay').classList.add('hidden');
@@ -1945,6 +1949,11 @@ function bind() {
   $('btnSound').addEventListener('click', () => {
     Sound.on = !Sound.on;
     $('btnSound').textContent = Sound.on ? '🔊 Sound: on' : '🔇 Sound: off';
+  });
+  // «Exit to menu» (мокап 761:31147): выход в хаб; standalone-запуску прятать
+  $('btnExitMenu').classList.toggle('hidden', window.parent === window);
+  $('btnExitMenu').addEventListener('click', () => {
+    try { window.parent.postMessage({ type: 'hub:exit', game: 'trade' }, '*'); } catch (e) {}
   });
   window.addEventListener('resize', resizeAll);
   /* Канвас графика привязан к размеру #chartPlot, а тот устаканивается ПОЗЖЕ первого

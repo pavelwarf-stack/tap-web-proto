@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Everyone's talking about the markets — Tap Trading</title>
+<meta name="description" content="A 60-second game on Bitcoin's live price. Next time markets come up — you'll have something to say. Free, no sign-up.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@600&family=Inter:ital,wght@0,400;0,600;0,700;0,800;1,500&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #05081D;
+    --bg-alt: #070B24;
+    --amber: #FFB000;
+    --green: #12D16C;
+    --body-text: #D1D5DB;
+    --muted: #9CA3AF;
+    --card-bg: rgba(12, 19, 59, 0.5);
+    --card-border: #1E295D;
+    --dark-ink: #111827;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: #FFFFFF;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { text-decoration: none; color: inherit; }
+  img, svg { display: block; max-width: 100%; }
+
+  .page { position: relative; }
+  .orbs { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .orbs-inner { position: relative; max-width: 1400px; height: 100%; margin: 0 auto; }
+  .orb { position: absolute; border-radius: 50%; opacity: 0.35; }
+  .orb-1 { left: -500px; top: -30px; width: 600px; height: 600px; background: #1E3A8A; filter: blur(60px); }
+  .orb-2 { left: 1184px; top: 447px; width: 505px; height: 505px; background: #3B2A8C; filter: blur(95.6px); }
+  .orb-3 { left: 287px; top: 1721px; width: 730px; height: 476px; background: rgba(30, 58, 138, 0.47); filter: blur(60px); }
+  .orb-4 { display: none; } /* mobile-only orb (Figma 770:1057) */
+
+  section { position: relative; }
+  .wrap {
+    max-width: 1400px; margin: 0 auto; position: relative; z-index: 1;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .amber { color: var(--amber); }
+
+  .eyebrow {
+    display: inline-flex; padding: 6px 16px; border-radius: 100px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--amber);
+    font-weight: 700; font-size: 12px; letter-spacing: 0.1667em; text-transform: uppercase;
+  }
+
+  /* ---------- hero ---------- */
+  .hero .wrap { padding: 120px 80px 180px; gap: 40px; }
+  h1 {
+    font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 64px;
+    line-height: 1.1; letter-spacing: -0.0234em; text-align: center;
+  }
+  .hero-sub {
+    max-width: 760px; font-size: 18px; line-height: 1.6; text-align: center; color: var(--body-text);
+  }
+  .hero-headings { display: flex; flex-direction: column; align-items: center; gap: 24px; align-self: stretch; }
+
+  /* chart card (shared with landing A design) */
+  .chart-card {
+    position: relative; width: 400px; height: 270px;
+    background: rgba(11, 17, 38, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 20px;
+    box-shadow: 0px 24px 48px 0px rgba(0, 0, 0, 0.8), 0px 0px 80px 20px rgba(16, 185, 129, 0.08), inset 0px 1px 0px 0px rgba(255, 255, 255, 0.03);
+  }
+  .chart-glass-top {
+    position: absolute; left: 0; top: 0; width: 100%; height: 1px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.13) 50%, rgba(255, 255, 255, 0) 100%);
+  }
+  .chart-header {
+    position: absolute; left: 28px; top: 28px; width: 344px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .chart-label-group { display: flex; align-items: center; gap: 8px; }
+  .chart-label-accent { width: 3px; height: 14px; border-radius: 2px; background: var(--amber); }
+  .chart-label {
+    font-family: 'Geist', 'Inter', sans-serif; font-weight: 600; font-size: 12px;
+    text-transform: uppercase; color: #4B567D;
+  }
+  .pulse-pill {
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 100px;
+    background: rgba(16, 185, 129, 0.07);
+  }
+  .pulse-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: #10B981;
+    box-shadow: 0px 0px 6px 0px rgba(16, 185, 129, 0.5);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 6px 0 rgba(16, 185, 129, 0.5); }
+    50% { opacity: 0.45; box-shadow: 0 0 2px 0 rgba(16, 185, 129, 0.25); }
+  }
+  .pulse-label {
+    font-family: 'Geist', 'Inter', sans-serif; font-weight: 600; font-size: 10px;
+    text-transform: uppercase; color: #10B981;
+  }
+  .chart-svg { position: absolute; left: 28px; top: 65px; width: 344px; height: 160px; }
+
+  /* ---------- social proof ---------- */
+  .social { background: var(--bg-alt); }
+  .social .wrap { padding: 120px 80px 160px; gap: 48px; }
+  .avatar-cluster { display: flex; justify-content: center; }
+  .avatar {
+    width: 72px; height: 72px; border-radius: 36px;
+    border: 4px solid var(--bg);
+    display: flex; justify-content: center; align-items: center;
+    font-size: 36px; line-height: 1;
+  }
+  .avatar + .avatar { margin-left: -16px; }
+  .avatar-blue { background: #3B82F6; }
+  .avatar-rose { background: #F43F5E; }
+  .avatar-amber { background: #F59E0B; }
+  .social-text { display: flex; flex-direction: column; align-items: center; gap: 24px; align-self: stretch; }
+  h2 {
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 48px;
+    line-height: 1.2; letter-spacing: -0.0208em; text-align: center;
+  }
+  .social h2 { max-width: 880px; }
+  .social-sub { max-width: 680px; font-size: 18px; line-height: 1.6; text-align: center; color: var(--body-text); }
+
+  /* ---------- feature / showcase ---------- */
+  .feature .wrap { padding: 140px 80px 160px; gap: 56px; }
+  .showcase { display: flex; align-items: center; gap: 48px; width: 1000px; max-width: 100%; }
+  .info-column {
+    flex: 1; min-height: 314px;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 32px;
+  }
+  .info-headers { display: flex; flex-direction: column; gap: 16px; }
+  h3 {
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 38px; line-height: 1.2;
+    max-width: 439px;
+  }
+  .info-headers p { font-size: 16px; line-height: 1.6; color: var(--body-text); }
+  .testimonial {
+    align-self: flex-start;
+    display: flex; flex-direction: column; gap: 12px;
+    padding: 24px; border-radius: 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+  }
+  .testimonial-quote {
+    max-width: 459px;
+    font-style: italic; font-weight: 500; font-size: 17px; line-height: 1.5; color: #FFFFFF;
+  }
+  .testimonial-author { font-weight: 700; font-size: 13px; color: var(--amber); }
+
+  .game-preview {
+    width: 440px; flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 20px;
+    padding: 24px; border-radius: 24px;
+    background: var(--card-bg);
+    border: 1.5px solid var(--card-border);
+  }
+  .game-header { display: flex; justify-content: space-between; align-items: center; }
+  .game-round { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 16px; }
+  .btc-badge {
+    padding: 4px 10px; border-radius: 100px; background: var(--amber);
+    font-weight: 800; font-size: 11px; color: var(--dark-ink);
+  }
+  /* exported SVG has 8px shadow bleed on each side around the 392x125 design box */
+  .game-chart { width: 408px; max-width: none; height: auto; margin: -8px; border-radius: 6px; }
+  .question-card {
+    display: flex; flex-direction: column; gap: 12px;
+    padding: 16px; border-radius: 12px;
+    background: #090F30;
+    border: 1px solid var(--card-border);
+  }
+  .question-label { font-weight: 700; font-size: 13px; text-transform: uppercase; color: var(--muted); }
+  .question-text { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 15px; }
+  .answer-row { display: flex; gap: 8px; }
+  .btn-answer {
+    flex: 1; display: flex; justify-content: center;
+    padding: 8px 16px; border-radius: 6px;
+    font-weight: 700; font-size: 12px;
+    cursor: default; transition: filter 0.15s ease;
+  }
+  .btn-answer:hover { filter: brightness(1.1); }
+  .btn-yes { background: var(--green); color: var(--dark-ink); }
+  .btn-no { background: var(--dark-ink); border: 1px solid var(--card-border); color: #FFFFFF; }
+
+  /* ---------- CTA ---------- */
+  .cta { background: var(--bg-alt); }
+  .cta .wrap { padding: 120px 80px 200px; gap: 48px; }
+  .cta-headers { display: flex; flex-direction: column; align-items: center; gap: 32px; align-self: stretch; }
+  .cta h2 {
+    max-width: 1000px; font-weight: 900; font-size: 56px; line-height: 1.1; letter-spacing: -0.0179em;
+  }
+  .button-and-details { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+  .cta-button {
+    display: inline-flex; justify-content: center; align-items: center; gap: 12px;
+    padding: 20px 48px; border-radius: 100px;
+    background: var(--green);
+    box-shadow: 0px 8px 24px 0px rgba(18, 209, 108, 0.25);
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 20px; color: var(--bg);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+  }
+  .cta-button:hover {
+    transform: translateY(-2px); filter: brightness(1.05);
+    box-shadow: 0px 12px 30px 0px rgba(18, 209, 108, 0.35);
+  }
+  .cta-button:active { transform: translateY(0); }
+  .cta-caption { font-size: 13px; color: var(--muted); text-align: center; }
+  .cta-footer { display: flex; flex-direction: column; align-items: center; gap: 32px; }
+  .badge-row { display: flex; justify-content: center; gap: 12px; }
+  .badge-pill {
+    display: inline-flex; padding: 8px 16px; border-radius: 100px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    font-weight: 600; font-size: 12px; color: var(--body-text);
+    transition: border-color 0.18s ease;
+  }
+  .badge-pill:hover { border-color: #2C3B7E; }
+
+  /* ---------- responsive (desktop 1280–1920; graceful below) ---------- */
+  @media (max-width: 1100px) {
+    .hero .wrap { padding: 90px 40px 120px; }
+    .social .wrap { padding: 90px 40px 110px; }
+    .feature .wrap { padding: 100px 40px 110px; }
+    .cta .wrap { padding: 90px 40px 130px; }
+    h1 { font-size: 48px; }
+    h2 { font-size: 38px; }
+    .cta h2 { font-size: 42px; }
+    .showcase { flex-direction: column; width: auto; }
+    .info-column { min-height: 0; }
+  }
+  /* ---------- mobile layout (Figma 770:1053, design width 375) ---------- */
+  @media (max-width: 600px) {
+    /* orbs */
+    .orb-1 { left: -150px; top: -50px; width: 300px; height: 300px; background: #1E3A8A; filter: blur(40px); opacity: 0.4; }
+    .orb-2 { left: 150px; top: 550px; width: 250px; height: 250px; background: #3B2A8C; filter: blur(45px); opacity: 0.4; }
+    .orb-3 { left: -100px; top: 1200px; width: 320px; height: 280px; background: rgba(30, 58, 138, 0.47); filter: blur(50px); opacity: 0.3; }
+    .orb-4 { display: block; left: 80px; top: 1800px; width: 300px; height: 300px; background: #3B2A8C; filter: blur(40px); opacity: 0.35; }
+
+    .eyebrow { padding: 6px 16px; font-size: 11px; letter-spacing: 0.1818em; }
+
+    /* hero */
+    .hero .wrap { padding: 40px 20px 60px; gap: 32px; }
+    .hero-headings { gap: 16px; }
+    h1 { font-size: 34px; line-height: 1.15; letter-spacing: -0.0294em; }
+    .hero-sub { max-width: none; font-size: 15px; line-height: 1.5; }
+
+    /* chart card — uniform 0.8375 scale of the desktop card */
+    .chart-card {
+      width: 100%; max-width: 400px; height: 226.13px;
+      border-width: 0.8375px; border-radius: 16.75px;
+      box-shadow: 0px 20.1px 40.2px 0px rgba(0, 0, 0, 0.8), 0px 0px 67px 16.75px rgba(16, 185, 129, 0.08), inset 0px 0.8375px 0px 0px rgba(255, 255, 255, 0.03);
+    }
+    .chart-header { left: 23.45px; top: 23.45px; width: calc(100% - 46.9px); height: 17.59px; }
+    .chart-label-group { gap: 6.7px; }
+    .chart-label-accent { width: 2.51px; height: 11.73px; border-radius: 1.675px; }
+    .chart-label { font-size: 10.05px; }
+    .pulse-pill { padding: 3.35px 8.375px; gap: 5.025px; }
+    .pulse-dot { width: 5.03px; height: 5.03px; }
+    .pulse-label { font-size: 8.375px; }
+    .chart-svg { left: 23.45px; top: 54.44px; width: calc(100% - 46.9px); height: 134px; }
+
+    /* social proof */
+    .social .wrap { padding: 60px 20px; gap: 32px; }
+    .avatar { width: 56px; height: 56px; border-radius: 28px; border-width: 3px; font-size: 28px; }
+    .avatar + .avatar { margin-left: -12px; }
+    .social-text { gap: 16px; }
+    h2 { font-size: 28px; line-height: 1.2; letter-spacing: -0.0179em; }
+    .social h2 { max-width: none; }
+    .social-sub { max-width: none; font-size: 15px; line-height: 1.5; }
+
+    /* feature / showcase — stacked */
+    .feature .wrap { padding: 60px 20px; gap: 32px; align-items: stretch; }
+    .showcase { flex-direction: column; align-items: stretch; gap: 32px; width: auto; }
+    .info-column { min-height: 0; gap: 20px; }
+    .info-headers { gap: 12px; }
+    h3 { max-width: none; font-size: 26px; line-height: 1.2; }
+    .info-headers p { font-size: 15px; line-height: 1.55; }
+    .testimonial { align-self: stretch; padding: 16px; gap: 8px; border-radius: 12px; }
+    .testimonial-quote { max-width: none; font-size: 15px; line-height: 1.4; }
+    .testimonial-author { font-size: 12px; }
+
+    .game-preview { width: auto; padding: 18.27px; gap: 15.23px; border-width: 1.142px; border-radius: 18.27px; }
+    .game-round { font-size: 12.18px; }
+    .btc-badge { padding: 3.05px 7.61px; font-size: 8.375px; }
+    /* keep the SVG's 8/408 shadow bleed proportional so the design box fills the card */
+    .game-chart { width: 104.0816%; max-width: none; margin: -2.0408%; border-radius: 4.57px; }
+    .question-card { padding: 12.18px; gap: 9.14px; border-width: 0.76px; border-radius: 9.14px; }
+    .question-label { font-size: 9.9px; }
+    .question-text { font-size: 11.42px; }
+    .answer-row { gap: 6.09px; }
+    .btn-answer { padding: 6.09px 12.18px; border-radius: 4.57px; font-size: 9.14px; }
+    .btn-no { border-width: 0.76px; }
+
+    /* CTA */
+    .cta .wrap { padding: 60px 20px 80px; gap: 32px; }
+    .cta-headers { align-items: stretch; gap: 24px; }
+    .cta h2 { max-width: none; font-size: 28px; line-height: 1.2; letter-spacing: -0.0179em; }
+    .button-and-details { align-self: stretch; gap: 16px; }
+    .cta-button { align-self: stretch; padding: 16px 32px; font-size: 17px; box-shadow: 0px 6px 16px 0px rgba(18, 209, 108, 0.25); }
+    .cta-caption { max-width: 321px; font-size: 12px; }
+    .cta-footer { align-self: stretch; }
+    .badge-row { flex-direction: column; align-items: center; gap: 8px; }
+    .badge-pill { padding: 6px 12px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="orbs">
+    <div class="orbs-inner">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+      <div class="orb orb-4"></div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Be honest</div>
+      <div class="hero-headings">
+        <h1>Everyone's talking about the markets.<br><span class="amber">And you just nod along.</span></h1>
+        <p class="hero-sub">The charts, the candles, the "I closed a nice position this morning" — it all sounds like a language you never got taught.</p>
+      </div>
+      <div class="chart-card">
+        <div class="chart-glass-top"></div>
+        <div class="chart-header">
+          <div class="chart-label-group">
+            <span class="chart-label-accent"></span>
+            <span class="chart-label">BTC/USD Live</span>
+          </div>
+          <div class="pulse-pill">
+            <span class="pulse-dot"></span>
+            <span class="pulse-label">Active</span>
+          </div>
+        </div>
+        <img class="chart-svg" src="assets/chart.svg" alt="Live BTC/USD candlestick chart" width="344" height="160">
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIAL PROOF -->
+  <section class="social">
+    <div class="wrap">
+      <div class="avatar-cluster">
+        <div class="avatar avatar-blue">👩‍💼</div>
+        <div class="avatar avatar-rose">👨‍💻</div>
+        <div class="avatar avatar-amber">🏋️</div>
+      </div>
+      <div class="social-text">
+        <h2>Your coworker. Your cousin. <span class="amber">Even the guy at the gym.</span></h2>
+        <p class="social-sub">They're not smarter than you. They just started. Every month you wait, the conversation moves further without you.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE / GAME SHOWCASE -->
+  <section class="feature">
+    <div class="wrap">
+      <div class="showcase">
+        <div class="info-column">
+          <div class="info-headers">
+            <h3>Most people start with <span class="amber">one 60-second round.</span></h3>
+            <p>A game on Bitcoin's live price. Tap to enter, tap to exit. You'll understand more in one minute than in a year of nodding.</p>
+          </div>
+          <div class="testimonial">
+            <p class="testimonial-quote">"I finally get what my son keeps talking about."</p>
+            <p class="testimonial-author">— Karen, 54</p>
+          </div>
+        </div>
+        <div class="game-preview">
+          <div class="game-header">
+            <span class="game-round">ROUND 1/3</span>
+            <span class="btc-badge">BTC</span>
+          </div>
+          <img class="game-chart" src="assets/game-chart.svg" alt="Bitcoin candlestick chart, round in progress" width="392" height="125">
+          <div class="question-card">
+            <span class="question-label">The question</span>
+            <span class="question-text">Is this green bar a 'bullish' indicator?</span>
+            <div class="answer-row">
+              <span class="btn-answer btn-yes">YES</span>
+              <span class="btn-answer btn-no">NO</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="wrap">
+      <div class="eyebrow">Free · No sign-up</div>
+      <div class="cta-headers">
+        <h2>Next time markets come up — <span class="amber">you'll have something to say.</span></h2>
+        <div class="button-and-details">
+          <a class="cta-button" href="https://pavelwarf-stack.github.io/tap-web-proto/">Play your first round →</a>
+          <p class="cta-caption">60 seconds · Real Bitcoin charts · Nothing to download or install</p>
+        </div>
+      </div>
+      <div class="cta-footer">
+        <div class="badge-row">
+          <span class="badge-pill">No experience needed</span>
+          <span class="badge-pill">Plays right in the browser</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>
